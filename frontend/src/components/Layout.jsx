@@ -7,6 +7,7 @@ const NAV = [
   { to: '/fees',          label: '💰 Fees'           },
   { to: '/events',        label: '📅 Events'         },
   { to: '/announcements', label: '📢 Announcements'  },
+  { to: '/settings',      label: '⚙️  Settings'        },
 ]
 
 const styles = {

@@ -59,3 +59,24 @@ router.get('/regions/:country_id', async (req, res) => {
 })
 
 module.exports = router
+
+// ─── PATCH /schools/me ───────────────────────────────────────
+router.patch('/me', auth, async (req, res) => {
+  const allowed = ['name', 'phone', 'email', 'school_reg_number', 'address']
+  const update = {}
+  allowed.forEach(k => { if (req.body[k] !== undefined) update[k] = req.body[k] })
+  try {
+    const { data, error } = await supabase
+      .from('schools')
+      .update(update)
+      .eq('id', req.user.school_id)
+      .select()
+      .single()
+    if (error) throw error
+    res.json(data)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+module.exports = router

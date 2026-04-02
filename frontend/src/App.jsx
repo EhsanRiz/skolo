@@ -8,6 +8,7 @@ import Learners from './pages/Learners'
 import Fees from './pages/Fees'
 import Events from './pages/Events'
 import Announcements from './pages/Announcements'
+import Settings from './pages/Settings'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -39,6 +40,7 @@ export default function App() {
             <Route path="fees"          element={<Fees />} />
             <Route path="events"        element={<Events />} />
             <Route path="announcements" element={<Announcements />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
 
           {/* Fallback */}
