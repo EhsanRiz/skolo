@@ -25,7 +25,7 @@ const s = {
   saveBtn: { padding: '9px 18px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer' },
 }
 
-const statusColor = { paid: ['#dcfce7','#16a34a'], partial: ['#fef9c3','#ca8a04'], unpaid: ['#fee2e2','#dc2626'] }
+const statusColor = { paid: ['#dcfce7','#16a34a'], partial: ['#fef9c3','#ca8a04'], unpaid: ['#fee2e2','#dc2626'], 'no fees': ['#f1f5f9','#94a3b8'] }
 
 export default function Fees() {
   const { school } = useAuth()

@@ -167,7 +167,7 @@ router.get('/arrears', async (req, res) => {
         total_owed: totalOwed,
         total_paid: totalPaid,
         balance: totalOwed - totalPaid,
-        status: totalPaid >= totalOwed ? 'paid' : totalPaid > 0 ? 'partial' : 'unpaid'
+        status: totalOwed === 0 ? 'no fees' : totalPaid >= totalOwed ? 'paid' : totalPaid > 0 ? 'partial' : 'unpaid'
       }
     })
 

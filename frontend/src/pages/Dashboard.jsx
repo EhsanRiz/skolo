@@ -18,7 +18,7 @@ const s = {
   badge: { display: 'inline-block', padding: '2px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600 },
 }
 
-const statusColor = { paid: ['#dcfce7','#16a34a'], partial: ['#fef9c3','#ca8a04'], unpaid: ['#fee2e2','#dc2626'] }
+const statusColor = { paid: ['#dcfce7','#16a34a'], partial: ['#fef9c3','#ca8a04'], unpaid: ['#fee2e2','#dc2626'], 'no fees': ['#f1f5f9','#94a3b8'] }
 
 export default function Dashboard() {
   const { school } = useAuth()
@@ -34,6 +34,7 @@ export default function Dashboard() {
 
   const report  = arrears?.report || []
   const paid    = report.filter(r => r.status === 'paid').length
+  const noFees  = report.filter(r => r.status === 'no fees').length
   const partial = report.filter(r => r.status === 'partial').length
   const unpaid  = report.filter(r => r.status === 'unpaid').length
   const totalCollected = report.reduce((s, r) => s + r.total_paid, 0)
