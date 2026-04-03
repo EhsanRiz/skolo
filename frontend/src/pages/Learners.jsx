@@ -1,16 +1,53 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useToast } from '../contexts/ToastContext'
 import { IconEye, IconEdit, IconTrash, ActionBtn, t } from '../components/ui'
+import * as XLSX from 'xlsx'
+import Papa from 'papaparse'
 import api from '../lib/api'
 
 const phonePlaceholder = c => c === 'ZA' ? '082 000 0000' : 'XXXX XXXX'
 const phoneMaxLen      = c => c === 'ZA' ? 10 : 8
-
 const emptyL = { first_name: '', last_name: '', date_of_birth: '', gender: '', class_id: '' }
 const emptyG = { first_name: '', last_name: '', phone: '', email: '', relationship: 'mother' }
 
+// Download a blank import template
+function downloadTemplate() {
+  const headers = [['first_name','last_name','date_of_birth','gender','guardian_first_name','guardian_last_name','guardian_phone','guardian_email','guardian_relationship']]
+  const example = [['Sarah','Mokoena','2015-03-12','female','Anna','Mokoena','58001234','anna@email.com','mother']]
+  const ws = XLSX.utils.aoa_to_sheet([...headers, ...example])
+  ws['!cols'] = headers[0].map(() => ({ wch: 22 }))
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Learners')
+  XLSX.writeFile(wb, 'Skolo_Learner_Import_Template.xlsx')
+}
+
+// Parse uploaded file into row objects
+async function parseFile(file) {
+  return new Promise((resolve, reject) => {
+    const ext = file.name.split('.').pop().toLowerCase()
+    if (ext === 'csv') {
+      Papa.parse(file, {
+        header: true, skipEmptyLines: true,
+        complete: r => resolve(r.data),
+        error: reject
+      })
+    } else {
+      const reader = new FileReader()
+      reader.onload = e => {
+        const wb = XLSX.read(e.target.result, { type: 'array' })
+        const ws = wb.Sheets[wb.SheetNames[0]]
+        resolve(XLSX.utils.sheet_to_json(ws, { defval: '' }))
+      }
+      reader.onerror = reject
+      reader.readAsArrayBuffer(file)
+    }
+  })
+}
+
 export default function Learners() {
   const { school } = useAuth()
+  const toast = useToast()
   const cc = school?.countries?.code || 'LS'
 
   const [learners, setLearners] = useState([])
@@ -21,6 +58,13 @@ export default function Learners() {
   const [form,     setForm]     = useState(emptyL)
   const [guardian, setGuardian] = useState(emptyG)
   const [saving,   setSaving]   = useState(false)
+
+  // Import state
+  const [showImport,   setShowImport]   = useState(false)
+  const [importRows,   setImportRows]   = useState([])
+  const [importLoading, setImportLoading] = useState(false)
+  const [importResult,  setImportResult]  = useState(null)
+  const fileRef = useRef()
 
   const load = () => {
     api.get('/learners').then(r => setLearners(r.data)).catch(() => {})
@@ -48,30 +92,68 @@ export default function Learners() {
 
   const save = async e => {
     e.preventDefault(); setSaving(true)
-    try { await api.post('/learners', { learner: form, guardian }); close(); load() }
-    catch (err) { alert(err.response?.data?.error || 'Failed') }
+    try {
+      await api.post('/learners', { learner: form, guardian })
+      toast.success('Learner added successfully')
+      close(); load()
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed to save') }
     finally { setSaving(false) }
   }
 
   const update = async e => {
     e.preventDefault(); setSaving(true)
-    try { await api.patch(`/learners/${selected.id}`, form); close(); load() }
-    catch (err) { alert(err.response?.data?.error || 'Failed') }
+    try {
+      await api.patch(`/learners/${selected.id}`, form)
+      toast.success('Learner updated')
+      close(); load()
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed to update') }
     finally { setSaving(false) }
   }
 
   const remove = async id => {
     if (!confirm('Remove this learner? Records will be preserved.')) return
-    await api.delete(`/learners/${id}`); load()
+    try {
+      await api.delete(`/learners/${id}`)
+      toast.success('Learner removed')
+      load()
+    } catch (err) { toast.error('Failed to remove') }
   }
 
-  // Fix: getClassName — no extra space, just "Grade 1A"
+  // ── IMPORT ──────────────────────────────────────────────────
+  const handleFileSelect = async e => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      const rows = await parseFile(file)
+      setImportRows(rows)
+      setImportResult(null)
+    } catch { toast.error('Could not read file. Use CSV or Excel (.xlsx)') }
+    e.target.value = ''
+  }
+
+  const runImport = async () => {
+    if (!importRows.length) return
+    setImportLoading(true)
+    try {
+      const { data } = await api.post('/learners/bulk', { rows: importRows })
+      setImportResult(data)
+      if (data.imported > 0) {
+        toast.success(`${data.imported} learner${data.imported > 1 ? 's' : ''} imported successfully`)
+        load()
+      }
+      if (data.skipped > 0) toast.warning(`${data.skipped} row${data.skipped > 1 ? 's' : ''} skipped — see details below`)
+    } catch (err) { toast.error(err.response?.data?.error || 'Import failed') }
+    finally { setImportLoading(false) }
+  }
+
+  const closeImport = () => { setShowImport(false); setImportRows([]); setImportResult(null) }
+
+  // Grade/class helpers
   const getClassName = l => {
     if (!l.class_id) return '—'
     for (const g of grades) {
       const c = (g.classes || []).find(c => c.id === l.class_id)
       if (c) return `${g.name} ${c.name}`
-      // If class_id matches a grade id directly (grade without sub-class)
       if (g.id === l.class_id) return g.name
     }
     return '—'
@@ -80,8 +162,7 @@ export default function Learners() {
   const GradeSelect = () => {
     const hasClasses = grades.some(g => (g.classes || []).length > 0)
     if (hasClasses) return (
-      <>
-        <label style={t.label}>Grade / Class</label>
+      <><label style={t.label}>Grade / Class</label>
         <select style={t.input} name="class_id" value={form.class_id} onChange={hf}>
           <option value="">Select class…</option>
           {grades.map(g => (
@@ -89,25 +170,20 @@ export default function Learners() {
               {(g.classes || []).map(c => <option key={c.id} value={c.id}>{g.name}{c.name}</option>)}
             </optgroup>
           ))}
-        </select>
-      </>
+        </select></>
     )
     if (grades.length > 0) return (
-      <>
-        <label style={t.label}>Grade</label>
+      <><label style={t.label}>Grade</label>
         <select style={t.input} name="class_id" value={form.class_id} onChange={hf}>
           <option value="">Select grade…</option>
           {grades.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
-        </select>
-      </>
+        </select></>
     )
     return (
-      <>
-        <label style={t.label}>Grade / Class</label>
+      <><label style={t.label}>Grade / Class</label>
         <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 14, padding: '9px 13px', background: '#f8fafc', borderRadius: 9 }}>
-          No grades set up yet — go to Settings → Grades & Classes
-        </div>
-      </>
+          No grades yet — go to Settings → Grades & Classes
+        </div></>
     )
   }
 
@@ -118,6 +194,8 @@ export default function Learners() {
     </div>
   )
 
+  const PREVIEW_COLS = ['first_name','last_name','guardian_phone','gender']
+
   return (
     <div>
       {/* Header */}
@@ -126,7 +204,10 @@ export default function Learners() {
           <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>Learners</h1>
           <p style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>{learners.length} active learner{learners.length !== 1 ? 's' : ''}</p>
         </div>
-        <button style={t.btn.primary} onClick={openAdd}>+ Add learner</button>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button style={t.btn.ghost} onClick={() => setShowImport(true)}>⬆ Import</button>
+          <button style={t.btn.primary} onClick={openAdd}>+ Add learner</button>
+        </div>
       </div>
 
       {/* Search */}
@@ -151,7 +232,7 @@ export default function Learners() {
             {filtered.map(l => {
               const primary = l.learner_guardians?.find(lg => lg.is_primary)?.guardians
               return (
-                <tr key={l.id} style={{ transition: 'background 0.1s' }}
+                <tr key={l.id}
                   onMouseEnter={e => e.currentTarget.style.background = '#fafafa'}
                   onMouseLeave={e => e.currentTarget.style.background = ''}>
                   <td style={{ ...t.td, fontWeight: 600, color: '#0f172a' }}>{l.first_name} {l.last_name}</td>
@@ -166,20 +247,113 @@ export default function Learners() {
                 </tr>
               )
             })}
-            {filtered.length === 0 &&
-              <tr><td colSpan={5} style={{ ...t.td, color: '#94a3b8', textAlign: 'center', padding: '40px' }}>
+            {filtered.length === 0 && (
+              <tr><td colSpan={5} style={{ ...t.td, color: '#94a3b8', textAlign: 'center', padding: 40 }}>
                 No learners found.
               </td></tr>
-            }
+            )}
           </tbody>
         </table>
       </div>
+
+      {/* ── IMPORT MODAL ── */}
+      {showImport && (
+        <div style={t.overlay} onClick={e => e.target === e.currentTarget && closeImport()}>
+          <div style={{ ...t.modal, maxWidth: 640 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h2 style={{ fontSize: 19, fontWeight: 800 }}>Import learners</h2>
+              <button onClick={closeImport} style={{ background: '#f1f5f9', border: 'none', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 16 }}>✕</button>
+            </div>
+
+            {/* Step 1 — template */}
+            <div style={{ background: '#f8fafc', borderRadius: 10, padding: '14px 16px', marginBottom: 16 }}>
+              <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6 }}>Step 1 — Download the template</div>
+              <div style={{ fontSize: 13, color: '#64748b', marginBottom: 10 }}>
+                Fill in learner and guardian details. Required columns: <code style={{ background: '#e2e8f0', padding: '1px 6px', borderRadius: 4, fontSize: 12 }}>first_name</code> <code style={{ background: '#e2e8f0', padding: '1px 6px', borderRadius: 4, fontSize: 12 }}>last_name</code> <code style={{ background: '#e2e8f0', padding: '1px 6px', borderRadius: 4, fontSize: 12 }}>guardian_phone</code>
+              </div>
+              <button onClick={downloadTemplate} style={{ ...t.btn.ghost, fontSize: 13, padding: '7px 14px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                ⬇ Download Excel template
+              </button>
+            </div>
+
+            {/* Step 2 — upload */}
+            <div style={{ background: '#f8fafc', borderRadius: 10, padding: '14px 16px', marginBottom: 16 }}>
+              <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 10 }}>Step 2 — Upload your file</div>
+              <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" onChange={handleFileSelect} style={{ display: 'none' }} />
+              <button onClick={() => fileRef.current?.click()} style={{ ...t.btn.ghost, fontSize: 13, padding: '7px 14px' }}>
+                Choose CSV or Excel file…
+              </button>
+              {importRows.length > 0 && (
+                <span style={{ marginLeft: 12, fontSize: 13, color: '#16a34a', fontWeight: 600 }}>
+                  ✓ {importRows.length} row{importRows.length > 1 ? 's' : ''} loaded
+                </span>
+              )}
+            </div>
+
+            {/* Preview */}
+            {importRows.length > 0 && !importResult && (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 8 }}>
+                  Preview — first {Math.min(5, importRows.length)} of {importRows.length} rows
+                </div>
+                <div style={{ overflowX: 'auto', borderRadius: 8, border: '1px solid #e2e8f0' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                    <thead>
+                      <tr>
+                        {PREVIEW_COLS.map(c => <th key={c} style={{ ...t.th, fontSize: 11 }}>{c}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {importRows.slice(0, 5).map((row, i) => (
+                        <tr key={i}>
+                          {PREVIEW_COLS.map(c => <td key={c} style={{ ...t.td, padding: '8px 12px' }}>{row[c] || '—'}</td>)}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Result */}
+            {importResult && (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, padding: '14px 16px', marginBottom: importResult.errors.length ? 10 : 0 }}>
+                  <div style={{ fontWeight: 700, color: '#15803d', marginBottom: 4 }}>Import complete</div>
+                  <div style={{ fontSize: 13, color: '#14532d' }}>
+                    ✓ {importResult.imported} imported · {importResult.skipped} skipped
+                  </div>
+                </div>
+                {importResult.errors.length > 0 && (
+                  <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 10, padding: '14px 16px', maxHeight: 140, overflowY: 'auto' }}>
+                    <div style={{ fontWeight: 700, color: '#dc2626', marginBottom: 6, fontSize: 13 }}>Skipped rows</div>
+                    {importResult.errors.map((e, i) => (
+                      <div key={i} style={{ fontSize: 12, color: '#7f1d1d', marginBottom: 3 }}>• {e}</div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button style={t.btn.ghost} onClick={closeImport}>
+                {importResult ? 'Close' : 'Cancel'}
+              </button>
+              {!importResult && (
+                <button style={t.btn.primary} disabled={!importRows.length || importLoading} onClick={runImport}>
+                  {importLoading ? 'Importing…' : `Import ${importRows.length} learners`}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ADD MODAL */}
       {modal === 'add' && (
         <div style={t.overlay} onClick={e => e.target === e.currentTarget && close()}>
           <div style={t.modal}>
-            <h2 style={{ fontSize: 19, fontWeight: 800, marginBottom: 20, color: '#0f172a' }}>Add learner</h2>
+            <h2 style={{ fontSize: 19, fontWeight: 800, marginBottom: 20 }}>Add learner</h2>
             <form onSubmit={save}>
               <div style={t.sectionLabel}>Learner details</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -194,7 +368,6 @@ export default function Learners() {
                   </select></div>
               </div>
               <GradeSelect />
-
               <div style={t.sectionLabel}>Parent / Guardian</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div><label style={t.label}>First name *</label><input style={t.input} name="first_name" value={guardian.first_name} onChange={hg} required /></div>

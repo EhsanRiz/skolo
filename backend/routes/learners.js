@@ -130,4 +130,47 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
-module.exports = router
+
+// ─── POST /learners/bulk ─────────────────────────────────────
+router.post('/bulk', async (req, res) => {
+  const { rows } = req.body
+  const school_id = req.user.school_id
+  if (!Array.isArray(rows) || !rows.length)
+    return res.status(400).json({ error: 'No rows provided' })
+
+  const results = { imported: 0, skipped: 0, errors: [] }
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i]
+    try {
+      if (!row.first_name || !row.last_name) {
+        results.skipped++; results.errors.push(`Row ${i+2}: missing name`); continue
+      }
+      if (!row.guardian_phone) {
+        results.skipped++; results.errors.push(`Row ${i+2}: ${row.first_name} — missing guardian_phone`); continue
+      }
+      const { data: learner, error: lErr } = await supabase.from('learners')
+        .insert({ school_id, first_name: row.first_name.trim(), last_name: row.last_name.trim(),
+          date_of_birth: row.date_of_birth || null, gender: row.gender || null })
+        .select().single()
+      if (lErr) throw lErr
+
+      const { data: guardian, error: gErr } = await supabase.from('guardians')
+        .insert({ school_id,
+          first_name:   (row.guardian_first_name || row.first_name).trim(),
+          last_name:    (row.guardian_last_name  || row.last_name).trim(),
+          phone:        row.guardian_phone.toString().trim(),
+          email:        row.guardian_email || null,
+          relationship: row.guardian_relationship || 'guardian' })
+        .select().single()
+      if (gErr) throw gErr
+
+      await supabase.from('learner_guardians')
+        .insert({ learner_id: learner.id, guardian_id: guardian.id, is_primary: true })
+      results.imported++
+    } catch (err) {
+      results.skipped++; results.errors.push(`Row ${i+2}: ${err.message}`)
+    }
+  }
+  res.json(results)
+})

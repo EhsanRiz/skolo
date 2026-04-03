@@ -1,13 +1,52 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useToast } from '../contexts/ToastContext'
 import { Badge, t } from '../components/ui'
+import * as XLSX from 'xlsx'
 import api from '../lib/api'
 
 const TABS = ['arrears', 'payments', 'schedules']
 
+function exportArrears(report, sym, schoolName) {
+  const rows = report.map(r => ({
+    'Learner':        r.name,
+    'Grade':          `${r.grade} ${r.class !== '—' ? r.class : ''}`.trim(),
+    'Guardian Phone': r.guardian_phone,
+    [`Owed (${sym})`]:  r.total_owed,
+    [`Paid (${sym})`]:  r.total_paid,
+    [`Balance (${sym})`]: r.balance,
+    'Status':         r.status,
+  }))
+  const ws = XLSX.utils.json_to_sheet(rows)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Arrears')
+  // Column widths
+  ws['!cols'] = [{ wch: 22 }, { wch: 12 }, { wch: 16 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 10 }]
+  XLSX.writeFile(wb, `${schoolName}_Arrears_${new Date().toISOString().slice(0,10)}.xlsx`)
+}
+
+function exportPayments(payments, sym, schoolName) {
+  const rows = payments.map(p => ({
+    'Date':           new Date(p.payment_date).toLocaleDateString('en-ZA'),
+    'Learner':        `${p.learners?.first_name} ${p.learners?.last_name}`,
+    'Fee Schedule':   p.fee_schedules?.name || '—',
+    [`Amount (${sym})`]: Number(p.amount_paid),
+    'Method':         p.payment_method,
+    'Reference':      p.reference || '',
+  }))
+  const ws = XLSX.utils.json_to_sheet(rows)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Payments')
+  ws['!cols'] = [{ wch: 14 }, { wch: 22 }, { wch: 28 }, { wch: 14 }, { wch: 10 }, { wch: 18 }]
+  XLSX.writeFile(wb, `${schoolName}_Payments_${new Date().toISOString().slice(0,10)}.xlsx`)
+}
+
 export default function Fees() {
   const { school } = useAuth()
+  const toast = useToast()
   const sym = school?.countries?.currency_symbol || 'R'
+  const schoolName = school?.name || 'School'
+
   const [tab, setTab]           = useState('arrears')
   const [schedules, setSchedules] = useState([])
   const [payments,  setPayments]  = useState([])
@@ -31,26 +70,48 @@ export default function Fees() {
 
   const saveSched = async e => {
     e.preventDefault(); setSaving(true)
-    try { await api.post('/fees/schedules', sf); setShowSched(false); loadAll() }
-    catch (err) { alert(err.response?.data?.error || 'Failed') }
+    try {
+      await api.post('/fees/schedules', sf)
+      setShowSched(false)
+      toast.success('Fee schedule created')
+      loadAll()
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed to create schedule') }
     finally { setSaving(false) }
   }
 
   const savePay = async e => {
     e.preventDefault(); setSaving(true)
-    try { await api.post('/fees/payments', pf); setShowPay(false); loadAll() }
-    catch (err) { alert(err.response?.data?.error || 'Failed') }
+    try {
+      await api.post('/fees/payments', pf)
+      setShowPay(false)
+      toast.success('Payment recorded successfully')
+      loadAll()
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed to record payment') }
     finally { setSaving(false) }
   }
 
   const report = arrears?.report || []
+
+  const ExportBtn = ({ onClick, label }) => (
+    <button onClick={onClick} style={{
+      display: 'flex', alignItems: 'center', gap: 6,
+      padding: '7px 14px', background: '#f0fdf4', color: '#15803d',
+      border: '1px solid #86efac', borderRadius: 8,
+      fontWeight: 600, fontSize: 13, cursor: 'pointer'
+    }}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      {label}
+    </button>
+  )
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>Fees</h1>
-          <p style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>Manage fee schedules, record payments and track arrears</p>
+          <p style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>Fee schedules, payments and arrears</p>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
           <button style={t.btn.ghost} onClick={() => setShowSched(true)}>+ Fee schedule</button>
@@ -58,55 +119,51 @@ export default function Fees() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: 2, marginBottom: 20, background: '#f1f5f9', borderRadius: 10, padding: 4, width: 'fit-content' }}>
-        {TABS.map(tb => (
-          <button key={tb} onClick={() => setTab(tb)} style={{
-            padding: '8px 18px', borderRadius: 8, border: 'none', cursor: 'pointer',
-            fontWeight: 600, fontSize: 13, transition: 'all 0.15s',
-            background: tab === tb ? '#fff' : 'none',
-            color: tab === tb ? '#1d4ed8' : '#64748b',
-            boxShadow: tab === tb ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
-          }}>
-            {tb.charAt(0).toUpperCase() + tb.slice(1)}
-          </button>
-        ))}
+      {/* Tabs + export */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <div style={{ display: 'flex', gap: 2, background: '#f1f5f9', borderRadius: 10, padding: 4 }}>
+          {TABS.map(tb => (
+            <button key={tb} onClick={() => setTab(tb)} style={{
+              padding: '8px 18px', borderRadius: 8, border: 'none', cursor: 'pointer',
+              fontWeight: 600, fontSize: 13, transition: 'all .15s',
+              background: tab === tb ? '#fff' : 'none',
+              color: tab === tb ? '#1d4ed8' : '#64748b',
+              boxShadow: tab === tb ? '0 1px 3px rgba(0,0,0,.1)' : 'none'
+            }}>{tb.charAt(0).toUpperCase() + tb.slice(1)}</button>
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {tab === 'arrears'  && <ExportBtn label="Export arrears"  onClick={() => { exportArrears(report, sym, schoolName); toast.success('Arrears exported to Excel') }} />}
+          {tab === 'payments' && <ExportBtn label="Export payments" onClick={() => { exportPayments(payments, sym, schoolName); toast.success('Payments exported to Excel') }} />}
+        </div>
       </div>
 
       <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
 
-          {/* ARREARS */}
           {tab === 'arrears' && <>
             <thead><tr>
-              {['Learner','Grade','Guardian phone','Owed','Paid','Balance','Status'].map(h =>
-                <th key={h} style={t.th}>{h}</th>
-              )}
+              {['Learner','Grade','Guardian phone','Owed','Paid','Balance','Status'].map(h => <th key={h} style={t.th}>{h}</th>)}
             </tr></thead>
             <tbody>
               {report.map(r => (
                 <tr key={r.id}>
-                  <td style={{ ...t.td, fontWeight: 600, color: '#0f172a' }}>{r.name}</td>
+                  <td style={{ ...t.td, fontWeight: 600 }}>{r.name}</td>
                   <td style={t.td}>{r.grade} {r.class !== '—' ? r.class : ''}</td>
                   <td style={t.td}>{r.guardian_phone}</td>
                   <td style={t.td}>{sym}{r.total_owed.toLocaleString()}</td>
                   <td style={t.td}>{sym}{r.total_paid.toLocaleString()}</td>
-                  <td style={{ ...t.td, fontWeight: 700, color: r.balance > 0 ? '#dc2626' : '#16a34a' }}>
-                    {sym}{r.balance.toLocaleString()}
-                  </td>
+                  <td style={{ ...t.td, fontWeight: 700, color: r.balance > 0 ? '#dc2626' : '#16a34a' }}>{sym}{r.balance.toLocaleString()}</td>
                   <td style={t.td}><Badge status={r.status} /></td>
                 </tr>
               ))}
-              {report.length === 0 && <tr><td colSpan={7} style={{ ...t.td, color: '#94a3b8', textAlign: 'center', padding: 40 }}>No data yet.</td></tr>}
+              {!report.length && <tr><td colSpan={7} style={{ ...t.td, color: '#94a3b8', textAlign: 'center', padding: 40 }}>No data yet.</td></tr>}
             </tbody>
           </>}
 
-          {/* PAYMENTS */}
           {tab === 'payments' && <>
             <thead><tr>
-              {['Date','Learner','Fee schedule','Amount','Method','Reference'].map(h =>
-                <th key={h} style={t.th}>{h}</th>
-              )}
+              {['Date','Learner','Fee schedule','Amount','Method','Reference'].map(h => <th key={h} style={t.th}>{h}</th>)}
             </tr></thead>
             <tbody>
               {payments.map(p => (
@@ -119,16 +176,13 @@ export default function Fees() {
                   <td style={t.td}>{p.reference || '—'}</td>
                 </tr>
               ))}
-              {payments.length === 0 && <tr><td colSpan={6} style={{ ...t.td, color: '#94a3b8', textAlign: 'center', padding: 40 }}>No payments recorded yet.</td></tr>}
+              {!payments.length && <tr><td colSpan={6} style={{ ...t.td, color: '#94a3b8', textAlign: 'center', padding: 40 }}>No payments recorded yet.</td></tr>}
             </tbody>
           </>}
 
-          {/* SCHEDULES */}
           {tab === 'schedules' && <>
             <thead><tr>
-              {['Name','Year','Term','Amount','Due date'].map(h =>
-                <th key={h} style={t.th}>{h}</th>
-              )}
+              {['Name','Year','Term','Amount','Due date'].map(h => <th key={h} style={t.th}>{h}</th>)}
             </tr></thead>
             <tbody>
               {schedules.map(sc => (
@@ -140,10 +194,9 @@ export default function Fees() {
                   <td style={t.td}>{sc.due_date ? new Date(sc.due_date).toLocaleDateString('en-ZA') : '—'}</td>
                 </tr>
               ))}
-              {schedules.length === 0 && <tr><td colSpan={5} style={{ ...t.td, color: '#94a3b8', textAlign: 'center', padding: 40 }}>No fee schedules yet.</td></tr>}
+              {!schedules.length && <tr><td colSpan={5} style={{ ...t.td, color: '#94a3b8', textAlign: 'center', padding: 40 }}>No fee schedules yet.</td></tr>}
             </tbody>
           </>}
-
         </table>
       </div>
 
