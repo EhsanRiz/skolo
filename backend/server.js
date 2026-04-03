@@ -15,7 +15,8 @@ app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, curl, Render health checks)
     if (!origin) return callback(null, true)
-    // Allow any skolo.pages.dev subdomain
+    // Allow skolo.pages.dev (production) and any subdomain preview URLs
+    if (origin === 'https://skolo.pages.dev') return callback(null, true)
     if (origin.endsWith('.skolo.pages.dev') || origin.endsWith('.skolo.app')) return callback(null, true)
     if (allowedOrigins.includes(origin)) return callback(null, true)
     callback(new Error(`CORS: origin ${origin} not allowed`))
