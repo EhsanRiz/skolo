@@ -177,7 +177,7 @@ router.post('/generate-for-learner', async (req, res) => {
     const { data: plans } = await planQuery
 
     const eligible = (plans||[]).filter(p => !p.grade_id || p.grade_id === learner.classes?.grade_id)
-    if (!eligible.length) return res.json({ created: 0, message: 'No fee plans match this learner's grade' })
+    if (!eligible.length) return res.json({ created: 0, message: 'No fee plans match this learner grade' })
 
     // Check existing
     const m = String(mo).padStart(2,'0')
