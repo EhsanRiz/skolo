@@ -13,6 +13,7 @@ import Settings from './pages/Settings'
 import ParentPortal from './pages/ParentPortal'
 import LearnerProfile from './pages/LearnerProfile'
 import Waivers from './pages/Waivers'
+import MyClasses from './pages/MyClasses'
 import SetPassword from './pages/SetPassword'
 
 function ProtectedRoute({ children }) {
@@ -47,6 +48,7 @@ export default function App() {
             <Route path="learners"      element={<Learners />} />
             <Route path="learners/:id" element={<LearnerProfile />} />
             <Route path="waivers"      element={<Waivers />} />
+            <Route path="my-classes"    element={<MyClasses />} />
             <Route path="fees"          element={<Fees />} />
             <Route path="events"        element={<Events />} />
             <Route path="announcements" element={<Announcements />} />

@@ -65,11 +65,13 @@ export default function Settings() {
   const loadGrades   = () => api.get('/grades').then(r=>setGrades(r.data)).catch(()=>{})
   const loadFeePlans = () => api.get('/fee-plans').then(r=>setFeePlans(r.data)).catch(()=>{})
   const loadTeachers = () => api.get('/teachers').then(r=>setTeachers(r.data)).catch(()=>{})
+  const [teacherClasses, setTeacherClasses] = useState([])
+  const loadTeacherClasses = () => api.get('/teacher-classes').then(r=>setTeacherClasses(r.data)).catch(()=>{})
   const loadUsers    = () => api.get('/users').then(r=>setUsers(r.data)).catch(()=>{})
 
   useEffect(() => { loadGrades() }, [])
   useEffect(() => { if (tab==='feeplans') loadFeePlans() }, [tab])
-  useEffect(() => { if (tab==='teachers') { loadTeachers(); loadGrades() } }, [tab])
+  useEffect(() => { if (tab==='teachers') { loadTeachers(); loadGrades(); loadTeacherClasses() } }, [tab])
   useEffect(() => { if (tab==='users') loadUsers() }, [tab])
   useEffect(() => {
     if (school) {
@@ -153,6 +155,34 @@ export default function Settings() {
     if(!confirm('Deactivate this teacher?')) return
     try{ await api.delete(`/teachers/${id}`); loadTeachers(); toast.success('Teacher deactivated') }
     catch{ toast.error('Failed') }
+  }
+
+  // Class assignment
+  const [assignTeacher, setAssignTeacher] = useState(null)
+  const [assignForm, setAssignForm] = useState({ class_id:'', subject:'', is_home_class:false })
+  const openAssignClass = tc => { setAssignTeacher(tc); setAssignForm({ class_id:'', subject:'', is_home_class:false }) }
+  const saveClassAssignment = async e => {
+    e.preventDefault(); setSaving(true)
+    try {
+      await api.post('/teacher-classes', { teacher_id: assignTeacher.id, ...assignForm })
+      setAssignTeacher(null); loadTeacherClasses(); toast.success('Class assigned')
+    } catch(err) { toast.error(err.response?.data?.error||'Failed') }
+    finally { setSaving(false) }
+  }
+  const removeTeacherClass = async id => {
+    try { await api.delete(`/teacher-classes/${id}`); loadTeacherClasses(); toast.success('Class removed') }
+    catch { toast.error('Failed') }
+  }
+
+  // Link user account to teacher
+  const [linkTeacher, setLinkTeacher] = useState(null)
+  const [linkUserId, setLinkUserId] = useState('')
+  const openLinkUser = tc => { setLinkTeacher(tc); setLinkUserId(tc.user_id||'') }
+  const saveLinkUser = async () => {
+    try {
+      await api.patch(`/teacher-classes/link-user/${linkTeacher.id}`, { user_id: linkUserId||null })
+      setLinkTeacher(null); loadTeachers(); toast.success('Account linked')
+    } catch(err) { toast.error(err.response?.data?.error||'Failed') }
   }
 
   // ── PROFILE ───────────────────────────────────────────────────
@@ -601,7 +631,7 @@ export default function Settings() {
               <input style={t.input} type="email" value={editForm.email} onChange={e=>setEditForm(f=>({...f,email:e.target.value}))} required/>
               <label style={t.label}>Role</label>
               <select style={t.input} value={editForm.role} onChange={e=>setEditForm(f=>({...f,role:e.target.value}))}>
-                <option value="bursar">Bursar</option><option value="principal">Principal</option><option value="admin">Admin</option>
+                <option value="teacher">Teacher</option><option value="teacher">Teacher</option><option value="bursar">Bursar</option><option value="principal">Principal</option><option value="admin">Admin</option>
               </select>
               <label style={t.label}>New password <span style={{color:'#94a3b8',fontWeight:400}}>(leave blank to keep current)</span></label>
               <input style={t.input} type="password" value={editForm.password} onChange={e=>setEditForm(f=>({...f,password:e.target.value}))} minLength={8} placeholder="Min 8 characters"/>
@@ -610,6 +640,59 @@ export default function Settings() {
                 <button type="submit" style={t.btn.primary} disabled={saving}>{saving?'Saving…':'Save changes'}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── ASSIGN CLASS MODAL ── */}
+      {assignTeacher && (
+        <div style={t.overlay} onClick={e=>e.target===e.currentTarget&&setAssignTeacher(null)}>
+          <div style={{...t.modal,maxWidth:420}}>
+            <h2 style={{fontSize:18,fontWeight:800,marginBottom:6}}>Assign class</h2>
+            <p style={{fontSize:13,color:'#64748b',marginBottom:20}}>Assign {assignTeacher.full_name} to a class and subject.</p>
+            <form onSubmit={saveClassAssignment}>
+              <label style={t.label}>Class *</label>
+              <select style={t.input} value={assignForm.class_id} onChange={e=>setAssignForm(f=>({...f,class_id:e.target.value}))} required>
+                <option value="">Select class…</option>
+                {classOptions.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+              <label style={t.label}>Subject they teach in this class</label>
+              <input style={t.input} value={assignForm.subject} onChange={e=>setAssignForm(f=>({...f,subject:e.target.value}))} placeholder="e.g. Mathematics, English"/>
+              <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}>
+                <input type="checkbox" id="home_class" checked={assignForm.is_home_class} onChange={e=>setAssignForm(f=>({...f,is_home_class:e.target.checked}))} style={{width:16,height:16,cursor:'pointer'}}/>
+                <label htmlFor="home_class" style={{fontSize:13,fontWeight:600,color:'#374151',cursor:'pointer'}}>This is their home / form class 🏠</label>
+              </div>
+              <div style={{display:'flex',gap:10,justifyContent:'flex-end'}}>
+                <button type="button" style={t.btn.ghost} onClick={()=>setAssignTeacher(null)}>Cancel</button>
+                <button type="submit" style={t.btn.primary} disabled={saving}>{saving?'Saving…':'Assign class'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── LINK USER MODAL ── */}
+      {linkTeacher && (
+        <div style={t.overlay} onClick={e=>e.target===e.currentTarget&&setLinkTeacher(null)}>
+          <div style={{...t.modal,maxWidth:420}}>
+            <h2 style={{fontSize:18,fontWeight:800,marginBottom:6}}>Link login account</h2>
+            <p style={{fontSize:13,color:'#64748b',marginBottom:20}}>
+              Link {linkTeacher.full_name}'s record to a staff login account so they can access My Classes.
+            </p>
+            <label style={t.label}>Staff account</label>
+            <select style={t.input} value={linkUserId} onChange={e=>setLinkUserId(e.target.value)}>
+              <option value="">Select account…</option>
+              {users.filter(u=>u.is_active).map(u=>(
+                <option key={u.id} value={u.id}>{u.full_name} ({u.email}) · {u.role}</option>
+              ))}
+            </select>
+            <div style={{background:'#f0fdf4',border:'1px solid #86efac',borderRadius:9,padding:'10px 14px',marginBottom:16,fontSize:13,color:'#15803d'}}>
+              💡 Invite the teacher as staff (role: teacher) in the Staff Accounts tab first, then link here.
+            </div>
+            <div style={{display:'flex',gap:10,justifyContent:'flex-end'}}>
+              <button style={t.btn.ghost} onClick={()=>setLinkTeacher(null)}>Cancel</button>
+              <button style={t.btn.primary} onClick={saveLinkUser}>Link account</button>
+            </div>
           </div>
         </div>
       )}
@@ -629,7 +712,7 @@ export default function Settings() {
               <input style={t.input} type="email" value={userForm.email} onChange={e=>setUserForm(f=>({...f,email:e.target.value}))} required/>
               <label style={t.label}>Role</label>
               <select style={t.input} value={userForm.role} onChange={e=>setUserForm(f=>({...f,role:e.target.value}))}>
-                <option value="bursar">Bursar</option><option value="principal">Principal</option><option value="admin">Admin</option>
+                <option value="teacher">Teacher</option><option value="teacher">Teacher</option><option value="bursar">Bursar</option><option value="principal">Principal</option><option value="admin">Admin</option>
               </select>
               <div style={{display:'flex',gap:10,justifyContent:'flex-end',marginTop:4}}>
                 <button type="button" style={t.btn.ghost} onClick={()=>setShowAddUser(false)}>Cancel</button>
