@@ -142,7 +142,7 @@ function OverviewTab({ learner, school }) {
   )
 }
 
-function FeesTab({ learnerId, sym }) {
+function FeesTab({ learnerId, sym, isReadOnly }) {
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [payEntry, setPayEntry] = useState(null)
@@ -255,7 +255,7 @@ function FeesTab({ learnerId, sym }) {
                     <td style={{ padding:'11px 14px', fontSize:13, fontWeight:700, color:bal>0?'#dc2626':'#16a34a' }}>{sym}{bal.toLocaleString()}</td>
                     <td style={{ padding:'11px 14px' }}><span style={{ background:bg, color:col, padding:'2px 9px', borderRadius:20, fontSize:11, fontWeight:700 }}>{e.status}</span></td>
                     <td style={{ padding:'11px 14px' }}>
-                      {e.status!=='paid' && <button onClick={()=>openPay(e)} style={{ padding:'5px 12px', background:'#0f2044', color:'#fff', border:'none', borderRadius:7, fontSize:12, fontWeight:700, cursor:'pointer' }}>Pay</button>}
+                      {e.status!=='paid' && !isReadOnly && <button onClick={()=>openPay(e)} style={{ padding:'5px 12px', background:'#0f2044', color:'#fff', border:'none', borderRadius:7, fontSize:12, fontWeight:700, cursor:'pointer' }}>Pay</button>}
                     </td>
                   </tr>
                 )
@@ -724,7 +724,7 @@ export default function LearnerProfile() {
 
         {/* Tab content */}
         {tab === 'overview' && <OverviewTab learner={learner} school={school} />}
-        {tab === 'fees'     && <FeesTab learnerId={id} sym={sym} />}
+        {tab === 'fees'     && <FeesTab learnerId={id} sym={sym} isReadOnly={['principal'].includes(user?.role)} />}
         {(tab === 'grades' || tab === 'awards' || tab === 'notes') && <PremiumGate tab={tab} learnerId={id} />}
       </div>
     </>
