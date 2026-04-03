@@ -106,7 +106,6 @@ export default function Fees() {
   const [month,     setMonth]     = useState(new Date().toISOString().slice(0,7))
   const [search,    setSearch]    = useState('')
   const [statusFilter, setStatusFilter] = useState('unpaid') // 'all'|'overdue'|'partial'|'unpaid'|'paid'
-  const [showPaid,  setShowPaid]  = useState(false)
   const [expanded,  setExpanded]  = useState({}) // grade name → bool
   const searchRef = useRef()
 
@@ -169,10 +168,7 @@ export default function Fees() {
     } else if (statusFilter === 'paid') {
       rows = rows.filter(r => r.status === 'paid')
     }
-    // 'all' → no filter, but respect showPaid toggle
-    if (statusFilter === 'all' && !showPaid) {
-      rows = rows.filter(r => r.status !== 'paid')
-    }
+    // 'all' → show everything, no additional filter
 
     // Group by grade
     const groups = {}
@@ -183,7 +179,7 @@ export default function Fees() {
     })
 
     return { isSearch: false, groups }
-  }, [ledger, search, statusFilter, showPaid])
+  }, [ledger, search, statusFilter])
 
   // Status pill counts
   const counts = useMemo(() => ({
@@ -194,11 +190,24 @@ export default function Fees() {
     paid:    ledger.filter(r=>r.status==='paid').length,
   }), [ledger])
 
-  // Monthly totals
-  const monthDue     = ledger.reduce((s,r)=>s+Number(r.amount_due),0)
-  const monthPaid    = ledger.reduce((s,r)=>s+Number(r.amount_paid),0)
+  // Filtered totals — reflect the current status pill selection
+  const filteredRows = useMemo(() => {
+    if (search.trim()) return []
+    if (statusFilter === 'unpaid')  return ledger.filter(r=>r.status!=='paid')
+    if (statusFilter === 'overdue') return ledger.filter(r=>r.status==='overdue')
+    if (statusFilter === 'partial') return ledger.filter(r=>r.status==='partial')
+    if (statusFilter === 'paid')    return ledger.filter(r=>r.status==='paid')
+    return ledger // 'all'
+  }, [ledger, statusFilter, search])
+
+  const monthDue     = filteredRows.reduce((s,r)=>s+Number(r.amount_due),0)
+  const monthPaid    = filteredRows.reduce((s,r)=>s+Number(r.amount_paid),0)
   const monthBalance = monthDue - monthPaid
   const pct = monthDue > 0 ? Math.round(monthPaid/monthDue*100) : 0
+  // Always use full ledger for collection rate context
+  const fullDue  = ledger.reduce((s,r)=>s+Number(r.amount_due),0)
+  const fullPaid = ledger.reduce((s,r)=>s+Number(r.amount_paid),0)
+  const fullPct  = fullDue > 0 ? Math.round(fullPaid/fullDue*100) : 0
 
   const [my, mm] = month.split('-')
   const monthLabel = `${MONTHS[parseInt(mm,10)-1]} ${my}`
@@ -426,18 +435,21 @@ export default function Fees() {
           )}
         </div>
 
-        {/* Monthly summary bar */}
-        {!loading && ledger.length > 0 && (
+        {/* Summary bar — always visible, reflects current filter */}
+        {!loading && (
           <div style={{ display:'flex', gap:0, marginBottom:16, background:'#fff', borderRadius:10, overflow:'hidden', boxShadow:'0 1px 3px rgba(0,0,0,.06)', border:'1px solid #e2e8f0' }}>
             {[
-              { label:'Due',         value:`${sym}${monthDue.toLocaleString()}`,     color:'#0f172a' },
+              { label: statusFilter==='all' ? 'Total due' : `${statusFilter.charAt(0).toUpperCase()+statusFilter.slice(1)} — due`,
+                value:`${sym}${monthDue.toLocaleString()}`, color:'#0f172a' },
               { label:'Collected',   value:`${sym}${monthPaid.toLocaleString()}`,    color:'#16a34a' },
               { label:'Outstanding', value:`${sym}${monthBalance.toLocaleString()}`, color: monthBalance>0?'#dc2626':'#16a34a' },
-              { label:'Collection rate', value:`${pct}%`,                           color: pct>=80?'#16a34a':pct>=50?'#ca8a04':'#dc2626' },
+              { label:'Collection rate (month)', value:`${fullPct}%`,               color: fullPct>=80?'#16a34a':fullPct>=50?'#ca8a04':'#dc2626' },
             ].map((c, i) => (
               <div key={c.label} style={{ flex:1, padding:'12px 20px', borderLeft: i>0?'1px solid #f1f5f9':'none' }}>
                 <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.6px', marginBottom:4 }}>{c.label}</div>
-                <div style={{ fontSize:20, fontWeight:800, color:c.color }}>{c.value}</div>
+                <div style={{ fontSize:20, fontWeight:800, color:c.color }}>
+                  {ledger.length===0 ? <span style={{color:'#94a3b8',fontSize:14}}>No entries</span> : c.value}
+                </div>
               </div>
             ))}
           </div>
