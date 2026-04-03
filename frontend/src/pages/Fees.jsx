@@ -271,6 +271,18 @@ export default function Fees() {
   const [payForm,  setPayForm]  = useState({ amount:'', payment_method:'cash', notes:'' })
   const [paying,   setPaying]   = useState(false)
 
+  const [autoGenMsg, setAutoGenMsg] = useState('')
+
+  const autoGenerate = async () => {
+    try {
+      const { data } = await api.post('/fee-ledger/auto-generate')
+      if (data.created > 0) {
+        setAutoGenMsg(`✓ ${data.created} fee entr${data.created>1?'ies':'y'} auto-generated`)
+        setTimeout(() => setAutoGenMsg(''), 6000)
+      }
+    } catch { /* silent fail */ }
+  }
+
   const loadLedger = async () => {
     setLoading(true)
     try {
@@ -292,7 +304,7 @@ export default function Fees() {
     try { const { data } = await api.get(`/fee-ledger/summary?year=${year}`); setSummary(data) } catch { }
   }
 
-  useEffect(() => { loadLedger(); loadSummary() }, [])
+  useEffect(() => { autoGenerate().then(() => { loadLedger(); loadSummary() }) }, [])
   useEffect(() => { loadLedger() }, [month])
 
   // Compute filtered + grouped ledger
@@ -533,7 +545,10 @@ export default function Fees() {
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
           <div>
             <h1 style={{ fontSize:22, fontWeight:800, color:'#0f172a', letterSpacing:'-0.3px' }}>Fees</h1>
-            <p style={{ fontSize:14, color:'#64748b', marginTop:2 }}>Fee collection — {monthLabel}</p>
+            <p style={{ fontSize:14, color:'#64748b', marginTop:2 }}>
+              Fee collection — {monthLabel} · <span style={{ color:'#16a34a', fontSize:13 }}>Auto-managed</span>
+              {autoGenMsg && <span style={{ marginLeft:12, fontSize:12, color:'#16a34a', fontWeight:700 }}>{autoGenMsg}</span>}
+            </p>
           </div>
           <div style={{ display:'flex', gap:10 }}>
             <button onClick={() => { exportToExcel(ledger, sym, schoolName, monthLabel); toast.success(`Exported ${monthLabel}`) }}
@@ -541,8 +556,9 @@ export default function Fees() {
               ⬇ Export
             </button>
             <button onClick={() => setShowGen(true)}
-              style={{ padding:'9px 18px', background:'#0f2044', color:'#fff', border:'none', borderRadius:9, fontWeight:600, cursor:'pointer', fontSize:14 }}>
-              ⚡ Generate fees
+              title="Manually generate fees for past/future periods or termly fees"
+              style={{ padding:'7px 14px', background:'#f8fafc', color:'#64748b', border:'1px solid #e2e8f0', borderRadius:9, fontWeight:600, cursor:'pointer', fontSize:12 }}>
+              ⚙ Manual
             </button>
           </div>
         </div>
@@ -610,19 +626,7 @@ export default function Fees() {
           )}
         </div>
 
-        {/* Catch-up hint — for new learners added mid-month */}
-        {!loading && ledger.length > 0 && (
-          <div style={{ marginBottom:10, fontSize:12, color:'#94a3b8', textAlign:'right' }}>
-            New learner added recently?{' '}
-            <button onClick={() => setShowGen(true)}
-              style={{ background:'none', border:'none', cursor:'pointer', color:'#0f2044', fontWeight:700, fontSize:12, textDecoration:'underline', padding:0 }}>
-              Re-run generate
-            </button>
-            {' '}— existing entries are never duplicated.
-          </div>
-        )}
-
-        {/* Summary bar — always visible, reflects current filter */}
+{/* Summary bar — always visible, reflects current filter */}
         {!loading && (
           <div style={{ display:'flex', gap:0, marginBottom:16, background:'#fff', borderRadius:10, overflow:'hidden', boxShadow:'0 1px 3px rgba(0,0,0,.06)', border:'1px solid #e2e8f0' }}>
             {[
@@ -685,7 +689,7 @@ export default function Fees() {
                      'No entries for this period'}
                   </div>
                   <div style={{ fontSize:13 }}>
-                    {ledger.length === 0 ? <>Click <strong>⚡ Generate fees</strong> to create entries from your fee plans.</> : ''}
+                    {ledger.length === 0 ? <>Fees are auto-generated. Check that fee plans exist in Settings → Fee Plans.</> : ''}
                   </div>
                 </div>
               )

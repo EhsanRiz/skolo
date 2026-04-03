@@ -86,6 +86,16 @@ router.get('/summary', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }) }
 })
 
+// ── POST /fee-ledger/auto-generate ──────────────────────────
+// Silently generates all missing monthly entries up to current month
+// Safe to call on every page load — idempotent
+router.post('/auto-generate', async (req, res) => {
+  try {
+    const result = await autoGenerateMonthlyFees(req.user.school_id)
+    res.json(result)
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
 // ── GET /fee-ledger/preview ──────────────────────────────────
 // Dry-run of what generate would create — no DB writes
 router.get('/preview', async (req, res) => {

@@ -2,6 +2,7 @@ const express = require('express')
 const supabase = require('../lib/supabase')
 const auth = require('../middleware/auth')
 const { nextRefNo } = require('../lib/sequences')
+const { autoGenerateMonthlyFees } = require('../lib/autoGenerate')
 
 const router = express.Router()
 
@@ -50,6 +51,12 @@ router.post('/', async (req, res) => {
       .single()
 
     if (lErr) throw lErr
+
+    // 1b. Auto-generate monthly fees for this learner immediately
+    // Fire and forget — don't block the response if it fails
+    autoGenerateMonthlyFees(school_id, newLearner.id).catch(err =>
+      console.error('Auto-generate fees for new learner failed:', err.message)
+    )
 
     // 2. Create guardian if provided
     if (guardian?.first_name && guardian?.phone) {

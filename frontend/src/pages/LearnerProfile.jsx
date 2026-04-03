@@ -178,12 +178,9 @@ function FeesTab({ learnerId, sym }) {
   const catchUp = async () => {
     setCatchingUp(true)
     try {
-      const mo = new Date().getMonth() + 1
-      const { data } = await api.post('/fee-ledger/generate-for-learner', {
-        learner_id: learnerId, frequency:'monthly', year, month: mo
-      })
-      if (data.created > 0) { toast.success(`${data.created} fee entr${data.created>1?'ies':'y'} created`); load() }
-      else toast.info(data.message || 'No entries created — check fee plans in Settings')
+      const { data } = await api.post('/fee-ledger/auto-generate')
+      if (data.created > 0) { toast.success(`${data.created} fee entr${data.created>1?'ies':'y'} generated`); load() }
+      else toast.info('No new entries — check fee plans exist in Settings → Fee Plans for this grade')
     } catch { toast.error('Failed to generate fees') }
     finally { setCatchingUp(false) }
   }
