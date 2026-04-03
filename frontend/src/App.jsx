@@ -12,6 +12,7 @@ import Announcements from './pages/Announcements'
 import Settings from './pages/Settings'
 import ParentPortal from './pages/ParentPortal'
 import LearnerProfile from './pages/LearnerProfile'
+import Waivers from './pages/Waivers'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -43,6 +44,7 @@ export default function App() {
             <Route index element={<Dashboard />} />
             <Route path="learners"      element={<Learners />} />
             <Route path="learners/:id" element={<LearnerProfile />} />
+            <Route path="waivers"      element={<Waivers />} />
             <Route path="fees"          element={<Fees />} />
             <Route path="events"        element={<Events />} />
             <Route path="announcements" element={<Announcements />} />

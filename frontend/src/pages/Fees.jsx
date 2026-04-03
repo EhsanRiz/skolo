@@ -399,16 +399,19 @@ export default function Fees() {
     setWaiveEntry(entry)
   }
 
-  const applyWaive = async e => {
+  const submitWaiverRequest = async e => {
     e.preventDefault(); setWaiving(true)
     try {
-      const payload = {
-        ...waiveForm,
-        reason: waiveForm.reason === 'Other' ? (waiveForm.customReason || 'Other') : waiveForm.reason
-      }
-      await api.post(`/fee-ledger/${waiveEntry.id}/waive`, payload)
-      toast.success('Waiver applied')
-      setWaiveEntry(null); loadLedger(); loadSummary()
+      const reason = waiveForm.reason === 'Other' ? (waiveForm.customReason || 'Other') : waiveForm.reason
+      await api.post('/waivers', {
+        ledger_id:        waiveEntry.id,
+        learner_id:       waiveEntry.learners?.id,
+        amount_requested: waiveForm.amount,
+        reason,
+        note: waiveForm.note
+      })
+      toast.success('Waiver request submitted — pending approval from principal/admin')
+      setWaiveEntry(null); loadLedger()
     } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
     finally { setWaiving(false) }
   }
@@ -743,7 +746,7 @@ export default function Fees() {
           <div style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:100, backdropFilter:'blur(2px)' }}
             onClick={e => e.target===e.currentTarget && setWaiveEntry(null)}>
             <div style={{ background:'#fff', borderRadius:18, padding:'32px', width:'100%', maxWidth:420, boxShadow:'0 24px 60px rgba(0,0,0,0.2)' }}>
-              <h2 style={{ fontSize:18, fontWeight:800, marginBottom:6 }}>Apply waiver</h2>
+              <h2 style={{ fontSize:18, fontWeight:800, marginBottom:6 }}>Request waiver</h2>
               <div style={{ marginBottom:16 }}>
                 <span style={{ fontWeight:700, color:'#0f172a', fontSize:15 }}>
                   {waiveEntry.learners?.first_name} {waiveEntry.learners?.last_name}
@@ -767,7 +770,7 @@ export default function Fees() {
                   </div>
                 </div>
               </div>
-              <form onSubmit={applyWaive}>
+              <form onSubmit={submitWaiverRequest}>
                 <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>Amount to waive ({sym}) *</label>
                 <input style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
                   type="number" step="0.01" min="0.01"
@@ -797,14 +800,14 @@ export default function Fees() {
                   value={waiveForm.note} onChange={e => setWaiveForm(f=>({...f,note:e.target.value}))}
                   placeholder="e.g. Approved by principal on 03 Apr 2026" />
                 <div style={{ background:'#faf5ff', border:'1px solid #e9d5ff', borderRadius:9, padding:'10px 14px', marginBottom:14, fontSize:12, color:'#7c3aed' }}>
-                  🔒 This waiver will be recorded against this entry and cannot be reversed without admin action. The entry remains in the ledger for audit purposes.
+                  🔔 This request will be sent to your principal/admin for approval. The waiver will only be applied after approval. You will be notified of the decision.
                 </div>
                 <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
                   <button type="button" onClick={() => setWaiveEntry(null)}
                     style={{ padding:'9px 18px', background:'#f1f5f9', color:'#374151', border:'none', borderRadius:9, fontWeight:600, cursor:'pointer' }}>Cancel</button>
                   <button type="submit" disabled={waiving}
                     style={{ padding:'9px 18px', background:'#7c3aed', color:'#fff', border:'none', borderRadius:9, fontWeight:700, cursor:'pointer' }}>
-                    {waiving ? 'Applying…' : 'Apply waiver'}
+                    {waiving ? 'Submitting…' : 'Submit request'}
                   </button>
                 </div>
               </form>

@@ -1,7 +1,7 @@
 {
   "name": "skolo-backend",
   "version": "1.0.0",
-  "description": "Skolo API \u2014 school fees and communication platform",
+  "description": "Skolo API — school fees and communication platform",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -13,7 +13,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.1",
     "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "resend": "^6.10.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.3"
