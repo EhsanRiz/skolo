@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useNavigate } from 'react-router-dom'
 import { useToast } from '../contexts/ToastContext'
 import { IconEye, IconEdit, IconTrash, ActionBtn, t } from '../components/ui'
 import * as XLSX from 'xlsx'
@@ -93,6 +94,7 @@ function PortalLinkBox({ learnerId, guardians }) {
 export default function Learners() {
   const { school } = useAuth()
   const toast = useToast()
+  const navigate = useNavigate()
   const cc = school?.countries?.code || 'LS'
 
   const [learners, setLearners] = useState([])
@@ -287,7 +289,7 @@ export default function Learners() {
                   <td style={t.td}>{primary ? `${primary.first_name} ${primary.last_name}` : '—'}</td>
                   <td style={t.td}>{primary?.phone || '—'}</td>
                   <td style={{ ...t.td, textAlign: 'right' }}>
-                    <ActionBtn onClick={() => openView(l)} title="View"><IconEye /></ActionBtn>
+                    <ActionBtn onClick={() => navigate(`/learners/${l.id}`)} title="View profile"><IconEye /></ActionBtn>
                     <ActionBtn onClick={() => openEdit(l)} title="Edit"><IconEdit /></ActionBtn>
                     <ActionBtn onClick={() => remove(l.id)} title="Remove" variant="danger"><IconTrash /></ActionBtn>
                   </td>
