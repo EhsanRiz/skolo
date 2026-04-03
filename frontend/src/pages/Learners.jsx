@@ -92,10 +92,9 @@ function PortalLinkBox({ learnerId, guardians }) {
 }
 
 export default function Learners() {
-  const { school } = useAuth()
+  const { school, user } = useAuth()
   const toast = useToast()
   const navigate = useNavigate()
-  const { user } = useAuth()
   const isReadOnly = user?.role === 'principal'
   const cc = school?.countries?.code || 'LS'
 
@@ -253,10 +252,12 @@ export default function Learners() {
           <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>Learners</h1>
           <p style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>{learners.length} active learner{learners.length !== 1 ? 's' : ''}</p>
         </div>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <button style={t.btn.ghost} onClick={() => setShowImport(true)}>⬆ Import</button>
-          <button style={t.btn.primary} onClick={openAdd}>+ Add learner</button>
-        </div>
+        {!isReadOnly && (
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button style={t.btn.ghost} onClick={() => setShowImport(true)}>⬆ Import</button>
+            <button style={t.btn.primary} onClick={openAdd}>+ Add learner</button>
+          </div>
+        )}
       </div>
 
       {/* Search */}
@@ -292,8 +293,8 @@ export default function Learners() {
                   <td style={t.td}>{primary?.phone || '—'}</td>
                   <td style={{ ...t.td, textAlign: 'right' }}>
                     <ActionBtn onClick={() => navigate(`/learners/${l.id}`)} title="View profile"><IconEye /></ActionBtn>
-                    <ActionBtn onClick={() => openEdit(l)} title="Edit"><IconEdit /></ActionBtn>
-                    <ActionBtn onClick={() => remove(l.id)} title="Remove" variant="danger"><IconTrash /></ActionBtn>
+                    {!isReadOnly && <ActionBtn onClick={() => openEdit(l)} title="Edit"><IconEdit /></ActionBtn>}
+                    {!isReadOnly && <ActionBtn onClick={() => remove(l.id)} title="Remove" variant="danger"><IconTrash /></ActionBtn>}
                   </td>
                 </tr>
               )

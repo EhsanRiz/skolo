@@ -511,7 +511,7 @@ export default function Fees() {
                 <ReceiptIcon />
               </button>
             )}
-            <TrashBtn onClick={() => deleteLedger(row.id)} />
+            {!isReadOnly && <TrashBtn onClick={() => deleteLedger(row.id)} />}
           </div>
         </td>
       </tr>
