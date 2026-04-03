@@ -180,9 +180,24 @@ export default function Settings() {
   // ── USERS ─────────────────────────────────────────────────────
   const addUser = async e => {
     e.preventDefault(); setSaving(true)
-    try{ await api.post('/users',userForm); setShowAddUser(false); setUserForm({full_name:'',email:'',password:'',role:'bursar'}); loadUsers(); toast.success('Staff account created') }
+    try{
+      const { data } = await api.post('/users', userForm)
+      setShowAddUser(false)
+      setUserForm({full_name:'',email:'',role:'bursar'})
+      loadUsers()
+      if (data.invite_sent) toast.success(`Invite email sent to ${userForm.email}`)
+      else toast.success(`Account created — share this link: ${data.invite_url}`)
+    }
     catch(err){ toast.error(err.response?.data?.error||'Failed') }
     finally{ setSaving(false) }
+  }
+
+  const resendInvite = async (userId, email) => {
+    try{
+      const { data } = await api.post(`/users/${userId}/resend-invite`)
+      if (data.sent) toast.success(`Invite resent to ${email}`)
+      else toast.info(`Invite link: ${data.invite_url}`)
+    } catch { toast.error('Failed to resend invite') }
   }
   const saveEdit = async e => {
     e.preventDefault(); setSaving(true)
@@ -403,7 +418,7 @@ export default function Settings() {
           </div>
           <Card>
             <table style={{width:'100%',borderCollapse:'collapse'}}>
-              <thead><tr>{['Name','Email','Role','Status','Actions'].map(h=><th key={h} style={t.th}>{h}</th>)}</tr></thead>
+              <thead><tr>{['Name','Email','Role','Account','Actions'].map(h=><th key={h} style={t.th}>{h}</th>)}</tr></thead>
               <tbody>
                 {users.map(u=>{
                   const isSelf = u.id===currentUser?.id
@@ -412,14 +427,25 @@ export default function Settings() {
                       <td style={{...t.td,fontWeight:600}}>{u.full_name}{isSelf&&<span style={{marginLeft:8,fontSize:11,color:'#94a3b8'}}>(you)</span>}</td>
                       <td style={t.td}>{u.email}</td>
                       <td style={t.td}><span style={{background:'#dbeafe',color:'#1d4ed8',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>{u.role}</span></td>
-                      <td style={t.td}><span style={{background:u.is_active?'#dcfce7':'#fee2e2',color:u.is_active?'#15803d':'#dc2626',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>{u.is_active?'active':'disabled'}</span></td>
+                      <td style={t.td}>
+                        {u.password_set === false
+                          ? <span style={{background:'#fef9c3',color:'#a16207',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>⏳ Invite pending</span>
+                          : <span style={{background:u.is_active?'#dcfce7':'#fee2e2',color:u.is_active?'#15803d':'#dc2626',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>{u.is_active?'active':'disabled'}</span>
+                        }
+                      </td>
                       <td style={t.td}>
                         <div style={{display:'flex',gap:6}}>
                           <ActionBtn onClick={()=>setViewUser(u)} title="View"><EyeIcon/></ActionBtn>
                           <ActionBtn onClick={()=>openEditUser(u)} title="Edit"><IconEdit/></ActionBtn>
-                          <button onClick={()=>toggleUser(u)} disabled={isSelf} style={{...t.btn.ghost,padding:'5px 12px',fontSize:12,opacity:isSelf?.4:1,cursor:isSelf?'not-allowed':'pointer'}}>
-                            {u.is_active?'Disable':'Enable'}
-                          </button>
+                          {u.password_set === false
+                            ? <button onClick={()=>resendInvite(u.id, u.email)}
+                                style={{...t.btn.ghost,padding:'5px 12px',fontSize:12,color:'#a16207',border:'1px solid #fcd34d'}}>
+                                Resend invite
+                              </button>
+                            : <button onClick={()=>toggleUser(u)} disabled={isSelf} style={{...t.btn.ghost,padding:'5px 12px',fontSize:12,opacity:isSelf?.4:1,cursor:isSelf?'not-allowed':'pointer'}}>
+                                {u.is_active?'Disable':'Enable'}
+                              </button>
+                          }
                         </div>
                       </td>
                     </tr>
@@ -552,13 +578,14 @@ export default function Settings() {
         <div style={t.overlay} onClick={e=>e.target===e.currentTarget&&setShowAddUser(false)}>
           <div style={{...t.modal,maxWidth:420}}>
             <h2 style={{fontSize:18,fontWeight:800,marginBottom:20}}>Add staff account</h2>
+            <div style={{background:'#f0fdf4',border:'1px solid #86efac',borderRadius:9,padding:'10px 14px',marginBottom:16,fontSize:13,color:'#15803d'}}>
+                ✉ An invite email will be sent automatically — they set their own password.
+              </div>
             <form onSubmit={addUser}>
               <label style={t.label}>Full name *</label>
               <input style={t.input} value={userForm.full_name} onChange={e=>setUserForm(f=>({...f,full_name:e.target.value}))} required/>
               <label style={t.label}>Email *</label>
               <input style={t.input} type="email" value={userForm.email} onChange={e=>setUserForm(f=>({...f,email:e.target.value}))} required/>
-              <label style={t.label}>Password *</label>
-              <input style={t.input} type="password" value={userForm.password} onChange={e=>setUserForm(f=>({...f,password:e.target.value}))} required minLength={8}/>
               <label style={t.label}>Role</label>
               <select style={t.input} value={userForm.role} onChange={e=>setUserForm(f=>({...f,role:e.target.value}))}>
                 <option value="bursar">Bursar</option><option value="principal">Principal</option><option value="admin">Admin</option>

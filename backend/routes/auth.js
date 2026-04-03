@@ -108,4 +108,68 @@ router.post('/login', async (req, res) => {
   }
 })
 
+// ─── POST /auth/set-password — from invite email link ────────
+router.post('/set-password', async (req, res) => {
+  const { token, password } = req.body
+  if (!token || !password) {
+    return res.status(400).json({ error: 'Token and password are required' })
+  }
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters' })
+  }
+  try {
+    // Find user by token
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('id, full_name, email, role, school_id, invite_expires_at')
+      .eq('invite_token', token)
+      .eq('is_active', true)
+      .single()
+
+    if (error || !user) {
+      return res.status(400).json({ error: 'Invalid or expired invite link' })
+    }
+    if (new Date(user.invite_expires_at) < new Date()) {
+      return res.status(400).json({ error: 'This invite link has expired. Ask your admin to resend the invite.' })
+    }
+
+    const password_hash = await bcrypt.hash(password, 10)
+    await supabase.from('users').update({
+      password_hash,
+      password_set:     true,
+      invite_token:     null,
+      invite_expires_at: null
+    }).eq('id', user.id)
+
+    // Auto-login: return a JWT so they go straight to dashboard
+    const jwt = require('jsonwebtoken')
+    const token_jwt = jwt.sign(
+      { id: user.id, school_id: user.school_id, role: user.role, email: user.email, full_name: user.full_name },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
+    )
+
+    res.json({ token: token_jwt, user: { id: user.id, full_name: user.full_name, email: user.email, role: user.role, school_id: user.school_id } })
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
+// ─── GET /auth/verify-invite — check token validity ──────────
+router.get('/verify-invite/:token', async (req, res) => {
+  try {
+    const { data: user } = await supabase
+      .from('users')
+      .select('full_name, email, role, invite_expires_at, schools(name)')
+      .eq('invite_token', req.params.token)
+      .eq('is_active', true)
+      .single()
+
+    if (!user) return res.status(404).json({ valid: false, error: 'Invalid invite link' })
+    if (new Date(user.invite_expires_at) < new Date()) {
+      return res.status(400).json({ valid: false, error: 'This invite link has expired' })
+    }
+
+    res.json({ valid: true, full_name: user.full_name, email: user.email, role: user.role, school_name: user.schools?.name })
+  } catch (err) { res.status(500).json({ valid: false, error: err.message }) }
+})
+
 module.exports = router
