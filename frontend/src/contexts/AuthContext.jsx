@@ -33,6 +33,13 @@ export function AuthProvider({ children }) {
     return data
   }
 
+  const refreshSchool = async () => {
+    try {
+      const r = await api.get('/schools/me')
+      setSchool(r.data)
+    } catch {}
+  }
+
   const logout = () => {
     localStorage.removeItem('sk_token')
     localStorage.removeItem('sk_user')
@@ -42,7 +49,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, school, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, school, loading, login, logout, refreshSchool }}>
       {children}
     </AuthContext.Provider>
   )

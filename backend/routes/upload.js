@@ -1,33 +1,36 @@
-const express = require('express')
+const express  = require('express')
 const supabase = require('../lib/supabase')
-const auth    = require('../middleware/auth')
+const auth     = require('../middleware/auth')
 
 const router = express.Router()
 router.use(auth)
 
-// POST /upload/logo — accepts base64 image, stores in Supabase Storage
+// POST /upload/logo
+// Accepts base64 image and stores directly in schools.logo_url
+// No Supabase Storage bucket required
 router.post('/logo', async (req, res) => {
-  const { base64, mime_type, file_name } = req.body
-  if (!base64 || !mime_type) return res.status(400).json({ error: 'base64 and mime_type required' })
+  const { base64, mime_type } = req.body
+  if (!base64 || !mime_type) {
+    return res.status(400).json({ error: 'base64 and mime_type required' })
+  }
+
+  // Validate size — reject anything over 3MB base64 (~2.25MB image)
+  if (base64.length > 3 * 1024 * 1024) {
+    return res.status(400).json({ error: 'Image too large. Please use an image under 2MB.' })
+  }
 
   try {
-    const buffer = Buffer.from(base64, 'base64')
-    const path   = `${req.user.school_id}/${file_name || 'logo.png'}`
+    const logo_url = `data:${mime_type};base64,${base64}`
 
-    const { error: upErr } = await supabase.storage
-      .from('school-logos')
-      .upload(path, buffer, { contentType: mime_type, upsert: true })
+    const { data, error } = await supabase
+      .from('schools')
+      .update({ logo_url })
+      .eq('id', req.user.school_id)
+      .select('logo_url')
+      .single()
 
-    if (upErr) throw upErr
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('school-logos')
-      .getPublicUrl(path)
-
-    // Save to school record
-    await supabase.from('schools').update({ logo_url: publicUrl }).eq('id', req.user.school_id)
-
-    res.json({ logo_url: publicUrl })
+    if (error) throw error
+    res.json({ logo_url: data.logo_url })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }

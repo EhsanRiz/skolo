@@ -26,7 +26,7 @@ const TABS = [
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 export default function Settings() {
-  const { school, user: currentUser } = useAuth()
+  const { school, user: currentUser, refreshSchool } = useAuth()
   const toast = useToast()
   const [tab, setTab] = useState('grades')
 
@@ -170,7 +170,7 @@ export default function Settings() {
     reader.onload = async ev => {
       try {
         const { data } = await api.post('/upload/logo',{ base64:ev.target.result.split(',')[1], mime_type:file.type, file_name:file.name })
-        setLogoPreview(data.logo_url); toast.success('Logo uploaded — reload to see it in the sidebar')
+        setLogoPreview(data.logo_url); await refreshSchool(); toast.success('Logo uploaded successfully')
       } catch(err){ toast.error(err.response?.data?.error||'Upload failed') }
       finally{ setUploading(false) }
     }
@@ -374,7 +374,7 @@ export default function Settings() {
                   <IconUpload size={14}/>{uploading?'Uploading…':logoPreview?'Change logo':'Upload logo'}
                 </button>
                 <div style={{fontSize:12,color:'#94a3b8',marginTop:6}}>PNG or JPG · max 2MB · appears in sidebar</div>
-                <div style={{fontSize:11,color:'#f59e0b',marginTop:3,fontWeight:500}}>⚠ Create "school-logos" bucket in Supabase Storage first</div>
+                <div style={{fontSize:11,color:'#94a3b8',marginTop:3}}>Logo is stored securely — no external bucket required</div>
               </div>
             </div>
           </div>
