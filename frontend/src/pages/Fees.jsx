@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx'
 import api from '../lib/api'
 
 // Open receipt in a new printable window
-function printReceipt(entry, schoolName, sym) {
+function printReceipt(entry, schoolName, sym, schoolLogoUrl) {
   const learner    = entry.learners
   const amtDue     = Number(entry.amount_due)
   const amtPaid    = Number(entry.amount_paid)
@@ -35,6 +35,7 @@ function printReceipt(entry, schoolName, sym) {
   .header{background:#0f2044;color:#fff;padding:24px 28px 20px;display:flex;justify-content:space-between;align-items:flex-start}
   .brand{font-size:22px;font-weight:900;letter-spacing:-0.5px}
   .brand-tag{font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px}
+  .school-logo{height:44px;max-width:120px;object-fit:contain;background:rgba(255,255,255,0.1);border-radius:6px;padding:4px}
   .receipt-label{text-align:right;font-size:11px;font-weight:700;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.8px}
   .receipt-no{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px}
   .school-row{padding:14px 28px;border-bottom:1px solid #f1f5f9}
@@ -68,9 +69,12 @@ function printReceipt(entry, schoolName, sym) {
 </div>
 <div class="receipt">
   <div class="header">
-    <div>
-      <div class="brand">Skolo</div>
-      <div class="brand-tag">One platform. Whole school.</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      ${schoolLogoUrl ? `<img src="${schoolLogoUrl}" alt="${schoolName}" class="school-logo"/>` : ''}
+      <div>
+        <div class="brand">Skolo</div>
+        <div class="brand-tag">One platform. Whole school.</div>
+      </div>
     </div>
     <div>
       <div class="receipt-label">Payment Receipt</div>
@@ -431,7 +435,7 @@ export default function Fees() {
               </button>
             )}
             {Number(row.amount_paid) > 0 && (
-              <button onClick={() => printReceipt(row, schoolName, sym)}
+              <button onClick={() => printReceipt(row, schoolName, sym, school?.logo_url)}
                 title="Print / view receipt"
                 style={{ display:'inline-flex', alignItems:'center', justifyContent:'center',
                   width:26, height:26, border:'1px solid #bfdbfe', borderRadius:6,

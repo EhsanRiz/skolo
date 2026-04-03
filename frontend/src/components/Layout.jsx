@@ -80,31 +80,30 @@ export default function Layout() {
     <>
       {/* Brand */}
       <div style={{ padding: '20px 16px 16px' }}>
-        {school?.logo_url ? (
-          /* School has a logo — show it prominently */
-          <div style={{ marginBottom:12 }}>
+        {/* Logo + school name always side by side */}
+        <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12 }}>
+          {school?.logo_url ? (
             <img src={school.logo_url} alt={school.name}
-              style={{ maxHeight:52, maxWidth:180, objectFit:'contain', display:'block' }} />
-          </div>
-        ) : (
-          /* No logo — show Skolo wordmark + initials */
-          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12 }}>
-            <div style={{ width:34, height:34, background:'#1d4ed8', borderRadius:8,
+              style={{ height:38, width:38, objectFit:'contain', flexShrink:0, borderRadius:6,
+                background:'rgba(255,255,255,0.08)', padding:3 }} />
+          ) : (
+            <div style={{ width:38, height:38, background:'#1d4ed8', borderRadius:8,
               display:'flex', alignItems:'center', justifyContent:'center',
-              fontSize:13, fontWeight:800, color:'#fff', flexShrink:0 }}>
+              fontSize:14, fontWeight:800, color:'#fff', flexShrink:0 }}>
               {initials}
             </div>
-            <div>
-              <div style={{ fontSize:15, fontWeight:800, color:'#fff', letterSpacing:'-0.3px', lineHeight:1.2 }}>Skolo</div>
-              <div style={{ fontSize:9, color:'rgba(255,255,255,0.4)', fontWeight:500 }}>One platform. Whole school.</div>
+          )}
+          <div style={{ minWidth:0 }}>
+            <div style={{ fontSize:13, fontWeight:700, color:'#fff', lineHeight:1.3,
+              whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+              {school?.name || 'Skolo'}
+            </div>
+            <div style={{ fontSize:9, color:'rgba(255,255,255,0.4)', fontWeight:500, marginTop:1 }}>
+              One platform. Whole school.
             </div>
           </div>
-        )}
-        <div style={{ fontSize:11, fontWeight:600, color:'rgba(255,255,255,0.45)',
-          paddingTop:10, borderTop:'1px solid rgba(255,255,255,0.08)',
-          whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
-          {school?.name || '—'}
         </div>
+        <div style={{ borderTop:'1px solid rgba(255,255,255,0.08)', paddingTop:10 }} />
       </div>
 
       {/* Nav */}
