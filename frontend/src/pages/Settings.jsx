@@ -1,348 +1,286 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { IconUpload, t } from '../components/ui'
 import api from '../lib/api'
 
-const s = {
-  heading: { fontSize: 22, fontWeight: 700, marginBottom: 6 },
-  sub: { color: '#64748b', fontSize: 14, marginBottom: 24 },
-  tabs: { display: 'flex', gap: 4, marginBottom: 24, background: '#f1f5f9', borderRadius: 10, padding: 4, width: 'fit-content' },
-  tab: { padding: '8px 18px', borderRadius: 8, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 14, background: 'none', color: '#64748b' },
-  activeTab: { background: '#fff', color: '#1d4ed8', boxShadow: '0 1px 4px rgba(0,0,0,0.1)' },
-  card: { background: '#fff', borderRadius: 12, padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', marginBottom: 16 },
-  cardTitle: { fontSize: 15, fontWeight: 700, marginBottom: 16 },
-  label: { display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 5 },
-  input: { width: '100%', padding: '9px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 14, marginBottom: 12, outline: 'none' },
-  row: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
-  btn: { padding: '9px 18px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: 14 },
-  btnSm: { padding: '6px 14px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: 13 },
-  btnDanger: { padding: '6px 14px', background: 'none', border: '1.5px solid #fca5a5', color: '#dc2626', borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: 13 },
-  btnGhost: { padding: '6px 14px', background: '#f1f5f9', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: 13 },
-  gradeBlock: { border: '1.5px solid #e2e8f0', borderRadius: 10, padding: '16px', marginBottom: 12 },
-  gradeHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  gradeName: { fontWeight: 700, fontSize: 15 },
-  classList: { display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 },
-  classChip: { display: 'flex', alignItems: 'center', gap: 6, background: '#f1f5f9', borderRadius: 20, padding: '4px 12px', fontSize: 13 },
-  chipDel: { background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: 14, padding: 0 },
-  addRow: { display: 'flex', gap: 8, marginTop: 8 },
-  addInput: { flex: 1, padding: '7px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, outline: 'none' },
-  table: { width: '100%', borderCollapse: 'collapse' },
-  th: { textAlign: 'left', padding: '10px 12px', fontSize: 12, fontWeight: 600, color: '#94a3b8', background: '#f8fafc', textTransform: 'uppercase' },
-  td: { padding: '12px', fontSize: 14, borderTop: '1px solid #f1f5f9', color: '#374151' },
-  badge: { display: 'inline-block', padding: '2px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: '#dbeafe', color: '#1d4ed8' },
-  success: { background: '#dcfce7', color: '#15803d', borderRadius: 8, padding: '10px 14px', fontSize: 13, marginBottom: 12 },
-  overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 },
-  modal: { background: '#fff', borderRadius: 16, padding: '32px', width: '100%', maxWidth: 420 },
-  mTitle: { fontSize: 18, fontWeight: 700, marginBottom: 20 },
-  mFooter: { display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 },
-  cancelBtn: { padding: '9px 18px', background: '#f1f5f9', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 },
-  saveBtn: { padding: '9px 18px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer' },
-}
-
-// Preset grade names for quick setup
-const GRADE_PRESETS = ['Grade R', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5',
-  'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12']
+const PRESETS = ['Grade R','Grade 1','Grade 2','Grade 3','Grade 4','Grade 5',
+  'Grade 6','Grade 7','Grade 8','Grade 9','Grade 10','Grade 11','Grade 12']
 
 export default function Settings() {
   const { school } = useAuth()
-  const [tab, setTab] = useState('grades')
+  const [tab,    setTab]    = useState('grades')
   const [grades, setGrades] = useState([])
-  const [users, setUsers]   = useState([])
+  const [users,  setUsers]  = useState([])
   const [saving, setSaving] = useState(false)
-  const [flash, setFlash]   = useState('')
-
-  // School profile form
-  const [profile, setProfile] = useState({ name: '', phone: '', email: '', school_reg_number: '' })
-
-  // New grade input
-  const [newGradeName, setNewGradeName] = useState('')
-
-  // New class inputs per grade (keyed by grade id)
-  const [newClassNames, setNewClassNames] = useState({})
-
-  // Add user modal
-  const [showUserModal, setShowUserModal] = useState(false)
+  const [flash,  setFlash]  = useState('')
+  const [newGrade, setNewGrade] = useState('')
+  const [newClasses, setNewClasses] = useState({})
+  const [showUser, setShowUser] = useState(false)
   const [userForm, setUserForm] = useState({ full_name: '', email: '', password: '', role: 'bursar' })
+  const [profile, setProfile] = useState({ name: '', phone: '', email: '', school_reg_number: '' })
+  const [logoPreview, setLogoPreview] = useState(null)
+  const [uploading, setUploading] = useState(false)
+  const fileRef = useRef()
 
-  const showFlash = msg => { setFlash(msg); setTimeout(() => setFlash(''), 3000) }
+  const flash_ = msg => { setFlash(msg); setTimeout(() => setFlash(''), 3500) }
 
   const loadGrades = () => api.get('/grades').then(r => setGrades(r.data)).catch(() => {})
   const loadUsers  = () => api.get('/users').then(r => setUsers(r.data)).catch(() => {})
 
+  useEffect(() => { loadGrades() }, [])
+  useEffect(() => { if (tab === 'users') loadUsers() }, [tab])
   useEffect(() => {
-    loadGrades()
     if (school) {
-      setProfile({
-        name: school.name || '',
-        phone: school.phone || '',
-        email: school.email || '',
-        school_reg_number: school.school_reg_number || ''
-      })
+      setProfile({ name: school.name || '', phone: school.phone || '', email: school.email || '', school_reg_number: school.school_reg_number || '' })
+      setLogoPreview(school.logo_url || null)
     }
   }, [school])
 
-  useEffect(() => {
-    if (tab === 'users') loadUsers()
-  }, [tab])
-
-  // ─── GRADES ──────────────────────────────────────────────────
-
-  const addGrade = async (name) => {
-    const n = (name || newGradeName).trim()
+  // ── GRADES ───────────────────────────────────────────────────
+  const addGrade = async name => {
+    const n = (name || newGrade).trim()
     if (!n) return
-    try {
-      await api.post('/grades', { name: n, display_order: grades.length })
-      setNewGradeName('')
-      loadGrades()
-      showFlash(`Grade "${n}" added`)
-    } catch (err) { alert(err.response?.data?.error || 'Failed') }
+    try { await api.post('/grades', { name: n, display_order: grades.length }); setNewGrade(''); loadGrades(); flash_(`"${n}" added`) }
+    catch (err) { alert(err.response?.data?.error || 'Failed') }
   }
 
   const addAllPresets = async () => {
     const existing = grades.map(g => g.name)
-    const toAdd = GRADE_PRESETS.filter(p => !existing.includes(p))
-    if (toAdd.length === 0) { showFlash('All standard grades already added'); return }
+    const toAdd = PRESETS.filter(p => !existing.includes(p))
+    if (!toAdd.length) { flash_('All standard grades already added'); return }
     setSaving(true)
-    try {
-      for (let i = 0; i < toAdd.length; i++) {
-        await api.post('/grades', { name: toAdd[i], display_order: grades.length + i })
-      }
-      loadGrades()
-      showFlash(`Added ${toAdd.length} grades`)
-    } catch (err) { alert('Failed to add grades') }
-    finally { setSaving(false) }
+    try { for (let i=0; i<toAdd.length; i++) await api.post('/grades', { name: toAdd[i], display_order: grades.length + i }); loadGrades(); flash_(`${toAdd.length} grades added`) }
+    catch { alert('Failed') } finally { setSaving(false) }
   }
 
   const deleteGrade = async (id, name) => {
-    if (!confirm(`Delete grade "${name}"? This will remove all associated classes.`)) return
-    try {
-      await api.delete(`/grades/${id}`)
-      loadGrades()
-    } catch (err) { alert(err.response?.data?.error || 'Failed') }
+    if (!confirm(`Delete grade "${name}"?`)) return
+    try { await api.delete(`/grades/${id}`); loadGrades() }
+    catch (err) { alert(err.response?.data?.error || 'Failed') }
   }
 
-  // ─── CLASSES ─────────────────────────────────────────────────
-
-  const addClass = async (gradeId) => {
-    const name = (newClassNames[gradeId] || '').trim()
+  const addClass = async gradeId => {
+    const name = (newClasses[gradeId] || '').trim()
     if (!name) return
-    try {
-      await api.post('/grades/classes', { grade_id: gradeId, name })
-      setNewClassNames(prev => ({ ...prev, [gradeId]: '' }))
-      loadGrades()
-    } catch (err) { alert(err.response?.data?.error || 'Failed') }
+    try { await api.post('/grades/classes', { grade_id: gradeId, name }); setNewClasses(p => ({ ...p, [gradeId]: '' })); loadGrades() }
+    catch (err) { alert(err.response?.data?.error || 'Failed') }
   }
 
-  const deleteClass = async (classId) => {
-    try {
-      await api.delete(`/grades/classes/${classId}`)
-      loadGrades()
-    } catch (err) { alert(err.response?.data?.error || 'Failed') }
+  const deleteClass = async id => {
+    try { await api.delete(`/grades/classes/${id}`); loadGrades() }
+    catch (err) { alert(err.response?.data?.error || 'Failed') }
   }
 
-  // ─── SCHOOL PROFILE ──────────────────────────────────────────
-
+  // ── SCHOOL PROFILE ───────────────────────────────────────────
   const saveProfile = async e => {
     e.preventDefault(); setSaving(true)
-    try {
-      await api.patch('/schools/me', profile)
-      showFlash('School profile updated')
-    } catch (err) { alert(err.response?.data?.error || 'Failed') }
+    try { await api.patch('/schools/me', profile); flash_('Profile updated') }
+    catch (err) { alert(err.response?.data?.error || 'Failed') }
     finally { setSaving(false) }
   }
 
-  // ─── USERS ───────────────────────────────────────────────────
+  // ── LOGO UPLOAD ──────────────────────────────────────────────
+  const handleLogoFile = async e => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) { alert('Logo must be under 2MB'); return }
+    setUploading(true)
+    const reader = new FileReader()
+    reader.onload = async ev => {
+      const base64 = ev.target.result.split(',')[1]
+      try {
+        const { data } = await api.post('/upload/logo', {
+          base64, mime_type: file.type, file_name: file.name
+        })
+        setLogoPreview(data.logo_url)
+        flash_('Logo uploaded — reload to see it in the sidebar')
+      } catch (err) { alert(err.response?.data?.error || 'Upload failed') }
+      finally { setUploading(false) }
+    }
+    reader.readAsDataURL(file)
+  }
 
+  // ── USERS ────────────────────────────────────────────────────
   const addUser = async e => {
     e.preventDefault(); setSaving(true)
-    try {
-      await api.post('/users', userForm)
-      setShowUserModal(false)
-      setUserForm({ full_name: '', email: '', password: '', role: 'bursar' })
-      loadUsers()
-      showFlash('User added')
-    } catch (err) { alert(err.response?.data?.error || 'Failed') }
+    try { await api.post('/users', userForm); setShowUser(false); setUserForm({ full_name: '', email: '', password: '', role: 'bursar' }); loadUsers(); flash_('Staff account created') }
+    catch (err) { alert(err.response?.data?.error || 'Failed') }
     finally { setSaving(false) }
   }
 
   const toggleUser = async (id, is_active) => {
-    try {
-      await api.patch(`/users/${id}`, { is_active: !is_active })
-      loadUsers()
-    } catch (err) { alert('Failed') }
+    try { await api.patch(`/users/${id}`, { is_active: !is_active }); loadUsers() }
+    catch { alert('Failed') }
   }
+
+  const TABS = [['grades','🎓 Grades & Classes'], ['profile','🏫 School Profile'], ['users','👤 Staff Accounts']]
 
   return (
     <div>
-      <div style={s.heading}>School Settings</div>
-      <div style={s.sub}>Manage grades, classes, school profile and staff accounts.</div>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>Settings</h1>
+        <p style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>Manage grades, school profile and staff accounts</p>
+      </div>
 
-      {flash && <div style={s.success}>✅ {flash}</div>}
+      {flash && (
+        <div style={{ background: '#dcfce7', color: '#15803d', borderRadius: 10, padding: '11px 16px', marginBottom: 20, fontSize: 14, fontWeight: 500 }}>
+          ✓ {flash}
+        </div>
+      )}
 
-      <div style={s.tabs}>
-        {[['grades','🎓 Grades & Classes'], ['profile','🏫 School Profile'], ['users','👤 Staff Accounts']].map(([key, label]) => (
-          <button key={key} style={{ ...s.tab, ...(tab === key ? s.activeTab : {}) }} onClick={() => setTab(key)}>
-            {label}
-          </button>
+      <div style={{ display: 'flex', gap: 2, marginBottom: 24, background: '#f1f5f9', borderRadius: 10, padding: 4, width: 'fit-content' }}>
+        {TABS.map(([key, label]) => (
+          <button key={key} onClick={() => setTab(key)} style={{
+            padding: '8px 18px', borderRadius: 8, border: 'none', cursor: 'pointer',
+            fontWeight: 600, fontSize: 13, transition: 'all 0.15s',
+            background: tab === key ? '#fff' : 'none',
+            color: tab === key ? '#1d4ed8' : '#64748b',
+            boxShadow: tab === key ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+          }}>{label}</button>
         ))}
       </div>
 
-      {/* ── GRADES & CLASSES ── */}
+      {/* ── GRADES ── */}
       {tab === 'grades' && (
-        <div>
-          <div style={s.card}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div style={s.cardTitle}>Grades</div>
-              <button style={s.btnGhost} onClick={addAllPresets} disabled={saving}>
-                + Add all standard grades (R–12)
-              </button>
-            </div>
+        <div style={{ background: '#fff', borderRadius: 14, padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div style={{ fontWeight: 700, fontSize: 16 }}>Grades</div>
+            <button style={t.btn.ghost} onClick={addAllPresets} disabled={saving}>+ Add all standard grades (R–12)</button>
+          </div>
 
-            {grades.length === 0 && (
-              <div style={{ color: '#94a3b8', fontSize: 14, marginBottom: 16 }}>
-                No grades yet. Add them manually or click "Add all standard grades".
+          {grades.length === 0 && <div style={{ color: '#94a3b8', fontSize: 14, marginBottom: 20 }}>No grades yet. Click "Add all standard grades" or add manually below.</div>}
+
+          {grades.map(g => (
+            <div key={g.id} style={{ border: '1.5px solid #f1f5f9', borderRadius: 10, padding: '16px', marginBottom: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>{g.name}</div>
+                <button onClick={() => deleteGrade(g.id, g.name)} style={{ ...t.btn.danger, padding: '5px 12px', fontSize: 12 }}>Delete</button>
               </div>
-            )}
 
-            {grades.map(g => (
-              <div key={g.id} style={s.gradeBlock}>
-                <div style={s.gradeHeader}>
-                  <div style={s.gradeName}>{g.name}</div>
-                  <button style={s.btnDanger} onClick={() => deleteGrade(g.id, g.name)}>Delete grade</button>
-                </div>
-
-                {/* Classes */}
-                <div style={s.classList}>
-                  {(g.classes || []).map(c => (
-                    <div key={c.id} style={s.classChip}>
-                      {c.name}
-                      <button style={s.chipDel} onClick={() => deleteClass(c.id)}>✕</button>
-                    </div>
-                  ))}
-                  {(g.classes || []).length === 0 && (
-                    <div style={{ fontSize: 12, color: '#94a3b8' }}>No classes — add below or leave empty</div>
-                  )}
-                </div>
-
-                <div style={s.addRow}>
-                  <input
-                    style={s.addInput}
-                    placeholder="Class name e.g. 6A"
-                    value={newClassNames[g.id] || ''}
-                    onChange={e => setNewClassNames(prev => ({ ...prev, [g.id]: e.target.value }))}
-                    onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addClass(g.id))}
-                  />
-                  <button style={s.btnSm} onClick={() => addClass(g.id)}>+ Add class</button>
-                </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+                {(g.classes || []).map(c => (
+                  <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#f1f5f9', borderRadius: 20, padding: '4px 10px 4px 12px', fontSize: 13, fontWeight: 500 }}>
+                    {c.name}
+                    <button onClick={() => deleteClass(c.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: 14, padding: 0, lineHeight: 1, display: 'flex', alignItems: 'center' }}>✕</button>
+                  </div>
+                ))}
+                {!(g.classes || []).length && <div style={{ fontSize: 12, color: '#94a3b8' }}>No classes — add class letters below (A, B, C…)</div>}
               </div>
-            ))}
 
-            {/* Add custom grade */}
-            <div style={{ ...s.addRow, marginTop: 16 }}>
-              <input
-                style={s.addInput}
-                placeholder="Custom grade name e.g. Grade 7"
-                value={newGradeName}
-                onChange={e => setNewGradeName(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addGrade())}
-              />
-              <button style={s.btn} onClick={() => addGrade()}>+ Add grade</button>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input
+                  style={{ ...t.input, marginBottom: 0, flex: 1, padding: '7px 12px', fontSize: 13 }}
+                  placeholder="Class letter e.g. A"
+                  value={newClasses[g.id] || ''}
+                  onChange={e => setNewClasses(p => ({ ...p, [g.id]: e.target.value }))}
+                  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addClass(g.id))}
+                />
+                <button style={{ ...t.btn.primary, padding: '7px 14px', fontSize: 13 }} onClick={() => addClass(g.id)}>+ Add class</button>
+              </div>
             </div>
+          ))}
+
+          <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+            <input style={{ ...t.input, marginBottom: 0, flex: 1 }} placeholder="Custom grade e.g. Grade 7" value={newGrade}
+              onChange={e => setNewGrade(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addGrade())} />
+            <button style={t.btn.primary} onClick={() => addGrade()}>+ Add grade</button>
           </div>
         </div>
       )}
 
-      {/* ── SCHOOL PROFILE ── */}
+      {/* ── PROFILE ── */}
       {tab === 'profile' && (
-        <div style={s.card}>
-          <div style={s.cardTitle}>School Profile</div>
-          <form onSubmit={saveProfile}>
-            <label style={s.label}>School name *</label>
-            <input style={s.input} value={profile.name} onChange={e => setProfile(p => ({ ...p, name: e.target.value }))} required />
-            <div style={s.row}>
+        <div style={{ background: '#fff', borderRadius: 14, padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 20 }}>School Profile</div>
+
+          {/* Logo upload */}
+          <div style={{ marginBottom: 24, padding: '20px', background: '#f8fafc', borderRadius: 12, border: '1.5px dashed #e2e8f0' }}>
+            <div style={{ fontWeight: 600, fontSize: 14, color: '#374151', marginBottom: 12 }}>School Logo</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+              {logoPreview ? (
+                <img src={logoPreview} alt="logo" style={{ height: 60, maxWidth: 160, objectFit: 'contain', borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff', padding: 6 }} />
+              ) : (
+                <div style={{ width: 80, height: 60, background: '#e2e8f0', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 24 }}>🏫</div>
+              )}
               <div>
-                <label style={s.label}>Phone</label>
-                <input style={s.input} value={profile.phone} onChange={e => setProfile(p => ({ ...p, phone: e.target.value }))} />
-              </div>
-              <div>
-                <label style={s.label}>Email</label>
-                <input style={s.input} type="email" value={profile.email} onChange={e => setProfile(p => ({ ...p, email: e.target.value }))} />
+                <input ref={fileRef} type="file" accept="image/*" onChange={handleLogoFile} style={{ display: 'none' }} />
+                <button style={{ ...t.btn.ghost, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => fileRef.current?.click()} disabled={uploading}>
+                  <IconUpload size={14} />
+                  {uploading ? 'Uploading…' : logoPreview ? 'Change logo' : 'Upload logo'}
+                </button>
+                <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>PNG or JPG, max 2MB. Appears in the sidebar.</div>
               </div>
             </div>
-            <label style={s.label}>Registration number (EMIS / MoE ref)</label>
-            <input style={s.input} value={profile.school_reg_number} onChange={e => setProfile(p => ({ ...p, school_reg_number: e.target.value }))} />
+          </div>
+
+          <form onSubmit={saveProfile}>
+            <label style={t.label}>School name *</label>
+            <input style={t.input} value={profile.name} onChange={e => setProfile(p => ({ ...p, name: e.target.value }))} required />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div><label style={t.label}>Phone</label><input style={t.input} value={profile.phone} onChange={e => setProfile(p => ({ ...p, phone: e.target.value }))} /></div>
+              <div><label style={t.label}>Email</label><input style={t.input} type="email" value={profile.email} onChange={e => setProfile(p => ({ ...p, email: e.target.value }))} /></div>
+            </div>
+            <label style={t.label}>Registration number (EMIS / MoE ref)</label>
+            <input style={t.input} value={profile.school_reg_number} onChange={e => setProfile(p => ({ ...p, school_reg_number: e.target.value }))} />
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <button type="submit" style={s.btn} disabled={saving}>{saving ? 'Saving…' : 'Save profile'}</button>
+              <button type="submit" style={t.btn.primary} disabled={saving}>{saving ? 'Saving…' : 'Save profile'}</button>
             </div>
           </form>
         </div>
       )}
 
-      {/* ── STAFF ACCOUNTS ── */}
+      {/* ── USERS ── */}
       {tab === 'users' && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <div style={{ fontSize: 15, fontWeight: 600 }}>Staff accounts</div>
-            <button style={s.btn} onClick={() => setShowUserModal(true)}>+ Add staff</button>
+            <div style={{ fontWeight: 700, fontSize: 16 }}>Staff accounts</div>
+            <button style={t.btn.primary} onClick={() => setShowUser(true)}>+ Add staff</button>
           </div>
-          <div style={s.card}>
-            <table style={s.table}>
-              <thead>
-                <tr>
-                  <th style={s.th}>Name</th>
-                  <th style={s.th}>Email</th>
-                  <th style={s.th}>Role</th>
-                  <th style={s.th}>Status</th>
-                  <th style={s.th}></th>
-                </tr>
-              </thead>
+          <div style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead><tr>
+                {['Name','Email','Role','Status',''].map(h => <th key={h} style={t.th}>{h}</th>)}
+              </tr></thead>
               <tbody>
                 {users.map(u => (
                   <tr key={u.id}>
-                    <td style={s.td}>{u.full_name}</td>
-                    <td style={s.td}>{u.email}</td>
-                    <td style={s.td}><span style={s.badge}>{u.role}</span></td>
-                    <td style={s.td}>
-                      <span style={{ ...s.badge, background: u.is_active ? '#dcfce7' : '#fee2e2', color: u.is_active ? '#16a34a' : '#dc2626' }}>
-                        {u.is_active ? 'active' : 'disabled'}
-                      </span>
-                    </td>
-                    <td style={s.td}>
-                      <button style={s.btnGhost} onClick={() => toggleUser(u.id, u.is_active)}>
-                        {u.is_active ? 'Disable' : 'Enable'}
-                      </button>
-                    </td>
+                    <td style={{ ...t.td, fontWeight: 600 }}>{u.full_name}</td>
+                    <td style={t.td}>{u.email}</td>
+                    <td style={t.td}><span style={{ background: '#dbeafe', color: '#1d4ed8', padding: '2px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600 }}>{u.role}</span></td>
+                    <td style={t.td}><span style={{ background: u.is_active ? '#dcfce7' : '#fee2e2', color: u.is_active ? '#15803d' : '#dc2626', padding: '2px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600 }}>{u.is_active ? 'active' : 'disabled'}</span></td>
+                    <td style={t.td}><button style={t.btn.ghost} onClick={() => toggleUser(u.id, u.is_active)} >{u.is_active ? 'Disable' : 'Enable'}</button></td>
                   </tr>
                 ))}
-                {users.length === 0 && <tr><td style={{ ...s.td, color: '#94a3b8' }} colSpan={5}>No staff accounts yet.</td></tr>}
+                {!users.length && <tr><td colSpan={5} style={{ ...t.td, color: '#94a3b8', textAlign: 'center', padding: 40 }}>No staff accounts yet.</td></tr>}
               </tbody>
             </table>
           </div>
+        </div>
+      )}
 
-          {showUserModal && (
-            <div style={s.overlay} onClick={e => e.target === e.currentTarget && setShowUserModal(false)}>
-              <div style={s.modal}>
-                <div style={s.mTitle}>Add staff account</div>
-                <form onSubmit={addUser}>
-                  <label style={s.label}>Full name *</label>
-                  <input style={s.input} value={userForm.full_name} onChange={e => setUserForm(f => ({ ...f, full_name: e.target.value }))} required />
-                  <label style={s.label}>Email *</label>
-                  <input style={s.input} type="email" value={userForm.email} onChange={e => setUserForm(f => ({ ...f, email: e.target.value }))} required />
-                  <label style={s.label}>Password *</label>
-                  <input style={s.input} type="password" value={userForm.password} onChange={e => setUserForm(f => ({ ...f, password: e.target.value }))} required minLength={8} />
-                  <label style={s.label}>Role</label>
-                  <select style={s.input} value={userForm.role} onChange={e => setUserForm(f => ({ ...f, role: e.target.value }))}>
-                    <option value="bursar">Bursar</option>
-                    <option value="principal">Principal</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                  <div style={s.mFooter}>
-                    <button type="button" style={s.cancelBtn} onClick={() => setShowUserModal(false)}>Cancel</button>
-                    <button type="submit" style={s.saveBtn} disabled={saving}>{saving ? 'Saving…' : 'Add staff'}</button>
-                  </div>
-                </form>
+      {showUser && (
+        <div style={t.overlay} onClick={e => e.target === e.currentTarget && setShowUser(false)}>
+          <div style={t.modal}>
+            <h2 style={{ fontSize: 19, fontWeight: 800, marginBottom: 20 }}>Add staff account</h2>
+            <form onSubmit={addUser}>
+              <label style={t.label}>Full name *</label>
+              <input style={t.input} value={userForm.full_name} onChange={e => setUserForm(f => ({ ...f, full_name: e.target.value }))} required />
+              <label style={t.label}>Email *</label>
+              <input style={t.input} type="email" value={userForm.email} onChange={e => setUserForm(f => ({ ...f, email: e.target.value }))} required />
+              <label style={t.label}>Password *</label>
+              <input style={t.input} type="password" value={userForm.password} onChange={e => setUserForm(f => ({ ...f, password: e.target.value }))} required minLength={8} />
+              <label style={t.label}>Role</label>
+              <select style={t.input} value={userForm.role} onChange={e => setUserForm(f => ({ ...f, role: e.target.value }))}>
+                <option value="bursar">Bursar</option>
+                <option value="principal">Principal</option>
+                <option value="admin">Admin</option>
+              </select>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 4 }}>
+                <button type="button" style={t.btn.ghost} onClick={() => setShowUser(false)}>Cancel</button>
+                <button type="submit" style={t.btn.primary} disabled={saving}>{saving ? 'Saving…' : 'Add staff'}</button>
               </div>
-            </div>
-          )}
+            </form>
+          </div>
         </div>
       )}
     </div>
