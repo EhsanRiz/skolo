@@ -7,10 +7,12 @@ import api from '../lib/api'
 // Open receipt in a new printable window
 function printReceipt(entry, schoolName, sym, schoolLogoUrl) {
   const learner    = entry.learners
-  const amtDue     = Number(entry.amount_due)
-  const amtPaid    = Number(entry.amount_paid)
-  const balance    = amtDue - amtPaid
-  const isPaid     = amtPaid >= amtDue
+  const amtDue    = Number(entry.amount_due)
+  const amtPaid   = Number(entry.amount_paid)
+  const amtWaived = Number(entry.amount_waived || 0)
+  const balance   = amtDue - amtPaid - amtWaived
+  const isWaived  = amtWaived > 0
+  const isPaid    = (amtPaid + amtWaived) >= amtDue
   const receiptNo  = 'REC-' + new Date().getFullYear() + '-' + entry.id.slice(-6).toUpperCase()
   const today      = new Date().toLocaleDateString('en-ZA', {day:'numeric',month:'long',year:'numeric'})
   const grade      = [learner?.classes?.grades?.name, learner?.classes?.name].filter(Boolean).join(' ') || '—'
@@ -125,7 +127,7 @@ function printReceipt(entry, schoolName, sym, schoolLogoUrl) {
     </div>
   </div>
 
-  <div class="stamp">${isPaid ? '✓ PAID IN FULL' : `BALANCE: ${sym}${balance.toFixed(2)}`}</div>
+  <div class="stamp">${isWaived && balance <= 0 ? '✓ WAIVED' : isPaid ? '✓ PAID IN FULL' : `BALANCE: ${sym}${balance.toFixed(2)}`}</div>
 
   <div class="footer">
     <div class="footer-text">
@@ -155,10 +157,12 @@ const PAYMENT_METHODS = [
 ]
 
 const STATUS_STYLE = {
-  paid:    { bg: '#dcfce7', color: '#15803d' },
-  partial: { bg: '#fef9c3', color: '#a16207' },
-  overdue: { bg: '#fee2e2', color: '#dc2626' },
-  pending: { bg: '#f1f5f9', color: '#64748b' },
+  paid:            { bg: '#dcfce7', color: '#15803d' },
+  waived:          { bg: '#f3e8ff', color: '#7c3aed' },
+  partial_waiver:  { bg: '#ede9fe', color: '#6d28d9' },
+  partial:         { bg: '#fef9c3', color: '#a16207' },
+  overdue:         { bg: '#fee2e2', color: '#dc2626' },
+  pending:         { bg: '#f1f5f9', color: '#64748b' },
 }
 
 const CSS = `
@@ -264,6 +268,11 @@ export default function Fees() {
   const [payEntry, setPayEntry] = useState(null)
   const [payForm,  setPayForm]  = useState({ amount:'', payment_method:'cash', notes:'' })
   const [paying,   setPaying]   = useState(false)
+
+  // Waive modal
+  const [waiveEntry, setWaiveEntry] = useState(null)
+  const [waiveForm,  setWaiveForm]  = useState({ amount:'', reason:'', note:'' })
+  const [waiving,    setWaiving]    = useState(false)
 
   const [autoGenMsg, setAutoGenMsg] = useState('')
 
@@ -379,9 +388,33 @@ export default function Fees() {
   const collapseAll = () => setExpanded({})
 
   const openPay = entry => {
-    const remaining = Number(entry.amount_due) - Number(entry.amount_paid)
+    const remaining = Number(entry.amount_due) - Number(entry.amount_paid) - Number(entry.amount_waived||0)
     setPayForm({ amount: remaining.toFixed(2), payment_method: 'cash', notes: '' })
     setPayEntry(entry)
+  }
+
+  const openWaive = entry => {
+    const remaining = Number(entry.amount_due) - Number(entry.amount_paid) - Number(entry.amount_waived||0)
+    setWaiveForm({ amount: remaining.toFixed(2), reason: '', note: '' })
+    setWaiveEntry(entry)
+  }
+
+  const applyWaive = async e => {
+    e.preventDefault(); setWaiving(true)
+    try {
+      await api.post(`/fee-ledger/${waiveEntry.id}/waive`, waiveForm)
+      toast.success('Waiver applied')
+      setWaiveEntry(null); loadLedger(); loadSummary()
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
+    finally { setWaiving(false) }
+  }
+
+  const removeWaiver = async id => {
+    if (!confirm('Remove the waiver from this entry?')) return
+    try {
+      await api.post(`/fee-ledger/${id}/remove-waiver`)
+      toast.success('Waiver removed'); loadLedger(); loadSummary()
+    } catch { toast.error('Failed') }
   }
 
   const recordPay = async e => {
@@ -426,7 +459,8 @@ export default function Fees() {
   }
 
   const FeeRow = ({ row }) => {
-    const balance = Number(row.amount_due) - Number(row.amount_paid)
+    const balance  = Number(row.amount_due) - Number(row.amount_paid) - Number(row.amount_waived||0)
+    const hasWaiver = Number(row.amount_waived||0) > 0
     return (
       <tr className="fee-row" style={{ background: row.status==='overdue' ? '#fff9f9' : '#fff' }}>
         <td style={{ padding:'10px 16px 10px 40px', fontSize:11, color:'#94a3b8', fontWeight:700, letterSpacing:'0.5px', width:70 }}>
@@ -448,10 +482,16 @@ export default function Fees() {
         <td style={{ padding:'10px 8px' }}><StatusPill status={row.status} /></td>
         <td style={{ padding:'10px 16px 10px 8px' }}>
           <div style={{ display:'flex', gap:5, alignItems:'center' }}>
-            {row.status !== 'paid' && (
+            {row.status !== 'paid' && row.status !== 'waived' && balance > 0 && (
               <button className="pay-btn" onClick={() => openPay(row)}
                 style={{ padding:'5px 14px', background:'#0f2044', color:'#fff', border:'none', borderRadius:7, fontSize:12, fontWeight:700, cursor:'pointer' }}>
                 Pay
+              </button>
+            )}
+            {row.status !== 'paid' && row.status !== 'waived' && balance > 0 && (
+              <button onClick={() => openWaive(row)} title="Apply waiver / discount"
+                style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', padding:'5px 10px', border:'1px solid #c4b5fd', borderRadius:7, background:'#faf5ff', color:'#7c3aed', cursor:'pointer', fontSize:11, fontWeight:700, flexShrink:0 }}>
+                Waive
               </button>
             )}
             {Number(row.amount_paid) > 0 && (
@@ -694,7 +734,72 @@ export default function Fees() {
         )}
 
 
-                {/* PAY MODAL */}
+                {/* WAIVE MODAL */}
+        {waiveEntry && (
+          <div style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:100, backdropFilter:'blur(2px)' }}
+            onClick={e => e.target===e.currentTarget && setWaiveEntry(null)}>
+            <div style={{ background:'#fff', borderRadius:18, padding:'32px', width:'100%', maxWidth:420, boxShadow:'0 24px 60px rgba(0,0,0,0.2)' }}>
+              <h2 style={{ fontSize:18, fontWeight:800, marginBottom:6 }}>Apply waiver</h2>
+              <div style={{ marginBottom:16 }}>
+                <span style={{ fontWeight:700, color:'#0f172a', fontSize:15 }}>
+                  {waiveEntry.learners?.first_name} {waiveEntry.learners?.last_name}
+                </span>
+                {waiveEntry.learners?.reference_no && (
+                  <span style={{ marginLeft:8, fontSize:11, background:'#f1f5f9', color:'#64748b', padding:'2px 8px', borderRadius:10, fontWeight:700 }}>
+                    #{waiveEntry.learners.reference_no}
+                  </span>
+                )}
+                <div style={{ fontSize:13, color:'#94a3b8', marginTop:3 }}>{waiveEntry.description}</div>
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:18, padding:'12px 14px', background:'#faf5ff', borderRadius:10, border:'1px solid #e9d5ff' }}>
+                <div>
+                  <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', marginBottom:3 }}>Total due</div>
+                  <div style={{ fontWeight:700, fontSize:18 }}>{sym}{Number(waiveEntry.amount_due).toLocaleString()}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', marginBottom:3 }}>Remaining</div>
+                  <div style={{ fontWeight:700, fontSize:18, color:'#7c3aed' }}>
+                    {sym}{(Number(waiveEntry.amount_due) - Number(waiveEntry.amount_paid) - Number(waiveEntry.amount_waived||0)).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+              <form onSubmit={applyWaive}>
+                <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>Amount to waive ({sym}) *</label>
+                <input style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
+                  type="number" step="0.01" min="0.01"
+                  max={Number(waiveEntry.amount_due) - Number(waiveEntry.amount_paid) - Number(waiveEntry.amount_waived||0)}
+                  value={waiveForm.amount} onChange={e => setWaiveForm(f=>({...f,amount:e.target.value}))} required />
+                <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>Reason *</label>
+                <select style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
+                  value={waiveForm.reason} onChange={e => setWaiveForm(f=>({...f,reason:e.target.value}))} required>
+                  <option value="">Select reason…</option>
+                  {['Scholarship','Financial hardship','Staff discount','Government bursary','Orphan / vulnerable child','Other'].map(r => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+                <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>
+                  Note <span style={{ color:'#94a3b8', fontWeight:400 }}>(optional)</span>
+                </label>
+                <input style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:16, background:'#fff' }}
+                  value={waiveForm.note} onChange={e => setWaiveForm(f=>({...f,note:e.target.value}))}
+                  placeholder="e.g. Approved by principal on 03 Apr 2026" />
+                <div style={{ background:'#faf5ff', border:'1px solid #e9d5ff', borderRadius:9, padding:'10px 14px', marginBottom:14, fontSize:12, color:'#7c3aed' }}>
+                  🔒 This waiver will be recorded against this entry and cannot be reversed without admin action. The entry remains in the ledger for audit purposes.
+                </div>
+                <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
+                  <button type="button" onClick={() => setWaiveEntry(null)}
+                    style={{ padding:'9px 18px', background:'#f1f5f9', color:'#374151', border:'none', borderRadius:9, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+                  <button type="submit" disabled={waiving}
+                    style={{ padding:'9px 18px', background:'#7c3aed', color:'#fff', border:'none', borderRadius:9, fontWeight:700, cursor:'pointer' }}>
+                    {waiving ? 'Applying…' : 'Apply waiver'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* PAY MODAL */}
         {payEntry && (
           <div style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:100, backdropFilter:'blur(2px)' }}
             onClick={e => e.target===e.currentTarget && setPayEntry(null)}>

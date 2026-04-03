@@ -6,11 +6,15 @@ const router = express.Router()
 router.use(auth)
 
 // ── Status helper ─────────────────────────────────────────────
-function computeStatus(amount_due, amount_paid, due_date) {
-  const paid = Number(amount_paid)
-  const due  = Number(amount_due)
-  if (paid >= due) return 'paid'
-  if (paid > 0)    return 'partial'
+function computeStatus(amount_due, amount_paid, due_date, amount_waived) {
+  const paid    = Number(amount_paid)
+  const due     = Number(amount_due)
+  const waived  = Number(amount_waived || 0)
+  const settled = paid + waived
+
+  if (settled >= due)  return waived > 0 ? 'waived' : 'paid'
+  if (waived > 0)      return 'partial_waiver'
+  if (paid > 0)        return 'partial'
   if (new Date(due_date) < new Date()) return 'overdue'
   return 'pending'
 }
@@ -52,7 +56,7 @@ router.get('/', async (req, res) => {
     // Recompute status live (catches overdue since last update)
     const updated = (data || []).map(row => ({
       ...row,
-      status: computeStatus(row.amount_due, row.amount_paid, row.due_date)
+      status: computeStatus(row.amount_due, row.amount_paid, row.due_date, row.amount_waived)
     }))
 
     res.json(updated)
@@ -73,16 +77,18 @@ router.get('/summary', async (req, res) => {
 
     const rows = (data || []).map(r => ({
       ...r,
-      status: computeStatus(r.amount_due, r.amount_paid, r.due_date)
+      status: computeStatus(r.amount_due, r.amount_paid, r.due_date, r.amount_waived)
     }))
 
     const totalDue      = rows.reduce((s, r) => s + Number(r.amount_due), 0)
     const totalPaid     = rows.reduce((s, r) => s + Number(r.amount_paid), 0)
+    const totalWaived   = rows.reduce((s, r) => s + Number(r.amount_waived || 0), 0)
     const overdueCount  = rows.filter(r => r.status === 'overdue').length
     const overdueAmount = rows.filter(r => r.status === 'overdue')
-                              .reduce((s, r) => s + (Number(r.amount_due) - Number(r.amount_paid)), 0)
+                              .reduce((s, r) => s + (Number(r.amount_due) - Number(r.amount_paid) - Number(r.amount_waived||0)), 0)
+    const waivedCount   = rows.filter(r => Number(r.amount_waived||0) > 0).length
 
-    res.json({ totalDue, totalPaid, outstanding: totalDue - totalPaid, overdueCount, overdueAmount })
+    res.json({ totalDue, totalPaid, totalWaived, waivedCount, outstanding: totalDue - totalPaid - totalWaived, overdueCount, overdueAmount })
   } catch (err) { res.status(500).json({ error: err.message }) }
 })
 
@@ -286,6 +292,74 @@ router.post('/generate', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }) }
 })
 
+// ── POST /fee-ledger/:id/waive ───────────────────────────────
+// Apply a waiver/discount to a fee entry
+router.post('/:id/waive', async (req, res) => {
+  const { amount, reason, note } = req.body
+  const school_id = req.user.school_id
+
+  if (!amount || Number(amount) <= 0) {
+    return res.status(400).json({ error: 'Waiver amount must be greater than 0' })
+  }
+  if (!reason) {
+    return res.status(400).json({ error: 'Waiver reason is required' })
+  }
+
+  try {
+    const { data: entry, error: fetchErr } = await supabase
+      .from('fee_ledger')
+      .select('*')
+      .eq('id', req.params.id)
+      .eq('school_id', school_id)
+      .single()
+    if (fetchErr) throw fetchErr
+
+    // Cap waiver so paid + waived cannot exceed amount_due
+    const maxWaiver    = Number(entry.amount_due) - Number(entry.amount_paid)
+    const waiveAmount  = Math.min(Number(amount), maxWaiver)
+    const newWaived    = Number(entry.amount_waived || 0) + waiveAmount
+    const newStatus    = computeStatus(entry.amount_due, entry.amount_paid, entry.due_date, newWaived)
+
+    const { data, error } = await supabase
+      .from('fee_ledger')
+      .update({
+        amount_waived: newWaived,
+        waiver_reason: reason,
+        waiver_note:   note || null,
+        waived_by:     req.user.id,
+        status:        newStatus,
+        updated_at:    new Date().toISOString()
+      })
+      .eq('id', req.params.id)
+      .eq('school_id', school_id)
+      .select()
+      .single()
+
+    if (error) throw error
+    res.json(data)
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
+// ── POST /fee-ledger/:id/remove-waiver ───────────────────────
+// Remove a waiver from an entry
+router.post('/:id/remove-waiver', async (req, res) => {
+  const school_id = req.user.school_id
+  try {
+    const { data: entry } = await supabase
+      .from('fee_ledger').select('*')
+      .eq('id', req.params.id).eq('school_id', school_id).single()
+
+    const newStatus = computeStatus(entry.amount_due, entry.amount_paid, entry.due_date, 0)
+
+    const { data, error } = await supabase
+      .from('fee_ledger')
+      .update({ amount_waived:0, waiver_reason:null, waiver_note:null, waived_by:null, status:newStatus, updated_at:new Date().toISOString() })
+      .eq('id', req.params.id).eq('school_id', school_id).select().single()
+    if (error) throw error
+    res.json(data)
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
 // ── POST /fee-ledger/:id/pay ──────────────────────────────────
 // Record a payment against a ledger entry (partial or full)
 router.post('/:id/pay', async (req, res) => {
@@ -308,7 +382,7 @@ router.post('/:id/pay', async (req, res) => {
 
     const newAmountPaid = Number(entry.amount_paid) + Number(amount)
     const capped        = Math.min(newAmountPaid, Number(entry.amount_due))
-    const newStatus     = computeStatus(entry.amount_due, capped, entry.due_date)
+    const newStatus     = computeStatus(entry.amount_due, capped, entry.due_date, entry.amount_waived)
 
     const { data, error } = await supabase
       .from('fee_ledger')
