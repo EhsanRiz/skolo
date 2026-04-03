@@ -214,7 +214,7 @@ router.post('/generate', async (req, res) => {
 // ── POST /fee-ledger/:id/pay ──────────────────────────────────
 // Record a payment against a ledger entry (partial or full)
 router.post('/:id/pay', async (req, res) => {
-  const { amount, notes } = req.body
+  const { amount, notes, payment_method } = req.body
   const school_id = req.user.school_id
 
   if (!amount || Number(amount) <= 0) {
@@ -241,7 +241,7 @@ router.post('/:id/pay', async (req, res) => {
         amount_paid: capped,
         status:      newStatus,
         recorded_by: req.user.id,
-        notes:       notes || entry.notes,
+        notes:       [payment_method ? `method:${payment_method}` : null, notes].filter(Boolean).join(' | ') || entry.notes,
         updated_at:  new Date().toISOString()
       })
       .eq('id', req.params.id)
