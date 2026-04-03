@@ -259,12 +259,6 @@ export default function Fees() {
   const [expanded,  setExpanded]  = useState({}) // grade name → bool
   const searchRef = useRef()
 
-  // Generate modal — two step: configure → preview → confirm
-  const [showGen,     setShowGen]     = useState(false)
-  const [genForm,     setGenForm]     = useState({ frequency:'monthly', year, month:new Date().getMonth()+1, term:1, due_date:'' })
-  const [preview,     setPreview]     = useState(null)   // null | preview data
-  const [previewing,  setPreviewing]  = useState(false)
-  const [generating,  setGenerating]  = useState(false)
 
   // Pay modal
   const [payEntry, setPayEntry] = useState(null)
@@ -555,11 +549,7 @@ export default function Fees() {
               style={{ display:'flex', alignItems:'center', gap:6, padding:'9px 16px', background:'#f0fdf4', color:'#15803d', border:'1px solid #86efac', borderRadius:9, fontWeight:600, fontSize:13, cursor:'pointer' }}>
               ⬇ Export
             </button>
-            <button onClick={() => setShowGen(true)}
-              title="Manually generate fees for past/future periods or termly fees"
-              style={{ padding:'7px 14px', background:'#f8fafc', color:'#64748b', border:'1px solid #e2e8f0', borderRadius:9, fontWeight:600, cursor:'pointer', fontSize:12 }}>
-              ⚙ Manual
-            </button>
+
           </div>
         </div>
 
@@ -703,157 +693,6 @@ export default function Fees() {
           </div>
         )}
 
-        {/* GENERATE FEES MODAL — Step 1: configure */}
-        {showGen && !preview && (
-          <div style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:100, backdropFilter:'blur(2px)' }}
-            onClick={e => e.target===e.currentTarget && setShowGen(false)}>
-            <div style={{ background:'#fff', borderRadius:18, padding:'32px', width:'100%', maxWidth:440, boxShadow:'0 24px 60px rgba(0,0,0,0.2)' }}>
-              <h2 style={{ fontSize:19, fontWeight:800, marginBottom:6 }}>Generate fees</h2>
-              <p style={{ fontSize:13, color:'#64748b', marginBottom:20 }}>Choose the period — we'll show you exactly what will be created before anything happens.</p>
-              <form onSubmit={fetchPreview}>
-                <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>Frequency</label>
-                <select style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
-                  value={genForm.frequency} onChange={e => setGenForm(f=>({...f,frequency:e.target.value}))}>
-                  <option value="monthly">Monthly</option>
-                  <option value="termly">Termly</option>
-                </select>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-                  <div>
-                    <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>Year *</label>
-                    <input style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
-                      type="number" value={genForm.year} onChange={e => setGenForm(f=>({...f,year:Number(e.target.value)}))} required />
-                  </div>
-                  {genForm.frequency==='monthly' ? (
-                    <div>
-                      <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>Month *</label>
-                      <select style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
-                        value={genForm.month} onChange={e => setGenForm(f=>({...f,month:Number(e.target.value)}))}>
-                        {MONTHS.map((m,i) => <option key={i} value={i+1}>{m}</option>)}
-                      </select>
-                    </div>
-                  ) : (
-                    <div>
-                      <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>Term *</label>
-                      <select style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
-                        value={genForm.term} onChange={e => setGenForm(f=>({...f,term:Number(e.target.value)}))}>
-                        {[1,2,3,4].map(n => <option key={n} value={n}>Term {n}</option>)}
-                      </select>
-                    </div>
-                  )}
-                </div>
-                <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>
-                  Override due date <span style={{ color:'#94a3b8', fontWeight:400 }}>(optional)</span>
-                </label>
-                <input style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:16, background:'#fff' }}
-                  type="date" value={genForm.due_date} onChange={e => setGenForm(f=>({...f,due_date:e.target.value}))} />
-                <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
-                  <button type="button" onClick={() => setShowGen(false)}
-                    style={{ padding:'9px 18px', background:'#f1f5f9', color:'#374151', border:'none', borderRadius:9, fontWeight:600, cursor:'pointer' }}>Cancel</button>
-                  <button type="submit" disabled={previewing}
-                    style={{ padding:'9px 18px', background:'#0f2044', color:'#fff', border:'none', borderRadius:9, fontWeight:700, cursor:'pointer' }}>
-                    {previewing ? 'Loading…' : 'Preview →'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* GENERATE FEES MODAL — Step 2: preview + confirm */}
-        {showGen && preview && (
-          <div style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:100, backdropFilter:'blur(2px)' }}
-            onClick={e => e.target===e.currentTarget && (setShowGen(false), setPreview(null))}>
-            <div style={{ background:'#fff', borderRadius:18, padding:'32px', width:'100%', maxWidth:580, maxHeight:'85vh', overflowY:'auto', boxShadow:'0 24px 60px rgba(0,0,0,0.2)' }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6 }}>
-                <h2 style={{ fontSize:19, fontWeight:800 }}>
-                  Preview — {MONTHS[(genForm.month||1)-1]} {genForm.year}
-                </h2>
-                <button onClick={() => setPreview(null)}
-                  style={{ background:'none', border:'none', cursor:'pointer', color:'#64748b', fontSize:13, fontWeight:600 }}>← Back</button>
-              </div>
-              <p style={{ fontSize:13, color:'#64748b', marginBottom:20 }}>Review before confirming. Nothing has been created yet.</p>
-
-              {!preview.has_plans && (
-                <div style={{ background:'#fff7ed', border:'1px solid #fed7aa', borderRadius:10, padding:'14px 16px', marginBottom:16, fontSize:13, color:'#c2410c' }}>
-                  ⚠ No active fee plans found. Go to <strong>Settings → Fee Plans</strong> to create one first.
-                </div>
-              )}
-
-              {preview.rows.length > 0 && (
-                <div style={{ marginBottom:16, borderRadius:10, overflow:'hidden', border:'1px solid #e2e8f0' }}>
-                  <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
-                    <thead>
-                      <tr style={{ background:'#f8fafc' }}>
-                        {['Grade','Fee plan','Per learner','Learners','New entries','Already done'].map(h=>
-                          <th key={h} style={{ textAlign:'left', padding:'9px 12px', fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.5px' }}>{h}</th>
-                        )}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {preview.rows.map((r,i)=>(
-                        <tr key={i} style={{ borderTop:'1px solid #f1f5f9' }}>
-                          <td style={{ padding:'10px 12px', fontWeight:600, color:'#0f172a' }}>{r.grade_name}</td>
-                          <td style={{ padding:'10px 12px', color:'#374151' }}>{r.plan_name}</td>
-                          <td style={{ padding:'10px 12px', fontWeight:600 }}>{sym}{Number(r.amount).toLocaleString()}</td>
-                          <td style={{ padding:'10px 12px', color:'#64748b' }}>{r.learner_count}</td>
-                          <td style={{ padding:'10px 12px' }}>
-                            <span style={{ fontWeight:800, color: r.to_create>0?'#0f2044':'#94a3b8', fontSize:14 }}>{r.to_create}</span>
-                            {r.to_create > 0 && <span style={{ fontSize:11, color:'#64748b', marginLeft:4 }}>({sym}{Number(r.total_amount).toLocaleString()})</span>}
-                          </td>
-                          <td style={{ padding:'10px 12px', color:'#16a34a', fontWeight:600 }}>{r.already_done>0?`✓ ${r.already_done}`:'—'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot>
-                      <tr style={{ background:'#0f2044' }}>
-                        <td colSpan={4} style={{ padding:'10px 12px', fontWeight:700, color:'rgba(255,255,255,0.7)', fontSize:12 }}>TOTAL</td>
-                        <td style={{ padding:'10px 12px', fontWeight:800, color:'#fff', fontSize:15 }}>
-                          {preview.total_to_create} entries · {sym}{Number(preview.total_amount).toLocaleString()}
-                        </td>
-                        <td></td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-              )}
-
-              {preview.learners_without_plan.length > 0 && (
-                <div style={{ background:'#fff7ed', border:'1px solid #fed7aa', borderRadius:10, padding:'14px 16px', marginBottom:16 }}>
-                  <div style={{ fontWeight:700, fontSize:13, color:'#c2410c', marginBottom:8 }}>
-                    ⚠ {preview.learners_without_plan.length} learner{preview.learners_without_plan.length>1?'s':''} will be skipped — no fee plan for their grade
-                  </div>
-                  <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:10 }}>
-                    {preview.learners_without_plan.map(l=>(
-                      <span key={l.id} style={{ background:'#fff', border:'1px solid #fed7aa', borderRadius:20, padding:'3px 10px', fontSize:12, color:'#374151' }}>
-                        {l.name} <span style={{ color:'#94a3b8' }}>· {l.grade} {l.class}</span>
-                      </span>
-                    ))}
-                  </div>
-                  <div style={{ fontSize:12, color:'#9a3412' }}>
-                    Fix: go to <strong>Settings → Fee Plans</strong> → add a plan for their grade → come back and generate again.
-                  </div>
-                </div>
-              )}
-
-              {preview.total_to_create === 0 && preview.has_plans && (
-                <div style={{ background:'#f0fdf4', border:'1px solid #86efac', borderRadius:10, padding:'14px 16px', marginBottom:16, fontSize:13, color:'#15803d', fontWeight:600 }}>
-                  ✓ All fee entries already exist for this period — nothing new to generate.
-                </div>
-              )}
-
-              <div style={{ display:'flex', gap:10, justifyContent:'flex-end', marginTop:8 }}>
-                <button onClick={() => { setShowGen(false); setPreview(null) }}
-                  style={{ padding:'9px 18px', background:'#f1f5f9', color:'#374151', border:'none', borderRadius:9, fontWeight:600, cursor:'pointer' }}>Cancel</button>
-                {preview.total_to_create > 0 && (
-                  <button onClick={confirmGenerate} disabled={generating}
-                    style={{ padding:'9px 20px', background:'#0f2044', color:'#fff', border:'none', borderRadius:9, fontWeight:700, cursor:'pointer', fontSize:14 }}>
-                    {generating ? 'Creating…' : `⚡ Create ${preview.total_to_create} entries`}
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
                 {/* PAY MODAL */}
         {payEntry && (

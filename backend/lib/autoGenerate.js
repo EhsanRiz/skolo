@@ -46,6 +46,7 @@ async function autoGenerateMonthlyFees(school_id, only_learner_id = null) {
   if (!learners || learners.length === 0) return { created: 0, skipped: 0 }
 
   // ── Get ALL existing entries for this year ────────────────
+  // Deduplicate by YEAR-MONTH, not exact date, preventing double entries
   const { data: existing } = await supabase
     .from('fee_ledger')
     .select('learner_id, fee_plan_id, due_date')
@@ -53,6 +54,7 @@ async function autoGenerateMonthlyFees(school_id, only_learner_id = null) {
     .gte('due_date', `${thisYear}-01-01`)
     .lte('due_date', `${thisYear}-12-31`)
 
+  // Key = learner + plan + YYYY-MM (month-level dedup, ignores exact day)
   const existingKeys = new Set(
     (existing || []).map(e => `${e.learner_id}|${e.fee_plan_id}|${e.due_date.slice(0,7)}`)
   )
@@ -92,7 +94,7 @@ async function autoGenerateMonthlyFees(school_id, only_learner_id = null) {
           status,
         })
 
-        // Add to set so we don't duplicate within this run
+        // Track in-run to prevent same-month duplicates even across plans
         existingKeys.add(key)
       }
     }

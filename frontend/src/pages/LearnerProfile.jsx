@@ -169,7 +169,11 @@ function FeesTab({ learnerId, sym }) {
     } catch {}
     setLoading(false)
   }
-  useEffect(() => { load() }, [learnerId])
+  useEffect(() => {
+    // Auto-generate missing fees for this school then load
+    api.post('/fee-ledger/auto-generate').catch(()=>{})
+    load()
+  }, [learnerId])
 
   const currentMonth = new Date().toISOString().slice(0,7)
   const currentMonthLabel = new Date().toLocaleDateString('en-ZA',{month:'long',year:'numeric'})
