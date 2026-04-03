@@ -111,7 +111,7 @@ export const t = {
   danger: '#dc2626',
   success: '#16a34a',
   bg: '#f1f5f9',
-  card: '#fff',
+  cardBg: '#fff',
   border: '#e2e8f0',
   text: '#0f172a',
   textMuted: '#64748b',
