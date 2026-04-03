@@ -2,7 +2,7 @@ const { Resend } = require('resend')
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-const FROM = 'Skolo <notifications@skolo.app>'
+const FROM = 'Skolo <noreply@4dcs.co.za>'
 
 /**
  * Send a waiver request email to the principal/admin
