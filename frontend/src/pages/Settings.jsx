@@ -207,7 +207,7 @@ export default function Settings() {
       display:'flex', alignItems:'center', gap:6,
       padding:'7px 14px', borderRadius:8, border:'none', cursor:'pointer',
       fontWeight:600, fontSize:13, transition:'all .15s',
-      background:tab===k?'#fff':'none', color:tab===k?'#1d4ed8':'#64748b',
+      background:tab===k?'#fff':'none', color:tab===k?'#0f2044':'#64748b',
       boxShadow:tab===k?'0 1px 3px rgba(0,0,0,.1)':'none'
     }}><Icon/>{label}</button>
   )
@@ -478,22 +478,22 @@ export default function Settings() {
       {showTeacher && (
         <div style={t.overlay} onClick={e=>e.target===e.currentTarget&&(setShowTeacher(false),setEditTeacher(null))}>
           <div style={{...t.modal,maxWidth:440}}>
-            <h2 style={{fontSize:18,fontWeight:800,marginBottom:20}}>{editTeacher?'Edit teacher':'Add teacher'}</h2>
+            <h2 style={{fontSize:18,fontWeight:800,marginBottom:6}}>{editTeacher?'Edit teacher':'Add teacher'}</h2>
+            <p style={{fontSize:13,color:'#64748b',marginBottom:20}}>Class scheduling is managed in the timetable view.</p>
             <form onSubmit={saveTeacher}>
               <label style={t.label}>Full name *</label>
               <input style={t.input} value={tcForm.full_name} onChange={e=>setTcForm(f=>({...f,full_name:e.target.value}))} required/>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
                 <div><label style={t.label}>Email</label><input style={t.input} type="email" value={tcForm.email} onChange={e=>setTcForm(f=>({...f,email:e.target.value}))}/></div>
-                <div><label style={t.label}>Phone</label><input style={t.input} value={tcForm.phone} onChange={e=>setTcForm(f=>({...f,phone:e.target.value}))}/></div>
+                <div>
+                  <label style={t.label}>Phone{school?.countries?.code==='LS'?' (XXXX XXXX)':school?.countries?.code==='ZA'?' (0XX XXX XXXX)':''}</label>
+                  <input style={t.input} value={tcForm.phone} onChange={e=>setTcForm(f=>({...f,phone:e.target.value}))}
+                    placeholder={school?.countries?.code==='LS'?'XXXX XXXX':school?.countries?.code==='ZA'?'082 000 0000':'Phone'}
+                    maxLength={school?.countries?.code==='LS'?8:school?.countries?.code==='ZA'?10:20}/>
+                </div>
               </div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-                <div><label style={t.label}>Assigned class</label>
-                  <select style={t.input} value={tcForm.class_id} onChange={e=>setTcForm(f=>({...f,class_id:e.target.value}))}>
-                    <option value="">Select class…</option>
-                    {classOptions.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
-                  </select></div>
-                <div><label style={t.label}>Subject</label><input style={t.input} value={tcForm.subject} onChange={e=>setTcForm(f=>({...f,subject:e.target.value}))} placeholder="e.g. Mathematics"/></div>
-              </div>
+              <label style={t.label}>Subject</label>
+              <input style={t.input} value={tcForm.subject} onChange={e=>setTcForm(f=>({...f,subject:e.target.value}))} placeholder="e.g. Mathematics, English, Science"/>
               <div style={{display:'flex',gap:10,justifyContent:'flex-end',marginTop:4}}>
                 <button type="button" style={t.btn.ghost} onClick={()=>{setShowTeacher(false);setEditTeacher(null)}}>Cancel</button>
                 <button type="submit" style={t.btn.primary} disabled={saving}>{saving?'Saving…':editTeacher?'Save changes':'Add teacher'}</button>

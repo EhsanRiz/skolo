@@ -111,7 +111,7 @@ export default function Register() {
             <input style={inp} name="password" type="password" value={admin.password} onChange={ha} required minLength={8} />
 
             <button disabled={loading} style={{
-              width: '100%', padding: '13px', background: loading ? '#93c5fd' : '#1d4ed8',
+              width: '100%', padding: '13px', background: loading ? '#4b6a9e' : '#0f2044',
               color: '#fff', border: 'none', borderRadius: 10, fontSize: 15,
               fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', marginTop: 8
             }}>

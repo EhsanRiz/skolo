@@ -146,7 +146,7 @@ export const t = {
   // Buttons
   btn: {
     primary: {
-      padding: '9px 18px', background: '#1d4ed8', color: '#fff',
+      padding: '9px 18px', background: '#0f2044', color: '#fff',
       border: 'none', borderRadius: 9, fontWeight: 600, cursor: 'pointer', fontSize: 14
     },
     ghost: {

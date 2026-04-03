@@ -104,7 +104,7 @@ export default function Login() {
             <button type="submit" disabled={loading} style={{
               width:'100%', padding:'13px', border:'none', borderRadius:10,
               fontSize:15, fontWeight:700, cursor:loading?'not-allowed':'pointer',
-              background:loading?'#93c5fd':'#1d4ed8', color:'#fff',
+              background:loading?'#4b6a9e':'#0f2044', color:'#fff',
               transition:'background .15s', fontFamily:'inherit'
             }}>
               {loading ? 'Signing in…' : 'Sign in →'}

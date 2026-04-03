@@ -187,7 +187,7 @@ export default function Fees() {
               padding:'8px 18px', borderRadius:8, border:'none', cursor:'pointer',
               fontWeight:600, fontSize:13, transition:'all .15s',
               background: tab===tb ? '#fff' : 'none',
-              color: tab===tb ? '#1d4ed8' : '#64748b',
+              color: tab===tb ? '#0f2044' : '#64748b',
               boxShadow: tab===tb ? '0 1px 3px rgba(0,0,0,.1)' : 'none'
             }}>
               {tb === 'ledger' ? '📋 Ledger' : tb.charAt(0).toUpperCase()+tb.slice(1)}
