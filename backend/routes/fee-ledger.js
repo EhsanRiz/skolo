@@ -174,21 +174,36 @@ router.post('/generate', async (req, res) => {
       }
     }
 
-    // Insert in batches, skip duplicates via ON CONFLICT DO NOTHING
+    // Check for existing entries to avoid duplicates (manual deduplication)
     if (entries.length > 0) {
+      const planIds = [...new Set(entries.map(e => e.fee_plan_id))]
+      const dueDates = [...new Set(entries.map(e => e.due_date))]
+
+      const { data: existing } = await supabase
+        .from('fee_ledger')
+        .select('learner_id, fee_plan_id, due_date')
+        .eq('school_id', school_id)
+        .in('fee_plan_id', planIds)
+        .in('due_date', dueDates)
+
+      const existingKeys = new Set(
+        (existing || []).map(e => `${e.learner_id}|${e.fee_plan_id}|${e.due_date}`)
+      )
+
+      const newEntries = entries.filter(e =>
+        !existingKeys.has(`${e.learner_id}|${e.fee_plan_id}|${e.due_date}`)
+      )
+      skipped = entries.length - newEntries.length
+
       const BATCH = 50
-      for (let i = 0; i < entries.length; i += BATCH) {
-        const batch = entries.slice(i, i + BATCH)
+      for (let i = 0; i < newEntries.length; i += BATCH) {
+        const batch = newEntries.slice(i, i + BATCH)
         const { data: inserted, error: insErr } = await supabase
           .from('fee_ledger')
-          .upsert(batch, {
-            onConflict: 'learner_id,fee_plan_id,due_date',
-            ignoreDuplicates: true
-          })
+          .insert(batch)
           .select('id')
         if (insErr) throw insErr
         created += (inserted || []).length
-        skipped += batch.length - (inserted || []).length
       }
     }
 

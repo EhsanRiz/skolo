@@ -19,9 +19,12 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
+    // Strip empty class_id so we don't pass '' as a UUID
+    const body = { ...req.body, school_id: req.user.school_id }
+    if (!body.class_id) delete body.class_id
     const { data, error } = await supabase
       .from('teachers')
-      .insert({ ...req.body, school_id: req.user.school_id })
+      .insert(body)
       .select('*, classes(name, grades(name))')
       .single()
     if (error) throw error

@@ -44,7 +44,7 @@ export default function Settings() {
   const [teachers, setTeachers] = useState([])
   const [showTeacher, setShowTeacher] = useState(false)
   const [editTeacher, setEditTeacher] = useState(null)
-  const [tcForm, setTcForm] = useState({ full_name:'', email:'', phone:'', class_id:'', subject:'' })
+  const [tcForm, setTcForm] = useState({ full_name:'', email:'', phone:'', subject:'' })
 
   // Users
   const [users, setUsers] = useState([])
@@ -140,13 +140,13 @@ export default function Settings() {
         toast.success('Teacher added')
       }
       setShowTeacher(false); setEditTeacher(null)
-      setTcForm({ full_name:'', email:'', phone:'', class_id:'', subject:'' })
+      setTcForm({ full_name:'', email:'', phone:'', subject:'' })
       loadTeachers()
     } catch(err){ toast.error(err.response?.data?.error||'Failed') }
     finally{ setSaving(false) }
   }
   const openEditTeacher = tc => {
-    setTcForm({ full_name:tc.full_name, email:tc.email||'', phone:tc.phone||'', class_id:tc.class_id||'', subject:tc.subject||'' })
+    setTcForm({ full_name:tc.full_name, email:tc.email||'', phone:tc.phone||'', subject:tc.subject||'' })
     setEditTeacher(tc); setShowTeacher(true)
   }
   const deactivateTeacher = async id => {
@@ -328,7 +328,7 @@ export default function Settings() {
         <div>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
             <div style={{fontWeight:700,fontSize:16}}>Teachers</div>
-            <button style={t.btn.primary} onClick={()=>{setEditTeacher(null);setTcForm({full_name:'',email:'',phone:'',class_id:'',subject:''});setShowTeacher(true)}}>+ Add teacher</button>
+            <button style={t.btn.primary} onClick={()=>{setEditTeacher(null);setTcForm({full_name:'',email:'',phone:'',subject:''});setShowTeacher(true)}}>+ Add teacher</button>
           </div>
           <Card>
             <table style={{width:'100%',borderCollapse:'collapse'}}>
