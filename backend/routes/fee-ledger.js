@@ -86,6 +86,128 @@ router.get('/summary', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }) }
 })
 
+// ── GET /fee-ledger/preview ──────────────────────────────────
+// Dry-run of what generate would create — no DB writes
+router.get('/preview', async (req, res) => {
+  const { frequency, year, month, term } = req.query
+  const school_id = req.user.school_id
+  if (!frequency || !year) return res.status(400).json({ error: 'frequency and year required' })
+  try {
+    let planQuery = supabase.from('fee_plans').select('*, grades(id, name)')
+      .eq('school_id', school_id).eq('frequency', frequency).eq('year', Number(year)).eq('is_active', true)
+    if (frequency === 'termly' && term) planQuery = planQuery.eq('term', Number(term))
+    const { data: plans, error: planErr } = await planQuery
+    if (planErr) throw planErr
+
+    const { data: learners, error: lErr } = await supabase.from('learners')
+      .select('id, first_name, last_name, reference_no, class_id, classes(grade_id, name, grades(id, name))')
+      .eq('school_id', school_id).eq('is_active', true)
+    if (lErr) throw lErr
+
+    // Get existing entries for this period
+    const m = month ? String(month).padStart(2,'0') : '01'
+    const { data: existing } = await supabase.from('fee_ledger').select('learner_id, fee_plan_id')
+      .eq('school_id', school_id)
+      .gte('due_date', `${year}-${m}-01`)
+      .lte('due_date', `${year}-${m}-31`)
+    const existingKeys = new Set((existing||[]).map(e=>`${e.learner_id}|${e.fee_plan_id}`))
+
+    const rows = []
+    const coveredIds = new Set()
+
+    ;(plans||[]).forEach(plan => {
+      const eligible = plan.grade_id
+        ? (learners||[]).filter(l=>l.classes?.grade_id===plan.grade_id)
+        : (learners||[])
+      const toCreate  = eligible.filter(l=>!existingKeys.has(`${l.id}|${plan.id}`))
+      eligible.forEach(l=>coveredIds.add(l.id))
+      rows.push({
+        grade_name:    plan.grades?.name || 'All grades',
+        plan_name:     plan.name,
+        plan_id:       plan.id,
+        amount:        plan.amount,
+        learner_count: eligible.length,
+        to_create:     toCreate.length,
+        already_done:  eligible.length - toCreate.length,
+        total_amount:  plan.amount * toCreate.length,
+      })
+    })
+
+    const learnersWithoutPlan = (learners||[]).filter(l=>!coveredIds.has(l.id)).map(l=>({
+      id: l.id,
+      name: `${l.first_name} ${l.last_name}`,
+      reference_no: l.reference_no,
+      grade: l.classes?.grades?.name || 'Unknown',
+      class: l.classes?.name || '',
+    }))
+
+    res.json({
+      rows,
+      learners_without_plan: learnersWithoutPlan,
+      total_to_create: rows.reduce((s,r)=>s+r.to_create,0),
+      total_amount:    rows.reduce((s,r)=>s+r.total_amount,0),
+      has_plans:       (plans||[]).length > 0,
+    })
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
+// ── POST /fee-ledger/generate-for-learner ────────────────────
+// Generates missing entries for ONE learner (catch-up)
+router.post('/generate-for-learner', async (req, res) => {
+  const { learner_id, frequency, year, month, term } = req.body
+  const school_id = req.user.school_id
+  if (!learner_id) return res.status(400).json({ error: 'learner_id required' })
+
+  try {
+    // Get the learner's grade
+    const { data: learner } = await supabase.from('learners')
+      .select('id, first_name, last_name, class_id, classes(grade_id)')
+      .eq('id', learner_id).eq('school_id', school_id).single()
+    if (!learner) return res.status(404).json({ error: 'Learner not found' })
+
+    const freq = frequency || 'monthly'
+    const yr   = year || new Date().getFullYear()
+    const mo   = month || new Date().getMonth() + 1
+    const tr   = term || 1
+
+    // Get matching fee plans
+    let planQuery = supabase.from('fee_plans').select('*')
+      .eq('school_id', school_id).eq('frequency', freq).eq('year', yr).eq('is_active', true)
+    if (freq === 'termly') planQuery = planQuery.eq('term', tr)
+    const { data: plans } = await planQuery
+
+    const eligible = (plans||[]).filter(p => !p.grade_id || p.grade_id === learner.classes?.grade_id)
+    if (!eligible.length) return res.json({ created: 0, message: 'No fee plans match this learner's grade' })
+
+    // Check existing
+    const m = String(mo).padStart(2,'0')
+    const { data: existing } = await supabase.from('fee_ledger').select('fee_plan_id')
+      .eq('learner_id', learner_id).gte('due_date', `${yr}-${m}-01`).lte('due_date', `${yr}-${m}-31`)
+    const existingPlanIds = new Set((existing||[]).map(e=>e.fee_plan_id))
+
+    const toInsert = eligible.filter(p => !existingPlanIds.has(p.id))
+    if (!toInsert.length) return res.json({ created: 0, message: 'All fee entries already exist' })
+
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
+    const entries = toInsert.map(plan => {
+      const dueDay = plan.due_day || 1
+      const dueDate = freq === 'monthly'
+        ? `${yr}-${m}-${String(dueDay).padStart(2,'0')}`
+        : ({ 1:`${yr}-01-15`, 2:`${yr}-04-08`, 3:`${yr}-07-14`, 4:`${yr}-09-15` })[tr]
+      const label = freq === 'monthly' ? `${MONTHS[mo-1]} ${yr}` : `Term ${tr} ${yr}`
+      return {
+        school_id, learner_id, fee_plan_id: plan.id,
+        description: `${plan.name} — ${label}`,
+        due_date: dueDate, amount_due: plan.amount, amount_paid: 0,
+        status: new Date(dueDate) < new Date() ? 'overdue' : 'pending'
+      }
+    })
+
+    const { data: inserted } = await supabase.from('fee_ledger').insert(entries).select('id')
+    res.json({ created: (inserted||[]).length })
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
 // ── POST /fee-ledger/generate ─────────────────────────────────
 // Generates ledger entries for a given period
 // Body: { frequency: 'monthly'|'termly', year, month (for monthly), term (for termly), due_date }

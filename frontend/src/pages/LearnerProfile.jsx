@@ -159,6 +159,8 @@ function FeesTab({ learnerId, sym }) {
 
   const STATUS_C = { paid:['#dcfce7','#15803d'], partial:['#fef9c3','#a16207'], overdue:['#fee2e2','#dc2626'], pending:['#f1f5f9','#64748b'] }
 
+  const [catchingUp, setCatchingUp] = useState(false)
+
   const load = async () => {
     setLoading(true)
     try {
@@ -168,6 +170,23 @@ function FeesTab({ learnerId, sym }) {
     setLoading(false)
   }
   useEffect(() => { load() }, [learnerId])
+
+  const currentMonth = new Date().toISOString().slice(0,7)
+  const currentMonthLabel = new Date().toLocaleDateString('en-ZA',{month:'long',year:'numeric'})
+  const hasCurrentMonth = entries.some(e => e.due_date?.slice(0,7) === currentMonth)
+
+  const catchUp = async () => {
+    setCatchingUp(true)
+    try {
+      const mo = new Date().getMonth() + 1
+      const { data } = await api.post('/fee-ledger/generate-for-learner', {
+        learner_id: learnerId, frequency:'monthly', year, month: mo
+      })
+      if (data.created > 0) { toast.success(`${data.created} fee entr${data.created>1?'ies':'y'} created`); load() }
+      else toast.info(data.message || 'No entries created — check fee plans in Settings')
+    } catch { toast.error('Failed to generate fees') }
+    finally { setCatchingUp(false) }
+  }
 
   const openPay = e => { setPayForm({ amount:(Number(e.amount_due)-Number(e.amount_paid)).toFixed(2), payment_method:'cash', notes:'' }); setPayEntry(e) }
 
@@ -186,6 +205,20 @@ function FeesTab({ learnerId, sym }) {
 
   return (
     <div>
+      {/* Catch-up banner — shown when no fees exist for current month */}
+      {!loading && !hasCurrentMonth && (
+        <div style={{ background:'#fffbeb', border:'1px solid #fcd34d', borderRadius:10, padding:'12px 16px', marginBottom:16, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <div>
+            <div style={{ fontWeight:700, fontSize:13, color:'#92400e' }}>⚠ No fees generated for {currentMonthLabel}</div>
+            <div style={{ fontSize:12, color:'#a16207', marginTop:2 }}>This learner has no fee entries for the current month.</div>
+          </div>
+          <button onClick={catchUp} disabled={catchingUp}
+            style={{ padding:'7px 14px', background:'#0f2044', color:'#fff', border:'none', borderRadius:8, fontSize:12, fontWeight:700, cursor:'pointer', flexShrink:0 }}>
+            {catchingUp ? 'Generating…' : '⚡ Generate now'}
+          </button>
+        </div>
+      )}
+
       {/* Summary */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12, marginBottom:20 }}>
         {[
