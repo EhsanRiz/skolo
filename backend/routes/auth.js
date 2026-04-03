@@ -156,20 +156,50 @@ router.post('/set-password', async (req, res) => {
 // ─── GET /auth/verify-invite — check token validity ──────────
 router.get('/verify-invite/:token', async (req, res) => {
   try {
-    const { data: user } = await supabase
-      .from('users')
-      .select('full_name, email, role, invite_expires_at, schools(name)')
-      .eq('invite_token', req.params.token)
-      .eq('is_active', true)
-      .single()
-
-    if (!user) return res.status(404).json({ valid: false, error: 'Invalid invite link' })
-    if (new Date(user.invite_expires_at) < new Date()) {
-      return res.status(400).json({ valid: false, error: 'This invite link has expired' })
+    const token = req.params.token
+    if (!token || token.length < 10) {
+      return res.status(400).json({ valid: false, error: 'Invalid token format' })
     }
 
-    res.json({ valid: true, full_name: user.full_name, email: user.email, role: user.role, school_name: user.schools?.name })
-  } catch (err) { res.status(500).json({ valid: false, error: err.message }) }
+    // Use maybeSingle() to avoid throwing when not found
+    const { data: user, error: uErr } = await supabase
+      .from('users')
+      .select('id, full_name, email, role, invite_expires_at, school_id, is_active, password_set')
+      .eq('invite_token', token)
+      .maybeSingle()
+
+    if (uErr) {
+      console.error('verify-invite DB error:', uErr.message)
+      return res.status(500).json({ valid: false, error: uErr.message })
+    }
+    if (!user) {
+      return res.status(404).json({ valid: false, error: 'Invite link not found — it may have already been used or expired' })
+    }
+    if (!user.is_active) {
+      return res.status(400).json({ valid: false, error: 'This account has been disabled' })
+    }
+    if (user.password_set) {
+      return res.status(400).json({ valid: false, error: 'Password already set — please log in normally' })
+    }
+    if (!user.invite_expires_at || new Date(user.invite_expires_at) < new Date()) {
+      return res.status(400).json({ valid: false, error: 'This invite link has expired — ask your admin to resend it' })
+    }
+
+    // Get school name separately to avoid join issues
+    const { data: school } = await supabase
+      .from('schools').select('name').eq('id', user.school_id).maybeSingle()
+
+    res.json({
+      valid:       true,
+      full_name:   user.full_name,
+      email:       user.email,
+      role:        user.role,
+      school_name: school?.name || 'Your school'
+    })
+  } catch (err) {
+    console.error('verify-invite unexpected error:', err.message)
+    res.status(500).json({ valid: false, error: 'Server error: ' + err.message })
+  }
 })
 
 module.exports = router

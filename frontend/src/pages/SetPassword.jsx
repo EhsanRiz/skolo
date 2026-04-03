@@ -19,12 +19,16 @@ export default function SetPassword() {
   useEffect(() => {
     if (!token) { setStep('invalid'); return }
     fetch(`${API}/auth/verify-invite/${token}`)
-      .then(r => r.json())
-      .then(data => {
+      .then(async r => {
+        const data = await r.json()
         if (data.valid) { setInvite(data); setStep('valid') }
         else { setError(data.error || 'Invalid invite link'); setStep('invalid') }
       })
-      .catch(() => { setError('Could not verify invite link'); setStep('invalid') })
+      .catch(err => {
+        console.error('Verify invite error:', err)
+        setError('Could not reach the server. Please try again in a moment.')
+        setStep('invalid')
+      })
   }, [token])
 
   const handleSubmit = async e => {
