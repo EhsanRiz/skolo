@@ -87,6 +87,22 @@ function OverviewTab({ learner, school }) {
         </div>
       </div>
 
+      {/* Medical */}
+      <div style={{ gridColumn:'1/-1', background:'#fff', borderRadius:12, padding:'20px 24px', boxShadow:'0 1px 3px rgba(0,0,0,.06)', borderLeft:'3px solid #e2e8f0' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
+          <div style={{ fontWeight:700, fontSize:15, color:'#0f172a' }}>Medical information</div>
+          <span style={{ fontSize:11, color:'#94a3b8', fontStyle:'italic' }}>Optional · shared only with consent</span>
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
+          <Field label="Medical condition" value={learner.medical_condition} />
+          <Field label="Doctor / clinic"   value={learner.doctor_name} />
+          <Field label="Doctor phone"      value={learner.doctor_phone} />
+        </div>
+        {!learner.medical_condition && !learner.doctor_name && (
+          <div style={{ fontSize:12, color:'#94a3b8', marginTop:6 }}>No medical information on file. Edit the learner record to add.</div>
+        )}
+      </div>
+
       {/* Guardian */}
       <div style={{ background:'#fff', borderRadius:12, padding:'20px 24px', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>
         <div style={{ fontWeight:700, fontSize:15, marginBottom:18, color:'#0f172a' }}>Parent / Guardian</div>
@@ -563,6 +579,37 @@ function NotesTab({ learnerId }) {
   )
 }
 
+// ── Premium gate ─────────────────────────────────────────────
+function PremiumGate({ tab, learnerId }) {
+  const labels = { grades:'Exam Grades', awards:'Awards', notes:'Notes' }
+  return (
+    <div style={{ background:'#fff', borderRadius:14, padding:'56px 40px', textAlign:'center',
+      boxShadow:'0 1px 3px rgba(0,0,0,.06)', border:'1.5px dashed #e2e8f0' }}>
+      <div style={{ fontSize:40, marginBottom:16 }}>🔒</div>
+      <div style={{ fontSize:18, fontWeight:800, color:'#0f172a', marginBottom:8 }}>
+        {labels[tab]} is a Pro feature
+      </div>
+      <div style={{ fontSize:14, color:'#64748b', maxWidth:380, margin:'0 auto 24px', lineHeight:1.7 }}>
+        Upgrade to Skolo Pro to unlock exam result tracking, awards management and staff notes for all your learners.
+      </div>
+      <div style={{ display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap' }}>
+        <div style={{ background:'#f8fafc', borderRadius:10, padding:'12px 20px', fontSize:13, color:'#374151' }}>
+          📊 Exam grades grid (subjects × terms)
+        </div>
+        <div style={{ background:'#f8fafc', borderRadius:10, padding:'12px 20px', fontSize:13, color:'#374151' }}>
+          🏆 Awards and achievements
+        </div>
+        <div style={{ background:'#f8fafc', borderRadius:10, padding:'12px 20px', fontSize:13, color:'#374151' }}>
+          📝 Staff notes and observations
+        </div>
+      </div>
+      <div style={{ marginTop:28, fontSize:13, color:'#94a3b8' }}>
+        Contact <strong style={{color:'#0f2044'}}>4D Climate Solutions</strong> to upgrade your school's plan.
+      </div>
+    </div>
+  )
+}
+
 // ── Main Page ─────────────────────────────────────────────────
 export default function LearnerProfile() {
   const { id } = useParams()
@@ -591,11 +638,11 @@ export default function LearnerProfile() {
   const grade = `${learner.classes?.grades?.name||''} ${learner.classes?.name||''}`.trim() || '—'
 
   const TABS = [
-    { key:'overview', label:'Overview' },
-    { key:'fees',     label:'Fees' },
-    { key:'grades',   label:'Exam Grades' },
-    { key:'awards',   label:'Awards' },
-    { key:'notes',    label:'Notes' },
+    { key:'overview', label:'Overview',    premium:false },
+    { key:'fees',     label:'Fees',        premium:false },
+    { key:'grades',   label:'Exam Grades', premium:true  },
+    { key:'awards',   label:'Awards',      premium:true  },
+    { key:'notes',    label:'Notes',       premium:true  },
   ]
 
   return (
@@ -625,17 +672,18 @@ export default function LearnerProfile() {
               </div>
             </div>
           </div>
-          <button onClick={() => navigate(`/learners/${id}/edit`)}
-            style={{ padding:'8px 16px', background:'rgba(255,255,255,0.15)', color:'#fff', border:'1px solid rgba(255,255,255,0.2)', borderRadius:9, fontSize:13, fontWeight:600, cursor:'pointer' }}>
-            ✏️ Edit learner
-          </button>
+
         </div>
 
         {/* Tabs */}
         <div style={{ borderBottom:'2px solid #e2e8f0', marginBottom:24, display:'flex', gap:0 }}>
           {TABS.map(tb => (
-            <button key={tb.key} className={`tab-btn${tab===tb.key?' active':''}`} onClick={() => setTab(tb.key)}>
+            <button key={tb.key}
+              className={`tab-btn${tab===tb.key?' active':''}`}
+              onClick={() => setTab(tb.key)}
+              style={{ display:'flex', alignItems:'center', gap:5 }}>
               {tb.label}
+              {tb.premium && <span style={{ fontSize:10, background:'#fef9c3', color:'#a16207', padding:'1px 6px', borderRadius:10, fontWeight:700, letterSpacing:'0.3px' }}>PRO</span>}
             </button>
           ))}
         </div>
@@ -643,9 +691,7 @@ export default function LearnerProfile() {
         {/* Tab content */}
         {tab === 'overview' && <OverviewTab learner={learner} school={school} />}
         {tab === 'fees'     && <FeesTab learnerId={id} sym={sym} />}
-        {tab === 'grades'   && <ExamGradesTab learnerId={id} />}
-        {tab === 'awards'   && <AwardsTab learnerId={id} />}
-        {tab === 'notes'    && <NotesTab learnerId={id} />}
+        {(tab === 'grades' || tab === 'awards' || tab === 'notes') && <PremiumGate tab={tab} learnerId={id} />}
       </div>
     </>
   )

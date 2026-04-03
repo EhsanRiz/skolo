@@ -130,7 +130,7 @@ export default function Learners() {
   const openView = l => { setSelected(l); setModal('view') }
   const openEdit = l => {
     setSelected(l)
-    setForm({ first_name: l.first_name, last_name: l.last_name, date_of_birth: l.date_of_birth || '', gender: l.gender || '', class_id: l.class_id || '' })
+    setForm({ first_name: l.first_name, last_name: l.last_name, date_of_birth: l.date_of_birth || '', gender: l.gender || '', class_id: l.class_id || '', medical_condition: l.medical_condition || '', doctor_name: l.doctor_name || '', doctor_phone: l.doctor_phone || '' })
     const g = l.learner_guardians?.find(lg => lg.is_primary)?.guardians
     if (g) setGuardian({ first_name: g.first_name, last_name: g.last_name, phone: g.phone, email: g.email || '', relationship: g.relationship || 'mother' })
     setModal('edit')
@@ -506,6 +506,20 @@ export default function Learners() {
                   </select></div>
               </div>
               <GradeSelect />
+              {/* Medical — optional */}
+              <div style={{ borderTop:'1px solid #f1f5f9', paddingTop:14, marginTop:4 }}>
+                <div style={{ fontSize:11, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.6px', marginBottom:12 }}>
+                  Medical <span style={{ fontWeight:400, textTransform:'none' }}>(optional · with parent consent)</span>
+                </div>
+                <div><label style={t.label}>Medical condition</label>
+                  <input style={t.input} value={form.medical_condition||''} onChange={e=>setForm(f=>({...f,medical_condition:e.target.value}))} placeholder="e.g. Asthma, Diabetes, Epilepsy" /></div>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+                  <div><label style={t.label}>Doctor / clinic</label>
+                    <input style={t.input} value={form.doctor_name||''} onChange={e=>setForm(f=>({...f,doctor_name:e.target.value}))} placeholder="Dr. Name or clinic name" /></div>
+                  <div><label style={t.label}>Doctor phone</label>
+                    <input style={t.input} value={form.doctor_phone||''} onChange={e=>setForm(f=>({...f,doctor_phone:e.target.value}))} placeholder="XXXX XXXX" /></div>
+                </div>
+              </div>
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 4 }}>
                 <button type="button" style={t.btn.ghost} onClick={close}>Cancel</button>
                 <button type="submit" style={t.btn.primary} disabled={saving}>{saving ? 'Saving…' : 'Save changes'}</button>
