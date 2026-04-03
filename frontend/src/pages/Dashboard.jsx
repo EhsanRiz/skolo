@@ -99,8 +99,34 @@ function OutstandingDrawer({ entries, sym, onClose }) {
   )
 }
 
+function WaiverQueueLink({ isPrincipal }) {
+  const [pending, setPending] = useState(0)
+  useEffect(() => {
+    api.get('/waivers').then(r => {
+      setPending((r.data||[]).filter(w => w.status === 'pending').length)
+    }).catch(()=>{})
+  }, [])
+
+  if (pending === 0 && !isPrincipal) return null
+  return (
+    <Link to="/waivers" className="quick-link"
+      style={isPrincipal && pending > 0 ? { background:'#faf5ff', border:'1px solid #c4b5fd' } : {}}>
+      <span style={{ color: isPrincipal && pending > 0 ? '#7c3aed' : '#0f172a' }}>
+        {isPrincipal ? '✅ Waiver approvals' : '📋 Waiver requests'}
+        {pending > 0 && (
+          <span style={{ marginLeft:8, background:'#7c3aed', color:'#fff', borderRadius:20, padding:'1px 8px', fontSize:11, fontWeight:700 }}>
+            {pending} pending
+          </span>
+        )}
+      </span>
+      <span style={{ color:'#94a3b8' }}>→</span>
+    </Link>
+  )
+}
+
 export default function Dashboard() {
   const { school, user } = useAuth()
+  const isPrincipal = user?.role === 'principal'
   const navigate  = useNavigate()
   const sym       = school?.countries?.currency_symbol || 'R'
   const now       = new Date()
@@ -168,6 +194,7 @@ export default function Dashboard() {
         </h1>
         <p style={{ fontSize:14, color:'#64748b', marginTop:2 }}>
           {now.toLocaleDateString('en-ZA', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}
+          {isPrincipal && <span style={{ marginLeft:10, fontSize:12, background:'#f0fdf4', color:'#15803d', padding:'2px 8px', borderRadius:20, fontWeight:600 }}>Principal view</span>}
         </p>
       </div>
 
@@ -221,22 +248,27 @@ export default function Dashboard() {
         {/* Right column */}
         <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
-          {/* Quick actions */}
+          {/* Quick actions — role aware */}
           <div className="dash-card" style={{ animationDelay:'300ms' }}>
-            <div style={{ fontWeight:700, fontSize:15, color:'#0f172a', marginBottom:14 }}>Quick actions</div>
+            <div style={{ fontWeight:700, fontSize:15, color:'#0f172a', marginBottom:14 }}>
+              {isPrincipal ? 'Principal actions' : 'Quick actions'}
+            </div>
 
             {unpaidEntries.length > 0 && (
               <button className="quick-link" onClick={() => setDrawer(true)}
                 style={{ background:'#fff7ed', border:'1px solid #fed7aa' }}>
                 <span style={{ color:'#c2410c' }}>
-                  💰 {unpaidEntries.length} unpaid fees — {sym}{monthBalance.toLocaleString()} outstanding
+                  💰 {unpaidEntries.length} unpaid — {sym}{monthBalance.toLocaleString()} outstanding
                 </span>
                 <span style={{ color:'#94a3b8' }}>→</span>
               </button>
             )}
 
+            {/* Waiver queue — prominent for principal */}
+            <WaiverQueueLink isPrincipal={isPrincipal} />
+
             <Link to="/fees" className="quick-link">
-              <span>📋 Fee collection — {monthLabel}</span>
+              <span>📋 Fee overview — {monthLabel}</span>
               <span style={{ color:'#94a3b8' }}>→</span>
             </Link>
 
@@ -246,14 +278,16 @@ export default function Dashboard() {
             </Link>
 
             <Link to="/announcements" className="quick-link">
-              <span>📢 Send announcement</span>
+              <span>📢 {isPrincipal ? 'Post announcement' : 'Send announcement'}</span>
               <span style={{ color:'#94a3b8' }}>→</span>
             </Link>
 
-            <Link to="/settings" className="quick-link">
-              <span>⚙ Settings</span>
-              <span style={{ color:'#94a3b8' }}>→</span>
-            </Link>
+            {!isPrincipal && (
+              <Link to="/settings" className="quick-link">
+                <span>⚙ Settings</span>
+                <span style={{ color:'#94a3b8' }}>→</span>
+              </Link>
+            )}
           </div>
 
           {/* Events */}

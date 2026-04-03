@@ -2,14 +2,15 @@ import { useState, useEffect, useRef } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
-const NAV = [
-  { to: '/',              label: 'Dashboard',     icon: DashIcon    },
-  { to: '/learners',      label: 'Learners',      icon: UsersIcon   },
-  { to: '/fees',          label: 'Fees',          icon: FeeIcon     },
-  { to: '/events',        label: 'Events',        icon: CalIcon     },
-  { to: '/announcements', label: 'Announcements', icon: SendIcon    },
-  { to: '/settings',      label: 'Settings',      icon: GearIcon    },
-  { to: '/waivers',       label: 'Waivers',       icon: WaiverIcon  },
+// roles: undefined = all, ['admin'] = admin only, ['principal','admin'] = both
+const NAV_ITEMS = [
+  { to: '/',              label: 'Dashboard',     icon: DashIcon,   roles: null },
+  { to: '/learners',      label: 'Learners',      icon: UsersIcon,  roles: null },
+  { to: '/fees',          label: 'Fees',          icon: FeeIcon,    roles: null },
+  { to: '/waivers',       label: 'Waivers',       icon: WaiverIcon, roles: null },
+  { to: '/events',        label: 'Events',        icon: CalIcon,    roles: null },
+  { to: '/announcements', label: 'Announcements', icon: SendIcon,   roles: null },
+  { to: '/settings',      label: 'Settings',      icon: GearIcon,   roles: ['admin', 'bursar'] },
 ]
 
 function DashIcon()  { return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> }
@@ -217,7 +218,7 @@ export default function Layout() {
 
       {/* Nav */}
       <nav style={{ flex:1, padding:'4px 12px', overflowY:'auto' }}>
-        {NAV.map(({ to, label, icon: Icon }) => (
+        {NAV_ITEMS.filter(item => !item.roles || item.roles.includes(user?.role)).map(({ to, label, icon: Icon }) => (
           <NavLink key={to} to={to} end={to==='/'} className={({isActive}) => `nav-link${isActive?' active':''}`}>
             <Icon />{label}
           </NavLink>
@@ -331,7 +332,7 @@ export default function Layout() {
           zIndex:150, justifyContent:'space-around', alignItems:'center',
           boxShadow:'0 -2px 12px rgba(0,0,0,0.2)'
         }}>
-          {NAV.map(({ to, label, icon: Icon }) => (
+          {NAV_ITEMS.filter(item => !item.roles || item.roles.includes(user?.role)).map(({ to, label, icon: Icon }) => (
             <NavLink key={to} to={to} end={to==='/'} className={({isActive}) => `mob-nav-link${isActive?' active':''}`}>
               <Icon />
               <span>{label}</span>

@@ -248,7 +248,8 @@ function exportToExcel(ledger, sym, schoolName, monthLabel) {
 }
 
 export default function Fees() {
-  const { school } = useAuth()
+  const { school, user } = useAuth()
+  const isReadOnly = user?.role === 'principal'
   const toast = useToast()
   const sym   = school?.countries?.currency_symbol || 'R'
   const schoolName = school?.name || 'School'
@@ -489,14 +490,14 @@ export default function Fees() {
         <td style={{ padding:'10px 8px' }}><StatusPill status={row.status} /></td>
         <td style={{ padding:'10px 16px 10px 8px' }}>
           <div style={{ display:'flex', gap:5, alignItems:'center' }}>
-            {row.status !== 'paid' && row.status !== 'waived' && balance > 0 && (
+            {!isReadOnly && row.status !== 'paid' && row.status !== 'waived' && balance > 0 && (
               <button className="pay-btn" onClick={() => openPay(row)}
                 style={{ padding:'5px 14px', background:'#0f2044', color:'#fff', border:'none', borderRadius:7, fontSize:12, fontWeight:700, cursor:'pointer' }}>
                 Pay
               </button>
             )}
-            {row.status !== 'paid' && row.status !== 'waived' && balance > 0 && (
-              <button onClick={() => openWaive(row)} title="Apply waiver / discount"
+            {!isReadOnly && row.status !== 'paid' && row.status !== 'waived' && balance > 0 && (
+              <button onClick={() => openWaive(row)} title="Request waiver"
                 style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', padding:'5px 10px', border:'1px solid #c4b5fd', borderRadius:7, background:'#faf5ff', color:'#7c3aed', cursor:'pointer', fontSize:11, fontWeight:700, flexShrink:0 }}>
                 Waive
               </button>

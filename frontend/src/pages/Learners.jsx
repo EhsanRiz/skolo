@@ -95,6 +95,8 @@ export default function Learners() {
   const { school } = useAuth()
   const toast = useToast()
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const isReadOnly = user?.role === 'principal'
   const cc = school?.countries?.code || 'LS'
 
   const [learners, setLearners] = useState([])
