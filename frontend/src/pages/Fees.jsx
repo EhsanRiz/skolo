@@ -4,26 +4,138 @@ import { useToast } from '../contexts/ToastContext'
 import * as XLSX from 'xlsx'
 import api from '../lib/api'
 
-// Download receipt PDF for a ledger entry
-async function downloadReceipt(entryId, learnerName, toast, apiInstance) {
-  try {
-    const token = localStorage.getItem('sk_token')
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/receipts/${entryId}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
-    if (!res.ok) throw new Error('Failed to generate receipt')
-    const blob = await res.blob()
-    const url  = URL.createObjectURL(blob)
-    const a    = document.createElement('a')
-    a.href     = url
-    a.download = `Receipt-${learnerName.replace(/ /g,'-')}.pdf`
-    a.click()
-    URL.revokeObjectURL(url)
-    toast.success('Receipt downloaded')
-  } catch (err) {
-    toast.error('Could not generate receipt')
+// Open receipt in a new printable window
+function printReceipt(entry, schoolName, sym) {
+  const learner    = entry.learners
+  const amtDue     = Number(entry.amount_due)
+  const amtPaid    = Number(entry.amount_paid)
+  const balance    = amtDue - amtPaid
+  const isPaid     = amtPaid >= amtDue
+  const receiptNo  = 'REC-' + new Date().getFullYear() + '-' + entry.id.slice(-6).toUpperCase()
+  const today      = new Date().toLocaleDateString('en-ZA', {day:'numeric',month:'long',year:'numeric'})
+  const grade      = [learner?.classes?.grades?.name, learner?.classes?.name].filter(Boolean).join(' ') || '—'
+  const methodMap  = { cash:'Cash', eft:'EFT / Bank Transfer', mobile_money:'Mobile Money (M-Pesa)', ewallet:'eWallet', snapscan:'SnapScan', other:'Other' }
+  const method     = entry.notes?.split('|')[0]?.replace('method:','').trim() || 'cash'
+  const methodLabel = methodMap[method] || 'Cash'
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Receipt ${receiptNo}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;padding:0}
+  @media print{
+    body{padding:0}
+    .no-print{display:none!important}
+    @page{size:A5;margin:8mm}
   }
+  .receipt{max-width:420px;margin:0 auto;background:#fff}
+  .header{background:#0f2044;color:#fff;padding:24px 28px 20px;display:flex;justify-content:space-between;align-items:flex-start}
+  .brand{font-size:22px;font-weight:900;letter-spacing:-0.5px}
+  .brand-tag{font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px}
+  .receipt-label{text-align:right;font-size:11px;font-weight:700;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.8px}
+  .receipt-no{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px}
+  .school-row{padding:14px 28px;border-bottom:1px solid #f1f5f9}
+  .school-name{font-size:14px;font-weight:800;color:#0f172a}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:16px 28px;border-bottom:1px solid #f1f5f9}
+  .info-block{margin-bottom:14px}
+  .info-label{font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:3px}
+  .info-value{font-size:13px;font-weight:600;color:#0f172a}
+  .desc-box{margin:0 28px 16px;background:#f8fafc;border-radius:8px;padding:12px 14px}
+  .desc-text{font-size:13px;font-weight:700;color:#0f172a}
+  .amounts{border-top:1px solid #f1f5f9}
+  .amount-row{display:flex;justify-content:space-between;align-items:center;padding:10px 28px;border-bottom:1px solid #f8fafc}
+  .amount-row:nth-child(2){background:#f8fafc}
+  .amount-label{font-size:12px;color:#64748b}
+  .amount-value{font-size:14px;font-weight:700;color:#0f172a}
+  .amount-value.paid{color:#15803d}
+  .amount-value.balance{color:${balance>0?'#dc2626':'#15803d'}}
+  .stamp{margin:16px 28px;padding:10px 14px;border-radius:8px;text-align:center;font-size:15px;font-weight:900;letter-spacing:1px;border:2.5px solid ${isPaid?'#16a34a':'#dc2626'};color:${isPaid?'#15803d':'#dc2626'}}
+  .method-row{padding:12px 28px;font-size:12px;color:#64748b;border-top:1px solid #f1f5f9}
+  .footer{background:#f8fafc;padding:14px 28px;margin-top:8px}
+  .footer-text{font-size:10px;color:#94a3b8;text-align:center;line-height:1.6}
+  .print-bar{background:#0f2044;padding:12px 20px;display:flex;gap:10px;justify-content:center;position:sticky;top:0;z-index:10}
+  .print-btn{padding:8px 20px;background:#fff;color:#0f2044;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer}
+  .close-btn{padding:8px 20px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:7px;font-size:13px;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="no-print print-bar">
+  <button class="print-btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+  <button class="close-btn" onclick="window.close()">Close</button>
+</div>
+<div class="receipt">
+  <div class="header">
+    <div>
+      <div class="brand">Skolo</div>
+      <div class="brand-tag">One platform. Whole school.</div>
+    </div>
+    <div>
+      <div class="receipt-label">Payment Receipt</div>
+      <div class="receipt-no">${receiptNo}</div>
+    </div>
+  </div>
+
+  <div class="school-row">
+    <div class="school-name">${schoolName}</div>
+    <div style="font-size:11px;color:#64748b;margin-top:2px">${today}</div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-block">
+      <div class="info-label">Learner</div>
+      <div class="info-value">${learner?.first_name} ${learner?.last_name}</div>
+    </div>
+    <div class="info-block">
+      <div class="info-label">Reference No.</div>
+      <div class="info-value">${learner?.reference_no || '—'}</div>
+    </div>
+    <div class="info-block">
+      <div class="info-label">Grade / Class</div>
+      <div class="info-value">${grade}</div>
+    </div>
+    <div class="info-block">
+      <div class="info-label">Payment method</div>
+      <div class="info-value">${methodLabel}</div>
+    </div>
+  </div>
+
+  <div class="desc-box">
+    <div class="desc-text">${entry.description}</div>
+  </div>
+
+  <div class="amounts">
+    <div class="amount-row">
+      <div class="amount-label">Amount due</div>
+      <div class="amount-value">${sym}${amtDue.toLocaleString('en-ZA',{minimumFractionDigits:2})}</div>
+    </div>
+    <div class="amount-row">
+      <div class="amount-label">Amount paid</div>
+      <div class="amount-value paid">${sym}${amtPaid.toLocaleString('en-ZA',{minimumFractionDigits:2})}</div>
+    </div>
+    <div class="amount-row">
+      <div class="amount-label">Balance remaining</div>
+      <div class="amount-value balance">${sym}${balance.toLocaleString('en-ZA',{minimumFractionDigits:2})}</div>
+    </div>
+  </div>
+
+  <div class="stamp">${isPaid ? '✓ PAID IN FULL' : `BALANCE: ${sym}${balance.toFixed(2)}`}</div>
+
+  <div class="footer">
+    <div class="footer-text">
+      This is an official payment receipt issued by ${schoolName}.<br/>
+      Generated by Skolo · Please retain for your records.
+    </div>
+  </div>
+</div>
+</body>
+</html>`
+
+  const win = window.open('', '_blank', 'width=520,height=700')
+  win.document.write(html)
+  win.document.close()
 }
 
 const MONTHS = ['January','February','March','April','May','June',
@@ -262,14 +374,12 @@ export default function Fees() {
 
   const recordPay = async e => {
     e.preventDefault(); setPaying(true)
-    const entryId = payEntry.id
-    const learnerName = `${payEntry.learners?.first_name} ${payEntry.learners?.last_name}`
+
     try {
       await api.post(`/fee-ledger/${entryId}/pay`, payForm)
       setPayEntry(null); loadLedger(); loadSummary()
-      // Offer receipt download
-      toast.success('Payment recorded — downloading receipt…')
-      setTimeout(() => downloadReceipt(entryId, learnerName, toast), 600)
+      // Small delay so ledger reloads with updated data before printing
+      toast.success('Payment recorded — click the receipt icon to print')
     } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
     finally { setPaying(false) }
   }
@@ -318,6 +428,15 @@ export default function Fees() {
               <button className="pay-btn" onClick={() => openPay(row)}
                 style={{ padding:'5px 14px', background:'#0f2044', color:'#fff', border:'none', borderRadius:7, fontSize:12, fontWeight:700, cursor:'pointer' }}>
                 Pay
+              </button>
+            )}
+            {Number(row.amount_paid) > 0 && (
+              <button onClick={() => printReceipt(row, schoolName, sym)}
+                title="Print / view receipt"
+                style={{ display:'inline-flex', alignItems:'center', justifyContent:'center',
+                  width:26, height:26, border:'1px solid #bfdbfe', borderRadius:6,
+                  background:'#eff6ff', color:'#1d4ed8', cursor:'pointer', flexShrink:0 }}>
+                <ReceiptIcon />
               </button>
             )}
             <TrashBtn onClick={() => deleteLedger(row.id)} />
