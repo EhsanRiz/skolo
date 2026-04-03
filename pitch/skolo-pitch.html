@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Skolo — One Platform. Whole School.</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:#fff;color:#0f172a;font-size:13px;line-height:1.5}
+  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+  .page{width:210mm;min-height:297mm;margin:0 auto;display:grid;grid-template-rows:auto 1fr auto}
+
+  /* HEADER */
+  .header{background:#0f2044;color:#fff;padding:28px 36px 24px;display:flex;justify-content:space-between;align-items:flex-start}
+  .brand-name{font-size:28px;font-weight:900;letter-spacing:-1px}
+  .brand-tag{font-size:11px;color:rgba(255,255,255,0.5);margin-top:3px;font-weight:500}
+  .header-right{text-align:right}
+  .header-headline{font-size:15px;font-weight:700;color:rgba(255,255,255,0.9);line-height:1.4;max-width:220px}
+
+  /* BODY */
+  .body{padding:28px 36px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+
+  /* PROBLEM */
+  .problem{grid-column:1/-1;background:#fef2f2;border-left:4px solid #dc2626;padding:16px 18px;border-radius:0 8px 8px 0}
+  .problem h2{font-size:12px;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
+  .problem p{font-size:12.5px;color:#374151;line-height:1.6}
+
+  /* SOLUTION */
+  .solution{grid-column:1/-1}
+  .solution h2{font-size:12px;font-weight:700;color:#0f2044;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px}
+
+  /* FEATURES GRID */
+  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:4px}
+  .feature{background:#f8fafc;border-radius:8px;padding:14px}
+  .feature-icon{font-size:18px;margin-bottom:6px}
+  .feature-title{font-size:12px;font-weight:700;color:#0f2044;margin-bottom:4px}
+  .feature-desc{font-size:11px;color:#64748b;line-height:1.5}
+
+  /* PHASES */
+  .phases-col h2{font-size:12px;font-weight:700;color:#0f2044;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px}
+  .phase{display:flex;gap:10px;margin-bottom:10px}
+  .phase-badge{background:#0f2044;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;height:fit-content;white-space:nowrap;margin-top:1px}
+  .phase-badge.current{background:#16a34a}
+  .phase-title{font-size:12px;font-weight:600;color:#0f172a;margin-bottom:3px}
+  .phase-items{font-size:11px;color:#64748b;line-height:1.6}
+
+  /* PRICING */
+  .pricing-col h2{font-size:12px;font-weight:700;color:#0f2044;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px}
+  .price-card{border:1.5px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:10px}
+  .price-card.featured{border-color:#0f2044;background:#f8fafc}
+  .price-country{font-size:11px;font-weight:600;color:#64748b;margin-bottom:2px}
+  .price-amount{font-size:20px;font-weight:900;color:#0f2044}
+  .price-period{font-size:11px;color:#94a3b8}
+  .price-note{font-size:11px;color:#64748b;margin-top:4px}
+
+  /* WHY */
+  .why{grid-column:1/-1;background:#f0fdf4;border-left:4px solid #16a34a;padding:14px 18px;border-radius:0 8px 8px 0}
+  .why h2{font-size:12px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
+  .why-points{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+  .why-point{font-size:11.5px;color:#374151;display:flex;gap:6px;align-items:flex-start}
+  .check{color:#16a34a;font-weight:700;flex-shrink:0}
+
+  /* FOOTER */
+  .footer{background:#0f2044;padding:16px 36px;display:flex;justify-content:space-between;align-items:center}
+  .footer-left{color:rgba(255,255,255,0.7);font-size:11px}
+  .footer-brand{color:#fff;font-weight:800;font-size:14px}
+  .footer-right{text-align:right;color:rgba(255,255,255,0.5);font-size:10px}
+  .cta{background:#fff;color:#0f2044;font-weight:700;font-size:11px;padding:8px 16px;border-radius:6px;text-decoration:none;display:inline-block}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <div class="brand-name">Skolo</div>
+      <div class="brand-tag">One platform. Whole school.</div>
+    </div>
+    <div class="header-right">
+      <div class="header-headline">Fee management and school communication — built for Lesotho and South Africa</div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- PROBLEM -->
+    <div class="problem">
+      <h2>The problem</h2>
+      <p>Most schools in Lesotho and low-fee South African markets track fees in exercise books or shared Excel files. Chasing arrears is done by word of mouth. There is no easy way for parents to check their balance, and bursars spend hours every term reconciling who has paid and who hasn't — time that should be spent supporting learners.</p>
+    </div>
+
+    <!-- SOLUTION: FEATURES -->
+    <div class="solution">
+      <h2>What Skolo does</h2>
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">💰</div>
+          <div class="feature-title">Smart fee ledger</div>
+          <div class="feature-desc">Set fee plans by grade. Generate monthly or termly entries automatically. Track paid, partial, overdue in real time.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🎒</div>
+          <div class="feature-title">Learner management</div>
+          <div class="feature-desc">Register learners with guardian contacts. Import from Excel. Every learner gets a unique reference number.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🧾</div>
+          <div class="feature-title">Instant receipts</div>
+          <div class="feature-desc">PDF receipt generated and downloaded the moment a payment is recorded. No manual paperwork.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📱</div>
+          <div class="feature-title">Parent portal</div>
+          <div class="feature-desc">Parents check their child's balance via a secure link. No app, no login — just a link sent by the school.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📋</div>
+          <div class="feature-title">Export to Excel</div>
+          <div class="feature-desc">One click exports the full monthly ledger with totals — ready for the bursar's report to the principal.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📅</div>
+          <div class="feature-title">Events & announcements</div>
+          <div class="feature-desc">School calendar + bulk announcements to parents. SMS integration available.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASES -->
+    <div class="phases-col">
+      <h2>Roadmap</h2>
+      <div class="phase">
+        <div class="phase-badge current">Now</div>
+        <div>
+          <div class="phase-title">Phase 1 — Foundation</div>
+          <div class="phase-items">Fee ledger · Learner management · PDF receipts · Parent portal · Events · Announcements · Excel export</div>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-badge">Next</div>
+        <div>
+          <div class="phase-title">Phase 2 — Engagement</div>
+          <div class="phase-items">Attendance · Bank reconciliation · Parent-teacher messaging · SMS reminders · Timetable</div>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-badge">Future</div>
+        <div>
+          <div class="phase-title">Phase 3 — Learning</div>
+          <div class="phase-items">Digital assignments · Results & report cards · AI homework assistant · Learning resources</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRICING -->
+    <div class="pricing-col">
+      <h2>Pricing</h2>
+      <div class="price-card featured">
+        <div class="price-country">🇱🇸 Lesotho</div>
+        <div><span class="price-amount">M500</span> <span class="price-period">– M800 / month</span></div>
+        <div class="price-note">Less than one day of admin staff time per month</div>
+      </div>
+      <div class="price-card">
+        <div class="price-country">🇿🇦 South Africa</div>
+        <div><span class="price-amount">R800</span> <span class="price-period">– R1,500 / month</span></div>
+        <div class="price-note">Cheaper than any comparable system</div>
+      </div>
+      <div style="font-size:11px;color:#64748b;margin-top:8px;line-height:1.6">
+        ✓ No setup fee · No long-term contract<br/>
+        ✓ Unlimited learners and staff accounts<br/>
+        ✓ Works on any phone or computer
+      </div>
+    </div>
+
+    <!-- WHY -->
+    <div class="why">
+      <h2>Why schools choose Skolo</h2>
+      <div class="why-points">
+        <div class="why-point"><span class="check">✓</span> Bursar records a payment in under 10 seconds</div>
+        <div class="why-point"><span class="check">✓</span> No technical knowledge required to use</div>
+        <div class="why-point"><span class="check">✓</span> Parent sees balance without calling the school</div>
+        <div class="why-point"><span class="check">✓</span> Principal sees collection rate by grade instantly</div>
+        <div class="why-point"><span class="check">✓</span> Works in Sesotho and English contexts</div>
+        <div class="why-point"><span class="check">✓</span> Built specifically for LS and SA school fees</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div>
+      <div class="footer-brand">Skolo</div>
+      <div class="footer-left">School fee management for Lesotho and South Africa</div>
+    </div>
+    <a href="https://skolo.pages.dev/register" class="cta">Register your school free →</a>
+    <div class="footer-right">
+      skolo.pages.dev<br/>
+      Built in Maseru · Serving LS + ZA
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

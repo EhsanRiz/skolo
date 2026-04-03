@@ -45,6 +45,51 @@ async function parseFile(file) {
   })
 }
 
+function PortalLinkBox({ learnerId, guardians }) {
+  const [portalUrl, setPortalUrl] = useState(null)
+  const [generating, setGenerating] = useState(false)
+  const api_ = api
+
+  const generate = async () => {
+    setGenerating(true)
+    try {
+      const primary = guardians?.find(lg => lg.is_primary)?.guardians
+      if (!primary?.id) { alert('No primary guardian found'); return }
+      const { data } = await api_.post('/portal/generate', { guardian_id: primary.id })
+      const baseUrl = window.location.origin
+      setPortalUrl(`${baseUrl}/parent/${data.token}`)
+    } catch (err) { alert('Failed to generate portal link') }
+    finally { setGenerating(false) }
+  }
+
+  const copy = () => {
+    navigator.clipboard.writeText(portalUrl)
+  }
+
+  if (!portalUrl) {
+    return (
+      <button onClick={generate} disabled={generating}
+        style={{ ...t.btn.ghost, width:'100%', justifyContent:'center', display:'flex', gap:8, alignItems:'center' }}>
+        🔗 {generating ? 'Generating…' : 'Generate parent portal link'}
+      </button>
+    )
+  }
+
+  return (
+    <div style={{ background:'#f0fdf4', border:'1px solid #86efac', borderRadius:9, padding:'10px 14px' }}>
+      <div style={{ fontSize:12, fontWeight:600, color:'#15803d', marginBottom:6 }}>Portal link ready — share with parent:</div>
+      <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+        <input value={portalUrl} readOnly
+          style={{ flex:1, padding:'7px 10px', border:'1px solid #86efac', borderRadius:7, fontSize:11, background:'#fff', color:'#374151', outline:'none' }} />
+        <button onClick={copy}
+          style={{ padding:'7px 14px', background:'#15803d', color:'#fff', border:'none', borderRadius:7, fontSize:12, fontWeight:600, cursor:'pointer', flexShrink:0 }}>
+          Copy
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function Learners() {
   const { school } = useAuth()
   const toast = useToast()
@@ -427,7 +472,12 @@ export default function Learners() {
                 </div>
               )
             })}
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }}>
+            <div style={{ borderTop:'1px solid #f1f5f9', margin:'16px 0' }} />
+            <div style={{ fontSize:12, color:'#64748b', marginBottom:12 }}>
+              <strong style={{color:'#374151'}}>Parent portal link</strong> — send this to the guardian so they can view their child's fee balance without logging in.
+            </div>
+            <PortalLinkBox learnerId={selected.id} guardians={selected.learner_guardians} />
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 16 }}>
               <button style={t.btn.ghost} onClick={close}>Close</button>
               <button style={t.btn.primary} onClick={() => openEdit(selected)}>Edit →</button>
             </div>
