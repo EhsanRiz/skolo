@@ -402,7 +402,11 @@ export default function Fees() {
   const applyWaive = async e => {
     e.preventDefault(); setWaiving(true)
     try {
-      await api.post(`/fee-ledger/${waiveEntry.id}/waive`, waiveForm)
+      const payload = {
+        ...waiveForm,
+        reason: waiveForm.reason === 'Other' ? (waiveForm.customReason || 'Other') : waiveForm.reason
+      }
+      await api.post(`/fee-ledger/${waiveEntry.id}/waive`, payload)
       toast.success('Waiver applied')
       setWaiveEntry(null); loadLedger(); loadSummary()
     } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
@@ -777,6 +781,15 @@ export default function Fees() {
                     <option key={r} value={r}>{r}</option>
                   ))}
                 </select>
+                {/* Custom reason box when Other is selected */}
+                {waiveForm.reason === 'Other' && (
+                  <>
+                    <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>Specify reason *</label>
+                    <input style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #c4b5fd', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
+                      value={waiveForm.customReason||''} onChange={e => setWaiveForm(f=>({...f,customReason:e.target.value}))}
+                      placeholder="Describe the reason for this waiver…" required />
+                  </>
+                )}
                 <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>
                   Note <span style={{ color:'#94a3b8', fontWeight:400 }}>(optional)</span>
                 </label>
