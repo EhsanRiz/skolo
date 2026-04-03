@@ -221,6 +221,7 @@ export default function Learners() {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
+              <th style={t.th}>Ref No</th>
               <th style={t.th}>Name</th>
               <th style={t.th}>Grade / Class</th>
               <th style={t.th}>Guardian</th>
@@ -235,6 +236,7 @@ export default function Learners() {
                 <tr key={l.id}
                   onMouseEnter={e => e.currentTarget.style.background = '#fafafa'}
                   onMouseLeave={e => e.currentTarget.style.background = ''}>
+                  <td style={{ ...t.td, fontSize:12, color:'#94a3b8', fontWeight:600, letterSpacing:'0.5px' }}>{l.reference_no||'—'}</td>
                   <td style={{ ...t.td, fontWeight: 600, color: '#0f172a' }}>{l.first_name} {l.last_name}</td>
                   <td style={t.td}>{getClassName(l)}</td>
                   <td style={t.td}>{primary ? `${primary.first_name} ${primary.last_name}` : '—'}</td>
@@ -248,7 +250,7 @@ export default function Learners() {
               )
             })}
             {filtered.length === 0 && (
-              <tr><td colSpan={5} style={{ ...t.td, color: '#94a3b8', textAlign: 'center', padding: 40 }}>
+              <tr><td colSpan={6} style={{ ...t.td, color: '#94a3b8', textAlign: 'center', padding: 40 }}>
                 No learners found.
               </td></tr>
             )}
@@ -404,7 +406,10 @@ export default function Learners() {
               <Field label="Date of birth" value={selected.date_of_birth ? new Date(selected.date_of_birth).toLocaleDateString('en-ZA') : null} />
               <Field label="Gender" value={selected.gender} />
             </div>
-            <Field label="Grade / Class" value={getClassName(selected)} />
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+              <Field label="Reference No" value={selected.reference_no} />
+              <Field label="Grade / Class" value={getClassName(selected)} />
+            </div>
             <div style={{ borderTop: '1px solid #f1f5f9', margin: '16px 0' }} />
             <div style={t.sectionLabel}>Parent / Guardian</div>
             {selected.learner_guardians?.map(lg => {

@@ -1,6 +1,7 @@
 const express = require('express')
 const supabase = require('../lib/supabase')
 const auth = require('../middleware/auth')
+const { nextRefNo } = require('../lib/sequences')
 
 const router = express.Router()
 
@@ -38,10 +39,13 @@ router.post('/', async (req, res) => {
   const school_id = req.user.school_id
 
   try {
-    // 1. Create learner
+    // 1. Assign reference number
+    const reference_no = await nextRefNo(school_id, 'learner')
+
+    // 2. Create learner
     const { data: newLearner, error: lErr } = await supabase
       .from('learners')
-      .insert({ ...learner, school_id })
+      .insert({ ...learner, school_id, reference_no })
       .select()
       .single()
 
@@ -149,9 +153,11 @@ router.post('/bulk', async (req, res) => {
       if (!row.guardian_phone) {
         results.skipped++; results.errors.push(`Row ${i+2}: ${row.first_name} — missing guardian_phone`); continue
       }
+      const ref_no = await nextRefNo(school_id, 'learner')
       const { data: learner, error: lErr } = await supabase.from('learners')
         .insert({ school_id, first_name: row.first_name.trim(), last_name: row.last_name.trim(),
-          date_of_birth: row.date_of_birth || null, gender: row.gender || null })
+          date_of_birth: row.date_of_birth || null, gender: row.gender || null,
+          reference_no: ref_no })
         .select().single()
       if (lErr) throw lErr
 

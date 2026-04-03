@@ -332,14 +332,14 @@ export default function Settings() {
           </div>
           <Card>
             <table style={{width:'100%',borderCollapse:'collapse'}}>
-              <thead><tr>{['Name','Email','Phone','Class','Subject',''].map(h=><th key={h} style={t.th}>{h}</th>)}</tr></thead>
+              <thead><tr>{['Ref No','Name','Email','Phone','Subject',''].map(h=><th key={h} style={t.th}>{h}</th>)}</tr></thead>
               <tbody>
                 {teachers.filter(tc=>tc.is_active).map(tc=>(
                   <tr key={tc.id}>
+                    <td style={{...t.td,fontSize:12,color:'#94a3b8',fontWeight:600,letterSpacing:'0.5px'}}>{tc.reference_no||'—'}</td>
                     <td style={{...t.td,fontWeight:600}}>{tc.full_name}</td>
                     <td style={t.td}>{tc.email||'—'}</td>
                     <td style={t.td}>{tc.phone||'—'}</td>
-                    <td style={t.td}>{tc.classes ? `${tc.classes.grades?.name||''} ${tc.classes.name}` : '—'}</td>
                     <td style={t.td}>{tc.subject||'—'}</td>
                     <td style={t.td}>
                       <div style={{display:'flex',gap:6}}>

@@ -19,8 +19,9 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
+    const reference_no = await nextRefNo(req.user.school_id, 'teacher')
     // Strip empty class_id so we don't pass '' as a UUID
-    const body = { ...req.body, school_id: req.user.school_id }
+    const body = { ...req.body, school_id: req.user.school_id, reference_no }
     if (!body.class_id) delete body.class_id
     const { data, error } = await supabase
       .from('teachers')
