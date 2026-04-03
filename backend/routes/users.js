@@ -117,4 +117,21 @@ router.patch('/:id', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }) }
 })
 
+// ─── DELETE /users/:id — remove a staff account ──────────────
+router.delete('/:id', async (req, res) => {
+  const school_id = req.user.school_id
+  if (req.params.id === req.user.id) {
+    return res.status(400).json({ error: 'Cannot delete your own account' })
+  }
+  try {
+    const { error } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', req.params.id)
+      .eq('school_id', school_id)
+    if (error) throw error
+    res.json({ success: true })
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
 module.exports = router

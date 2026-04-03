@@ -196,8 +196,31 @@ export default function Settings() {
     try{
       const { data } = await api.post(`/users/${userId}/resend-invite`)
       if (data.sent) toast.success(`Invite resent to ${email}`)
-      else toast.info(`Invite link: ${data.invite_url}`)
+      // Also copy to clipboard as fallback
+      if (data.invite_url) {
+        navigator.clipboard.writeText(data.invite_url).catch(()=>{})
+        toast.success(`Link copied to clipboard — share via WhatsApp`)
+      }
     } catch { toast.error('Failed to resend invite') }
+  }
+
+  const copyInviteLink = async (userId) => {
+    try {
+      const { data } = await api.post(`/users/${userId}/resend-invite`)
+      if (data.invite_url) {
+        await navigator.clipboard.writeText(data.invite_url)
+        toast.success('Invite link copied — paste into WhatsApp or email')
+      }
+    } catch { toast.error('Failed to generate link') }
+  }
+
+  const deleteUser = async (userId, name) => {
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return
+    try {
+      await api.delete(`/users/${userId}`)
+      loadUsers()
+      toast.success('Account deleted')
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
   }
   const saveEdit = async e => {
     e.preventDefault(); setSaving(true)
@@ -437,15 +460,33 @@ export default function Settings() {
                         <div style={{display:'flex',gap:6}}>
                           <ActionBtn onClick={()=>setViewUser(u)} title="View"><EyeIcon/></ActionBtn>
                           <ActionBtn onClick={()=>openEditUser(u)} title="Edit"><IconEdit/></ActionBtn>
-                          {u.password_set === false
-                            ? <button onClick={()=>resendInvite(u.id, u.email)}
-                                style={{...t.btn.ghost,padding:'5px 12px',fontSize:12,color:'#a16207',border:'1px solid #fcd34d'}}>
-                                Resend invite
+                          {u.password_set === false ? (
+                            <div style={{display:'flex',gap:6}}>
+                              <button onClick={()=>copyInviteLink(u.id)}
+                                style={{...t.btn.ghost,padding:'5px 10px',fontSize:11,color:'#0f2044',border:'1px solid #0f2044',fontWeight:700}}>
+                                📋 Copy link
                               </button>
-                            : <button onClick={()=>toggleUser(u)} disabled={isSelf} style={{...t.btn.ghost,padding:'5px 12px',fontSize:12,opacity:isSelf?.4:1,cursor:isSelf?'not-allowed':'pointer'}}>
+                              <button onClick={()=>resendInvite(u.id, u.email)}
+                                style={{...t.btn.ghost,padding:'5px 10px',fontSize:11,color:'#a16207',border:'1px solid #fcd34d'}}>
+                                Resend
+                              </button>
+                              <button onClick={()=>deleteUser(u.id, u.full_name)}
+                                style={{...t.btn.danger,padding:'5px 10px',fontSize:11}}>
+                                Delete
+                              </button>
+                            </div>
+                          ) : (
+                            <div style={{display:'flex',gap:6}}>
+                              <button onClick={()=>toggleUser(u)} disabled={isSelf}
+                                style={{...t.btn.ghost,padding:'5px 12px',fontSize:12,opacity:isSelf?.4:1,cursor:isSelf?'not-allowed':'pointer'}}>
                                 {u.is_active?'Disable':'Enable'}
                               </button>
-                          }
+                              {!isSelf && <button onClick={()=>deleteUser(u.id, u.full_name)}
+                                style={{...t.btn.danger,padding:'5px 10px',fontSize:12}}>
+                                Delete
+                              </button>}
+                            </div>
+                          )}
                         </div>
                       </td>
                     </tr>
