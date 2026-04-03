@@ -174,3 +174,5 @@ router.post('/bulk', async (req, res) => {
   }
   res.json(results)
 })
+
+module.exports = router
