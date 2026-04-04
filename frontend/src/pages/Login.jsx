@@ -101,6 +101,9 @@ export default function Login() {
             <input className="li" name="email" type="email" value={form.email} onChange={handle} required autoComplete="email" />
             <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>Password</label>
             <input className="li" name="password" type="password" value={form.password} onChange={handle} required autoComplete="current-password" />
+            <div style={{ textAlign:'right', marginTop:-10, marginBottom:16 }}>
+              <Link to="/forgot-password" style={{ fontSize:12, color:'#64748b', textDecoration:'none' }}>Forgot password?</Link>
+            </div>
             <button type="submit" disabled={loading} style={{
               width:'100%', padding:'13px', border:'none', borderRadius:10,
               fontSize:15, fontWeight:700, cursor:loading?'not-allowed':'pointer',

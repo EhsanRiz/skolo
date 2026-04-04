@@ -198,4 +198,53 @@ async function sendInviteEmail({ to, fullName, role, schoolName, inviteUrl }) {
   }
 }
 
-module.exports = { sendWaiverRequestEmail, sendWaiverDecisionEmail, sendInviteEmail }
+/**
+ * Send a password reset email
+ */
+async function sendPasswordReset({ to, fullName, resetLink }) {
+  const html = `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f1f5f9;color:#0f172a">
+  <div style="max-width:520px;margin:32px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08)">
+    <div style="background:#0f2044;padding:28px 32px">
+      <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-0.5px">Skolo</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:3px">One platform. Whole school.</div>
+    </div>
+    <div style="padding:32px">
+      <div style="font-size:13px;color:#64748b;margin-bottom:6px">Password reset</div>
+      <div style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:20px">Reset your password</div>
+      <p style="font-size:14px;color:#374151;line-height:1.7;margin:0 0 20px">
+        Hi ${fullName},<br><br>
+        We received a request to reset your Skolo password. Click the button below — this link expires in <strong>1 hour</strong>.
+      </p>
+      <a href="${resetLink}" style="display:block;text-align:center;background:#0f2044;color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:16px 24px;border-radius:10px;margin-bottom:16px">
+        Reset my password →
+      </a>
+      <p style="font-size:12px;color:#94a3b8;text-align:center;margin:0">
+        If you didn't request this, you can safely ignore this email. Your password won't change.
+      </p>
+    </div>
+    <div style="padding:20px 32px;background:#f8fafc;border-top:1px solid #e2e8f0">
+      <p style="font-size:11px;color:#94a3b8;margin:0;text-align:center">
+        Powered by Skolo · Developed by 4D Climate Solutions
+      </p>
+    </div>
+  </div>
+</body>
+</html>`
+
+  try {
+    await resend.emails.send({
+      from: FROM, to,
+      subject: 'Reset your Skolo password',
+      html
+    })
+    return { sent: true }
+  } catch (err) {
+    console.error('Password reset email failed:', err.message)
+    return { sent: false, error: err.message }
+  }
+}
+
+module.exports = { sendWaiverRequestEmail, sendWaiverDecisionEmail, sendInviteEmail, sendPasswordReset }

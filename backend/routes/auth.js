@@ -1,7 +1,9 @@
 const express = require('express')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const crypto = require('crypto')
 const supabase = require('../lib/supabase')
+const { sendPasswordReset } = require('../lib/email')
 
 const router = express.Router()
 
@@ -238,6 +240,81 @@ router.get('/verify-invite/:token', async (req, res) => {
   } catch (err) {
     console.error('verify-invite unexpected error:', err.message)
     res.status(500).json({ valid: false, error: 'Server error: ' + err.message })
+  }
+})
+
+// ─── POST /auth/forgot-password ─────────────────────────────
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body
+  if (!email) return res.status(400).json({ error: 'Email required' })
+
+  try {
+    const { data: user } = await supabase
+      .from('users')
+      .select('id, full_name, email')
+      .eq('email', email.toLowerCase().trim())
+      .maybeSingle()
+
+    // Always return 200 — don't reveal whether email exists
+    if (!user) return res.json({ ok: true })
+
+    const token = crypto.randomBytes(32).toString('hex')
+    const expires = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
+
+    await supabase
+      .from('users')
+      .update({ reset_token: token, reset_expires_at: expires })
+      .eq('id', user.id)
+
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`
+    await sendPasswordReset({ to: user.email, fullName: user.full_name || 'there', resetLink })
+
+    res.json({ ok: true })
+  } catch (err) {
+    console.error('forgot-password error:', err)
+    res.status(500).json({ error: 'Failed to send reset email' })
+  }
+})
+
+// ─── POST /auth/reset-password ──────────────────────────────
+router.post('/reset-password', async (req, res) => {
+  const { token, password } = req.body
+  if (!token || !password) return res.status(400).json({ error: 'Token and password required' })
+  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' })
+
+  try {
+    const { data: user } = await supabase
+      .from('users')
+      .select('id, full_name, email, role, school_id, reset_token, reset_expires_at, is_active')
+      .eq('reset_token', token)
+      .maybeSingle()
+
+    if (!user) return res.status(400).json({ error: 'Invalid or expired reset link' })
+    if (!user.is_active) return res.status(400).json({ error: 'Account is disabled' })
+    if (new Date(user.reset_expires_at) < new Date()) {
+      return res.status(400).json({ error: 'Reset link has expired — please request a new one' })
+    }
+
+    const password_hash = await bcrypt.hash(password, 10)
+
+    await supabase
+      .from('users')
+      .update({ password_hash, reset_token: null, reset_expires_at: null })
+      .eq('id', user.id)
+
+    const jwtToken = jwt.sign(
+      { id: user.id, school_id: user.school_id, role: user.role, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    )
+
+    res.json({
+      token: jwtToken,
+      user: { id: user.id, full_name: user.full_name, email: user.email, role: user.role, school_id: user.school_id }
+    })
+  } catch (err) {
+    console.error('reset-password error:', err)
+    res.status(500).json({ error: 'Reset failed' })
   }
 })
 

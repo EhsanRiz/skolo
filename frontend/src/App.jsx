@@ -15,6 +15,8 @@ import LearnerProfile from './pages/LearnerProfile'
 import Waivers from './pages/Waivers'
 import MyClasses from './pages/MyClasses'
 import SetPassword from './pages/SetPassword'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -39,6 +41,8 @@ export default function App() {
           {/* Public */}
           <Route path="/parent/:token" element={<ParentPortal />} />
           <Route path="/set-password/:token" element={<SetPassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/login"    element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
 
