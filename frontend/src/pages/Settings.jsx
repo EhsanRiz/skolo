@@ -678,7 +678,7 @@ export default function Settings() {
               <input style={t.input} type="email" value={editForm.email} onChange={e=>setEditForm(f=>({...f,email:e.target.value}))} required/>
               <label style={t.label}>Role</label>
               <select style={t.input} value={editForm.role} onChange={e=>setEditForm(f=>({...f,role:e.target.value}))}>
-                <option value="teacher">Teacher</option><option value="teacher">Teacher</option><option value="bursar">Bursar</option><option value="principal">Principal</option><option value="admin">Admin</option>
+                <option value="teacher">Teacher</option><option value="bursar">Bursar</option><option value="principal">Principal</option><option value="admin">Admin</option>
               </select>
               <label style={t.label}>New password <span style={{color:'#94a3b8',fontWeight:400}}>(leave blank to keep current)</span></label>
               <input style={t.input} type="password" value={editForm.password} onChange={e=>setEditForm(f=>({...f,password:e.target.value}))} minLength={8} placeholder="Min 8 characters"/>
@@ -759,7 +759,7 @@ export default function Settings() {
               <input style={t.input} type="email" value={userForm.email} onChange={e=>setUserForm(f=>({...f,email:e.target.value}))} required/>
               <label style={t.label}>Role</label>
               <select style={t.input} value={userForm.role} onChange={e=>setUserForm(f=>({...f,role:e.target.value}))}>
-                <option value="teacher">Teacher</option><option value="teacher">Teacher</option><option value="bursar">Bursar</option><option value="principal">Principal</option><option value="admin">Admin</option>
+                <option value="teacher">Teacher</option><option value="bursar">Bursar</option><option value="principal">Principal</option><option value="admin">Admin</option>
               </select>
               <div style={{display:'flex',gap:10,justifyContent:'flex-end',marginTop:4}}>
                 <button type="button" style={t.btn.ghost} onClick={()=>setShowAddUser(false)}>Cancel</button>
