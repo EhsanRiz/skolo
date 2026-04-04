@@ -39,6 +39,89 @@ const CSS = `
 
 // ── Sub-components ────────────────────────────────────────────
 
+function ReportCardButton({ learnerId, learnerName }) {
+  const [open, setOpen] = useState(false)
+  const [term, setTerm] = useState(Math.ceil((new Date().getMonth() + 1) / 3))
+  const [year, setYear] = useState(new Date().getFullYear())
+  const [generating, setGenerating] = useState(false)
+  const toast = useToast()
+
+  const download = async () => {
+    setGenerating(true)
+    try {
+      const token = localStorage.getItem('sk_token')
+      const baseUrl = (await import('../lib/api')).default.defaults.baseURL || ''
+      const url = `${baseUrl}/report-cards/${learnerId}?term=${term}&year=${year}`
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Failed to generate report card' }))
+        throw new Error(err.error || 'Failed')
+      }
+      const blob = await res.blob()
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = `Report_Card_${learnerName.replace(/\s+/g, '_')}_T${term}_${year}.pdf`
+      link.click()
+      URL.revokeObjectURL(link.href)
+      toast.success('Report card downloaded')
+      setOpen(false)
+    } catch (err) {
+      toast.error(err.message || 'Failed to generate report card')
+    } finally {
+      setGenerating(false)
+    }
+  }
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <button onClick={() => setOpen(o => !o)}
+        style={{ padding: '9px 16px', background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)',
+          borderRadius: 9, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, transition: 'background .15s' }}
+        onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.25)'}
+        onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+        Report Card
+      </button>
+
+      {open && (
+        <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 8, background: '#fff', borderRadius: 12,
+          padding: '18px 20px', boxShadow: '0 12px 40px rgba(0,0,0,.2)', zIndex: 100, width: 240 }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', marginBottom: 14 }}>Download report card</div>
+
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 5 }}>Term</label>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+            {[1, 2, 3, 4].map(t => (
+              <button key={t} onClick={() => setTerm(t)}
+                style={{ flex: 1, padding: '7px 0', border: term === t ? '2px solid #0f2044' : '1.5px solid #e2e8f0',
+                  borderRadius: 7, background: term === t ? '#0f2044' : '#fff', color: term === t ? '#fff' : '#374151',
+                  fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                T{t}
+              </button>
+            ))}
+          </div>
+
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 5 }}>Year</label>
+          <select value={year} onChange={e => setYear(Number(e.target.value))}
+            style={{ width: '100%', padding: '8px 10px', border: '1.5px solid #e2e8f0', borderRadius: 7, fontSize: 13,
+              outline: 'none', background: '#fff', marginBottom: 14 }}>
+            {[new Date().getFullYear(), new Date().getFullYear() - 1].map(y => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+
+          <button onClick={download} disabled={generating}
+            style={{ width: '100%', padding: '10px', background: '#0f2044', color: '#fff', border: 'none',
+              borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: generating ? 0.7 : 1 }}>
+            {generating ? 'Generating…' : 'Download PDF'}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function OverviewTab({ learner, school }) {
   const [generatingLink, setGeneratingLink] = useState(false)
   const [portalUrl, setPortalUrl] = useState(null)
@@ -707,6 +790,7 @@ export default function LearnerProfile() {
             </div>
           </div>
 
+          <ReportCardButton learnerId={id} learnerName={`${learner.first_name} ${learner.last_name}`} />
         </div>
 
         {/* Tabs */}

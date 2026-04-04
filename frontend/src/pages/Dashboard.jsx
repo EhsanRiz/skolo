@@ -135,6 +135,89 @@ function WaiverQueueLink({ isPrincipal }) {
 }
 
 
+function AttendanceAlertsCard({ delay }) {
+  const navigate = useNavigate()
+  const now = new Date()
+  const [alerts, setAlerts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [threshold, setThreshold] = useState(80)
+
+  const month = now.getMonth() + 1
+  const year  = now.getFullYear()
+  const monthLabel = MONTHS[month - 1]
+
+  useEffect(() => {
+    api.get(`/attendance-alerts?threshold=${threshold}&year=${year}&month=${month}`)
+      .then(r => setAlerts(r.data?.alerts || []))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [threshold])
+
+  const rateColor = rate => rate < 50 ? '#dc2626' : rate < 70 ? '#ea580c' : '#ca8a04'
+
+  return (
+    <div className="dash-card" style={{ animationDelay: delay || '0ms' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+        <div>
+          <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>Attendance alerts</div>
+          <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 2 }}>{monthLabel} {year} · below {threshold}%</div>
+        </div>
+        <select value={threshold} onChange={e => { setLoading(true); setThreshold(Number(e.target.value)) }}
+          style={{ padding: '5px 8px', border: '1.5px solid #e2e8f0', borderRadius: 7, fontSize: 12, fontWeight: 600, outline: 'none', background: '#fff', color: '#374151' }}>
+          <option value={90}>90%</option>
+          <option value={80}>80%</option>
+          <option value={70}>70%</option>
+          <option value={60}>60%</option>
+        </select>
+      </div>
+
+      {loading && <div style={{ color: '#94a3b8', fontSize: 13, padding: '16px 0', textAlign: 'center' }}>Loading…</div>}
+
+      {!loading && alerts.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '20px 0' }}>
+          <div style={{ fontSize: 24, marginBottom: 6 }}>✅</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#16a34a' }}>All learners above {threshold}% attendance</div>
+          <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>No alerts for {monthLabel}.</div>
+        </div>
+      )}
+
+      {!loading && alerts.length > 0 && (
+        <>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#dc2626', marginBottom: 10 }}>
+            ⚠ {alerts.length} learner{alerts.length !== 1 ? 's' : ''} below {threshold}%
+          </div>
+          {alerts.slice(0, 6).map(a => (
+            <div key={a.learner_id}
+              onClick={() => navigate(`/learners/${a.learner_id}`)}
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 12px',
+                borderRadius: 9, marginBottom: 6, cursor: 'pointer', background: a.rate < 50 ? '#fff5f5' : '#fffbeb',
+                border: `1px solid ${a.rate < 50 ? '#fca5a5' : '#fcd34d'}`, transition: 'background .1s' }}>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 13, color: '#0f172a' }}>
+                  {a.first_name} {a.last_name}
+                  {a.reference_no && <span style={{ marginLeft: 6, fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>#{a.reference_no}</span>}
+                </div>
+                <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 1 }}>
+                  {a.grade_name} {a.class_name} · {a.absent} absent of {a.total_days} days
+                </div>
+              </div>
+              <span style={{ fontSize: 14, fontWeight: 800, color: rateColor(a.rate), flexShrink: 0, marginLeft: 8 }}>
+                {a.rate}%
+              </span>
+            </div>
+          ))}
+          {alerts.length > 6 && (
+            <div style={{ fontSize: 12, color: '#64748b', textAlign: 'center', marginTop: 6 }}>
+              + {alerts.length - 6} more learner{alerts.length - 6 !== 1 ? 's' : ''}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+
 // ════════════════════════════════════════════════════════════════
 // TEACHER DASHBOARD
 // ════════════════════════════════════════════════════════════════
@@ -442,6 +525,9 @@ function TeacherDashboard() {
           </div>
         </div>
       )}
+
+      {/* ── Attendance alerts ── */}
+      <AttendanceAlertsCard delay="480ms" />
 
       {/* ── Full week timetable (collapsed by default) ── */}
       {periods.length > 0 && timetable?.slots?.length > 0 && (
@@ -802,6 +888,9 @@ function AdminDashboard() {
           )}
         </div>
       )}
+
+      {/* ── Attendance alerts ── */}
+      <AttendanceAlertsCard delay="480ms" />
 
       {/* All paid celebration */}
       {!loading && ledger.length > 0 && unpaidEntries.length === 0 && (
