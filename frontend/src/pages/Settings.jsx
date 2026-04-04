@@ -398,10 +398,9 @@ export default function Settings() {
             <div>
               <div style={{fontWeight:700,fontSize:16}}>Teachers</div>
               <div style={{fontSize:12,color:'#94a3b8',marginTop:2}}>
-                Step 1: Add teacher record here → Step 2: Assign classes → Step 3: Link to their login account
+                Teachers appear here automatically when invited via Staff Accounts with role <strong>teacher</strong>. Assign their classes below.
               </div>
             </div>
-            <button style={t.btn.primary} onClick={()=>{setEditTeacher(null);setTcForm({full_name:'',email:'',phone:'',subject:''});setShowTeacher(true)}}>+ Add teacher</button>
           </div>
           <Card>
             <table style={{width:'100%',borderCollapse:'collapse'}}>

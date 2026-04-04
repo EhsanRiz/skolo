@@ -141,6 +141,45 @@ router.post('/set-password', async (req, res) => {
       invite_expires_at: null
     }).eq('id', user.id)
 
+    // If teacher role — ensure teacher record exists and is linked
+    if (user.role === 'teacher') {
+      const { data: existing } = await supabase
+        .from('teachers')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('school_id', user.school_id)
+        .maybeSingle()
+
+      if (!existing) {
+        // Get user full_name and email
+        const { data: fullUser } = await supabase
+          .from('users')
+          .select('full_name, email')
+          .eq('id', user.id)
+          .single()
+
+        const { data: newTeacher } = await supabase
+          .from('teachers')
+          .insert({
+            school_id: user.school_id,
+            full_name: fullUser?.full_name || 'Teacher',
+            email: fullUser?.email,
+            is_active: true,
+            user_id: user.id
+          })
+          .select('id')
+          .single()
+
+        if (newTeacher) {
+          const { nextRefNo } = require('../lib/sequences')
+          const ref_no = await nextRefNo(user.school_id, 'teacher')
+          await supabase.from('teachers')
+            .update({ reference_no: ref_no })
+            .eq('id', newTeacher.id)
+        }
+      }
+    }
+
     // Auto-login: return a JWT so they go straight to dashboard
     const jwt = require('jsonwebtoken')
     const token_jwt = jwt.sign(

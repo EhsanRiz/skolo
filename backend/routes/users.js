@@ -64,6 +64,22 @@ router.post('/', async (req, res) => {
       role: role || 'bursar', schoolName: school?.name || 'School', inviteUrl
     })
 
+    // Auto-create teacher record when role is teacher
+    if ((role || 'bursar') === 'teacher') {
+      await supabase.from('teachers').insert({
+        school_id:  req.user.school_id,
+        full_name,
+        email,
+        is_active:  true,
+        user_id:    user.id
+      }).select().single()
+      // Assign reference number
+      const { nextRefNo } = require('../lib/sequences')
+      const ref_no = await nextRefNo(req.user.school_id, 'teacher')
+      await supabase.from('teachers').update({ reference_no: ref_no })
+        .eq('user_id', user.id).eq('school_id', req.user.school_id)
+    }
+
     res.status(201).json({
       ...user,
       invite_sent: emailResult.sent,
