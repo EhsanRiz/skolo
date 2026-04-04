@@ -132,6 +132,7 @@ export default function Register() {
             <div style={{ fontSize:10, color:'#cbd5e1', marginTop:8 }}>
               © {new Date().getFullYear()} 4D Climate Solutions · All rights reserved
             </div>
+          </div>
         </div>
       </div>
     </>
