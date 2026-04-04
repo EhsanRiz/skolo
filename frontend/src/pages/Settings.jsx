@@ -16,11 +16,12 @@ const UsersIcon    = () => <svg width="14" height="14" viewBox="0 0 24 24" fill=
 const EyeIcon      = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
 
 const TABS = [
-  { key:'grades',   label:'Grades & Classes', Icon:GradeIcon   },
-  { key:'feeplans', label:'Fee Plans',         Icon:FeeIcon     },
-  { key:'teachers', label:'Teachers',          Icon:TeacherIcon },
-  { key:'profile',  label:'School Profile',    Icon:SchoolIcon  },
-  { key:'users',    label:'Staff Accounts',    Icon:UsersIcon   },
+  { key:'grades',     label:'Grades & Classes', Icon:GradeIcon   },
+  { key:'feeplans',   label:'Fee Plans',         Icon:FeeIcon     },
+  { key:'teachers',   label:'Teachers',          Icon:TeacherIcon },
+  { key:'gradescale', label:'Grade Scale',        Icon:EyeIcon     },
+  { key:'profile',    label:'School Profile',    Icon:SchoolIcon  },
+  { key:'users',      label:'Staff Accounts',    Icon:UsersIcon   },
 ]
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
@@ -473,6 +474,11 @@ export default function Settings() {
         </div>
       )}
 
+      {/* ── GRADE SCALE ── */}
+      {tab==='gradescale' && (
+        <GradeScaleTab school={school} refreshSchool={refreshSchool} toast={toast} />
+      )}
+
       {/* ── PROFILE ── */}
       {tab==='profile' && (
         <Card title="School Profile">
@@ -769,6 +775,150 @@ export default function Settings() {
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+// ── Grade Scale Tab ───────────────────────────────────────────
+const DEFAULT_BOUNDARIES = [
+  { grade: 'A', min: 80 },
+  { grade: 'B', min: 70 },
+  { grade: 'C', min: 60 },
+  { grade: 'D', min: 50 },
+  { grade: 'F', min: 0  },
+]
+
+function GradeScaleTab({ school, refreshSchool, toast }) {
+  const [rows,   setRows]   = useState([])
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    const saved = school?.grade_boundaries
+    setRows(saved && saved.length ? [...saved] : DEFAULT_BOUNDARIES.map(r => ({ ...r })))
+  }, [school])
+
+  function updateRow(i, field, val) {
+    setRows(prev => prev.map((r, idx) => idx === i ? { ...r, [field]: val } : r))
+  }
+
+  function addRow() {
+    setRows(prev => [...prev, { grade: '', min: 0 }])
+  }
+
+  function removeRow(i) {
+    setRows(prev => prev.filter((_, idx) => idx !== i))
+  }
+
+  function resetDefaults() {
+    setRows(DEFAULT_BOUNDARIES.map(r => ({ ...r })))
+  }
+
+  async function save() {
+    // Validate
+    for (const r of rows) {
+      if (!r.grade.trim()) return toast.error('All rows must have a grade symbol')
+      if (r.min === '' || r.min === null || isNaN(Number(r.min))) return toast.error('All rows must have a valid min mark')
+      if (Number(r.min) < 0 || Number(r.min) > 100) return toast.error('Min marks must be between 0 and 100')
+    }
+    const cleaned = rows
+      .map(r => ({ grade: r.grade.trim(), min: Number(r.min) }))
+      .sort((a, b) => b.min - a.min)  // sort descending by min
+
+    setSaving(true)
+    try {
+      await import('../lib/api').then(m => m.default.patch('/schools/me', { grade_boundaries: cleaned }))
+      await refreshSchool()
+      setRows(cleaned)
+      toast.success('Grade scale saved')
+    } catch { toast.error('Failed to save grade scale') }
+    finally { setSaving(false) }
+  }
+
+  const gradeColors = ['#16a34a','#2563eb','#d97706','#ea580c','#dc2626','#7c3aed','#0891b2','#be185d']
+
+  return (
+    <div style={{ maxWidth: 520 }}>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a', marginBottom: 4 }}>Grade Scale</div>
+        <div style={{ fontSize: 13, color: '#64748b' }}>
+          Define the minimum mark (%) for each grade symbol. Sorted automatically — highest min first.
+        </div>
+      </div>
+
+      {/* Table */}
+      <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', marginBottom: 16 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+              <th style={{ padding: '10px 16px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'left', width: 80 }}>Grade</th>
+              <th style={{ padding: '10px 16px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'left' }}>Min mark (%)</th>
+              <th style={{ padding: '10px 16px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'left' }}>Preview</th>
+              <th style={{ width: 40 }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, i) => {
+              const color = gradeColors[i % gradeColors.length]
+              const next = rows[i + 1]
+              const maxMark = i === 0 ? 100 : (rows[i - 1]?.min ?? 100) - 1
+              return (
+                <tr key={i} style={{ borderBottom: i < rows.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+                  <td style={{ padding: '10px 16px' }}>
+                    <input
+                      value={row.grade}
+                      onChange={e => updateRow(i, 'grade', e.target.value)}
+                      maxLength={8}
+                      placeholder="A"
+                      style={{ width: 56, padding: '6px 10px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 15, fontWeight: 700, textAlign: 'center', outline: 'none', textTransform: 'uppercase' }}
+                    />
+                  </td>
+                  <td style={{ padding: '10px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <input
+                        type="number"
+                        min={0} max={100}
+                        value={row.min}
+                        onChange={e => updateRow(i, 'min', e.target.value)}
+                        style={{ width: 70, padding: '6px 10px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 14, fontWeight: 600, textAlign: 'center', outline: 'none' }}
+                      />
+                      <span style={{ fontSize: 13, color: '#94a3b8' }}>
+                        – {next ? `${Number(next.min) + 1}%` : ''}
+                        {!next ? '100%' : ''}
+                        {next ? ` → ${maxMark}%` : ''}
+                      </span>
+                    </div>
+                  </td>
+                  <td style={{ padding: '10px 16px' }}>
+                    <span style={{ display: 'inline-block', padding: '3px 12px', borderRadius: 20, background: color + '18', color, fontWeight: 700, fontSize: 13 }}>
+                      {row.grade || '?'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                    <button onClick={() => removeRow(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: 16, padding: 4 }} title="Remove">✕</button>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Actions */}
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        <button onClick={addRow} style={{ padding: '8px 16px', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
+          + Add grade
+        </button>
+        <button onClick={resetDefaults} style={{ padding: '8px 16px', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
+          Reset to defaults
+        </button>
+        <button onClick={save} disabled={saving} style={{ marginLeft: 'auto', padding: '8px 22px', background: '#0f2044', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? 'not-allowed' : 'pointer' }}>
+          {saving ? 'Saving…' : 'Save grade scale'}
+        </button>
+      </div>
+
+      <div style={{ marginTop: 20, padding: '12px 16px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, fontSize: 13, color: '#15803d' }}>
+        💡 Changes apply immediately to the Exam Grades page for all staff at your school.
+      </div>
     </div>
   )
 }

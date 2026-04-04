@@ -7,23 +7,39 @@ const TERMS = [1, 2, 3, 4]
 const CUR_YEAR = new Date().getFullYear()
 const YEARS = [CUR_YEAR - 1, CUR_YEAR, CUR_YEAR + 1]
 
-function letterGrade(mark) {
+const DEFAULT_BOUNDARIES = [
+  { grade: 'A', min: 80 },
+  { grade: 'B', min: 70 },
+  { grade: 'C', min: 60 },
+  { grade: 'D', min: 50 },
+  { grade: 'F', min: 0  },
+]
+
+const GRADE_COLORS = ['#16a34a','#2563eb','#d97706','#ea580c','#dc2626','#7c3aed','#0891b2','#be185d']
+
+function letterGrade(mark, boundaries) {
   if (mark === null || mark === undefined || mark === '') return '—'
   const n = Number(mark)
-  if (n >= 80) return 'A'
-  if (n >= 70) return 'B'
-  if (n >= 60) return 'C'
-  if (n >= 50) return 'D'
-  return 'F'
+  const scale = (boundaries && boundaries.length ? boundaries : DEFAULT_BOUNDARIES)
+    .slice().sort((a, b) => b.min - a.min)
+  for (const b of scale) {
+    if (n >= b.min) return b.grade
+  }
+  return scale[scale.length - 1]?.grade || '—'
 }
 
-function gradeColor(g) {
-  return { A: '#16a34a', B: '#2563eb', C: '#d97706', D: '#ea580c', F: '#dc2626', '—': '#94a3b8' }[g] || '#94a3b8'
+function gradeColor(grade, boundaries) {
+  const scale = (boundaries && boundaries.length ? boundaries : DEFAULT_BOUNDARIES)
+    .slice().sort((a, b) => b.min - a.min)
+  const idx = scale.findIndex(b => b.grade === grade)
+  if (idx === -1) return '#94a3b8'
+  return GRADE_COLORS[idx % GRADE_COLORS.length]
 }
 
 export default function ExamGrades() {
-  const { user } = useAuth()
+  const { user, school } = useAuth()
   const { showToast } = useToast()
+  const boundaries  = school?.grade_boundaries?.length ? school.grade_boundaries : DEFAULT_BOUNDARIES
   const isTeacher   = user?.role === 'teacher'
   const isPrincipal = user?.role === 'principal'
   const readOnly    = isPrincipal
@@ -251,8 +267,10 @@ export default function ExamGrades() {
             <tbody>
               {learners.map((l, i) => {
                 const mark = marks[l.id]
-                const grade = letterGrade(mark !== '' ? mark : null)
-                const isF = grade === 'F'
+                const grade = letterGrade(mark !== '' ? mark : null, boundaries)
+                const isF = boundaries.length
+                  ? grade === [...boundaries].sort((a,b) => a.min - b.min)[0]?.grade
+                  : grade === 'F'
                 return (
                   <tr key={l.id} style={{ borderBottom: '1px solid #f1f5f9', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
                     <td style={{ ...td, color: '#94a3b8', width: 40 }}>{i + 1}</td>
@@ -280,8 +298,8 @@ export default function ExamGrades() {
                     <td style={{ ...td, width: 60 }}>
                       <span style={{
                         display: 'inline-block', padding: '3px 10px', borderRadius: 20,
-                        background: gradeColor(grade) + '18',
-                        color: gradeColor(grade),
+                        background: gradeColor(grade, boundaries) + '18',
+                        color: gradeColor(grade, boundaries),
                         fontWeight: 700, fontSize: 13
                       }}>{grade}</span>
                     </td>
