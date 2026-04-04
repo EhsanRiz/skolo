@@ -14,6 +14,7 @@ import ParentPortal from './pages/ParentPortal'
 import LearnerProfile from './pages/LearnerProfile'
 import Waivers from './pages/Waivers'
 import MyClasses from './pages/MyClasses'
+import ExamGrades from './pages/ExamGrades'
 import SetPassword from './pages/SetPassword'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
@@ -53,6 +54,7 @@ export default function App() {
             <Route path="learners/:id" element={<LearnerProfile />} />
             <Route path="waivers"      element={<Waivers />} />
             <Route path="my-classes"    element={<MyClasses />} />
+            <Route path="exam-grades"   element={<ExamGrades />} />
             <Route path="fees"          element={<Fees />} />
             <Route path="events"        element={<Events />} />
             <Route path="announcements" element={<Announcements />} />

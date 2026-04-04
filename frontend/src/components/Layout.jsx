@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext'
 const NAV_ITEMS = [
   { to: '/',            label: 'Dashboard',     icon: DashIcon,    roles: null },
   { to: '/my-classes',  label: 'My Classes',    icon: UsersIcon,   roles: ['teacher'] },
+  { to: '/exam-grades', label: 'Grades',         icon: CalIcon,     roles: ['teacher', 'admin', 'principal'] },
   { to: '/learners',    label: 'Learners',      icon: UsersIcon,   roles: ['admin', 'bursar', 'principal'] },
   { to: '/fees',        label: 'Fees',          icon: FeeIcon,     roles: ['admin', 'bursar', 'principal'] },
   { to: '/waivers',     label: 'Waivers',       icon: WaiverIcon,  roles: ['admin', 'bursar', 'principal'] },
