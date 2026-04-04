@@ -49,6 +49,7 @@ app.use('/fee-ledger',    require('./routes/fee-ledger'))
 app.use('/teachers',      require('./routes/teachers'))
 app.use('/exam-grades',   require('./routes/exam-grades'))
 app.use('/attendance',    require('./routes/attendance'))
+app.use('/timetable',     require('./routes/timetable'))
 
 // ─── 404 fallback ─────────────────────────────────────────────
 app.use((req, res) => res.status(404).json({ error: 'Route not found' }))

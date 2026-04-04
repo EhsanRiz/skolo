@@ -62,7 +62,7 @@ module.exports = router
 
 // ─── PATCH /schools/me ───────────────────────────────────────
 router.patch('/me', auth, async (req, res) => {
-  const allowed = ['name', 'phone', 'email', 'school_reg_number', 'address', 'grade_boundaries']
+  const allowed = ['name', 'phone', 'email', 'school_reg_number', 'address', 'grade_boundaries', 'periods']
   const update = {}
   allowed.forEach(k => { if (req.body[k] !== undefined) update[k] = req.body[k] })
   try {

@@ -14,11 +14,13 @@ const TeacherIcon  = () => <svg width="14" height="14" viewBox="0 0 24 24" fill=
 const SchoolIcon   = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
 const UsersIcon    = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
 const EyeIcon      = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+const ClockIcon    = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
 
 const TABS = [
   { key:'grades',     label:'Grades & Classes', Icon:GradeIcon   },
   { key:'feeplans',   label:'Fee Plans',         Icon:FeeIcon     },
   { key:'teachers',   label:'Teachers',          Icon:TeacherIcon },
+  { key:'timetable',  label:'Timetable',         Icon:ClockIcon   },
   { key:'gradescale', label:'Grade Scale',        Icon:EyeIcon     },
   { key:'profile',    label:'School Profile',    Icon:SchoolIcon  },
   { key:'users',      label:'Staff Accounts',    Icon:UsersIcon   },
@@ -475,6 +477,10 @@ export default function Settings() {
       )}
 
       {/* ── GRADE SCALE ── */}
+      {tab==='timetable' && (
+        <TimetableTab school={school} refreshSchool={refreshSchool} toast={toast} />
+      )}
+
       {tab==='gradescale' && (
         <GradeScaleTab school={school} refreshSchool={refreshSchool} toast={toast} />
       )}
@@ -787,6 +793,348 @@ const DEFAULT_BOUNDARIES = [
   { grade: 'D', min: 50 },
   { grade: 'F', min: 0  },
 ]
+
+// ════════════════════════════════════════════════════════════════
+// TIMETABLE TAB
+// ════════════════════════════════════════════════════════════════
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday']
+const DAY_SHORT = ['Mon','Tue','Wed','Thu','Fri']
+
+const DEFAULT_PERIODS = [
+  { number:1, label:'Period 1', start:'07:30', end:'08:15' },
+  { number:2, label:'Period 2', start:'08:15', end:'09:00' },
+  { number:3, label:'Period 3', start:'09:00', end:'09:45' },
+  { number:4, label:'Break',    start:'09:45', end:'10:15', isBreak:true },
+  { number:5, label:'Period 4', start:'10:15', end:'11:00' },
+  { number:6, label:'Period 5', start:'11:00', end:'11:45' },
+  { number:7, label:'Period 6', start:'11:45', end:'12:30' },
+  { number:8, label:'Lunch',    start:'12:30', end:'13:15', isBreak:true },
+  { number:9, label:'Period 7', start:'13:15', end:'14:00' },
+]
+
+function TimetableTab({ school, refreshSchool, toast }) {
+  const [periods, setPeriods] = useState([])
+  const [slots, setSlots]     = useState([])         // timetable rows from DB
+  const [tcs, setTcs]         = useState([])          // teacher_classes for dropdown
+  const [saving, setSaving]   = useState(false)
+  const [step, setStep]       = useState('periods')   // 'periods' | 'assign'
+
+  // Load data
+  useEffect(() => {
+    const saved = school?.periods
+    setPeriods(saved && saved.length ? [...saved] : [])
+  }, [school])
+
+  useEffect(() => {
+    if (step === 'assign') {
+      api.get('/timetable').then(r => setSlots(r.data || [])).catch(() => {})
+      api.get('/teacher-classes').then(r => setTcs(r.data || [])).catch(() => {})
+    }
+  }, [step])
+
+  // ── Period management ──────────────────────────────────────
+  function addPeriod() {
+    const last = periods[periods.length - 1]
+    const num  = periods.length + 1
+    setPeriods(p => [...p, {
+      number: num,
+      label: `Period ${num}`,
+      start: last?.end || '08:00',
+      end: '',
+      isBreak: false
+    }])
+  }
+
+  function updatePeriod(i, field, val) {
+    setPeriods(prev => prev.map((p, idx) => idx === i ? { ...p, [field]: field === 'isBreak' ? val : val } : p))
+  }
+
+  function removePeriod(i) {
+    setPeriods(prev => prev.filter((_, idx) => idx !== i).map((p, idx) => ({ ...p, number: idx + 1 })))
+  }
+
+  function loadDefaults() {
+    setPeriods(DEFAULT_PERIODS.map(p => ({ ...p })))
+  }
+
+  async function savePeriods() {
+    // Validate
+    for (const p of periods) {
+      if (!p.label.trim()) return toast.error('All periods must have a label')
+      if (!p.start || !p.end) return toast.error('All periods must have start and end times')
+    }
+    const cleaned = periods.map((p, i) => ({
+      number: i + 1,
+      label: p.label.trim(),
+      start: p.start,
+      end: p.end,
+      ...(p.isBreak ? { isBreak: true } : {})
+    }))
+
+    setSaving(true)
+    try {
+      await api.patch('/schools/me', { periods: cleaned })
+      await refreshSchool()
+      setPeriods(cleaned)
+      toast.success('Periods saved')
+    } catch { toast.error('Failed to save periods') }
+    finally { setSaving(false) }
+  }
+
+  // ── Slot assignment helpers ────────────────────────────────
+  // Build a lookup: `${day}-${period}` → slot
+  const slotMap = {}
+  slots.forEach(s => {
+    const key = `${s.day_of_week}-${s.period_number}`
+    if (!slotMap[key]) slotMap[key] = []
+    slotMap[key].push(s)
+  })
+
+  // Build teacher-class options with labels
+  const tcOptions = tcs.map(tc => ({
+    id: tc.id,
+    label: `${tc.teachers?.full_name || '?'} → ${tc.classes?.grades?.name || ''} ${tc.classes?.name || ''} ${tc.subject ? `(${tc.subject})` : ''}`.trim()
+  }))
+
+  async function assignSlot(day, periodNum, tcId) {
+    if (!tcId) return
+    try {
+      const { data } = await api.post('/timetable', {
+        teacher_class_id: tcId,
+        day_of_week: day,
+        period_number: periodNum
+      })
+      setSlots(prev => [...prev, data])
+      toast.success('Slot assigned')
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed to assign') }
+  }
+
+  async function removeSlot(slotId) {
+    try {
+      await api.delete(`/timetable/${slotId}`)
+      setSlots(prev => prev.filter(s => s.id !== slotId))
+    } catch { toast.error('Failed to remove') }
+  }
+
+  const teachablePeriods = periods.filter(p => !p.isBreak)
+
+  // ── Render ─────────────────────────────────────────────────
+  return (
+    <div>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a', marginBottom: 4 }}>Timetable</div>
+        <div style={{ fontSize: 13, color: '#64748b' }}>
+          Define your school's period times, then assign teachers to each slot in the weekly grid.
+        </div>
+      </div>
+
+      {/* Step toggle */}
+      <div style={{ display: 'flex', gap: 2, marginBottom: 20, background: '#f1f5f9', borderRadius: 8, padding: 3, width: 'fit-content' }}>
+        {[{ key:'periods', label:'① Define Periods' }, { key:'assign', label:'② Assign Timetable' }].map(s => (
+          <button key={s.key} onClick={() => {
+            if (s.key === 'assign' && periods.length === 0) {
+              toast.warning('Define periods first')
+              return
+            }
+            setStep(s.key)
+          }}
+            style={{
+              padding: '7px 16px', borderRadius: 6, border: 'none', cursor: 'pointer',
+              fontWeight: 600, fontSize: 13, transition: 'all .15s',
+              background: step === s.key ? '#fff' : 'transparent',
+              color: step === s.key ? '#0f2044' : '#64748b',
+              boxShadow: step === s.key ? '0 1px 3px rgba(0,0,0,.1)' : 'none'
+            }}>
+            {s.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ─ Step 1: Periods ─ */}
+      {step === 'periods' && (
+        <div style={{ maxWidth: 700 }}>
+          {periods.length === 0 && (
+            <div style={{ background: '#fff', borderRadius: 12, padding: 32, textAlign: 'center', border: '1.5px dashed #e2e8f0', marginBottom: 16 }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>🕐</div>
+              <div style={{ fontWeight: 600, fontSize: 14, color: '#374151', marginBottom: 4 }}>No periods defined yet</div>
+              <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 16 }}>Set up your school day — periods, breaks and times.</div>
+              <button onClick={loadDefaults} style={{ padding: '8px 20px', background: '#0f2044', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                Load default template
+              </button>
+            </div>
+          )}
+
+          {periods.length > 0 && (
+            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', marginBottom: 16 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', textAlign: 'left', width: 40 }}>#</th>
+                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', textAlign: 'left' }}>Label</th>
+                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', textAlign: 'left', width: 100 }}>Start</th>
+                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', textAlign: 'left', width: 100 }}>End</th>
+                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', textAlign: 'center', width: 60 }}>Break?</th>
+                    <th style={{ width: 40 }}></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {periods.map((p, i) => (
+                    <tr key={i} style={{ borderBottom: i < periods.length - 1 ? '1px solid #f1f5f9' : 'none', background: p.isBreak ? '#fefce8' : '#fff' }}>
+                      <td style={{ padding: '8px 12px', fontSize: 12, color: '#94a3b8', fontWeight: 600 }}>{i + 1}</td>
+                      <td style={{ padding: '8px 12px' }}>
+                        <input value={p.label} onChange={e => updatePeriod(i, 'label', e.target.value)}
+                          style={{ width: '100%', padding: '6px 10px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, fontWeight: 600, outline: 'none' }} />
+                      </td>
+                      <td style={{ padding: '8px 12px' }}>
+                        <input type="time" value={p.start} onChange={e => updatePeriod(i, 'start', e.target.value)}
+                          style={{ padding: '6px 8px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, outline: 'none' }} />
+                      </td>
+                      <td style={{ padding: '8px 12px' }}>
+                        <input type="time" value={p.end} onChange={e => updatePeriod(i, 'end', e.target.value)}
+                          style={{ padding: '6px 8px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, outline: 'none' }} />
+                      </td>
+                      <td style={{ padding: '8px 12px', textAlign: 'center' }}>
+                        <input type="checkbox" checked={!!p.isBreak} onChange={e => updatePeriod(i, 'isBreak', e.target.checked)}
+                          style={{ width: 16, height: 16, cursor: 'pointer' }} />
+                      </td>
+                      <td style={{ padding: '8px 8px', textAlign: 'center' }}>
+                        <button onClick={() => removePeriod(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: 16, padding: 4 }} title="Remove">✕</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <button onClick={addPeriod} style={{ padding: '8px 16px', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
+              + Add period
+            </button>
+            {periods.length > 0 && (
+              <button onClick={loadDefaults} style={{ padding: '8px 16px', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
+                Reset to defaults
+              </button>
+            )}
+            {periods.length > 0 && (
+              <button onClick={savePeriods} disabled={saving} style={{ marginLeft: 'auto', padding: '8px 22px', background: '#0f2044', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? 'not-allowed' : 'pointer' }}>
+                {saving ? 'Saving…' : 'Save periods'}
+              </button>
+            )}
+          </div>
+
+          {periods.length > 0 && (
+            <div style={{ marginTop: 16, padding: '12px 16px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, fontSize: 13, color: '#15803d' }}>
+              💡 After saving periods, switch to "② Assign Timetable" to fill in the weekly grid.
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ─ Step 2: Weekly grid ─ */}
+      {step === 'assign' && (
+        <div>
+          {teachablePeriods.length === 0 && (
+            <div style={{ background: '#fff', borderRadius: 12, padding: 32, textAlign: 'center', border: '1.5px dashed #e2e8f0' }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>⚠️</div>
+              <div style={{ fontWeight: 600, fontSize: 14, color: '#374151' }}>No teaching periods defined</div>
+              <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>Go back to step 1 and add your school's periods first.</div>
+            </div>
+          )}
+
+          {teachablePeriods.length > 0 && (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', minWidth: 800, borderCollapse: 'collapse', background: '#fff', borderRadius: 12, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                <thead>
+                  <tr style={{ background: '#f8fafc' }}>
+                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', textAlign: 'left', width: 110, borderBottom: '1px solid #e2e8f0', borderRight: '1px solid #f1f5f9' }}>
+                      Period
+                    </th>
+                    {DAYS.map((d, di) => (
+                      <th key={d} style={{ padding: '10px 8px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', textAlign: 'center', borderBottom: '1px solid #e2e8f0', borderRight: di < 4 ? '1px solid #f1f5f9' : 'none' }}>
+                        {d}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {periods.map((p, pi) => {
+                    if (p.isBreak) {
+                      return (
+                        <tr key={pi} style={{ background: '#fefce8' }}>
+                          <td colSpan={6} style={{ padding: '8px 12px', fontSize: 12, fontWeight: 600, color: '#a16207', textAlign: 'center', borderBottom: '1px solid #f1f5f9' }}>
+                            ☕ {p.label} ({p.start}–{p.end})
+                          </td>
+                        </tr>
+                      )
+                    }
+
+                    return (
+                      <tr key={pi} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '10px 12px', borderRight: '1px solid #f1f5f9', verticalAlign: 'top' }}>
+                          <div style={{ fontWeight: 600, fontSize: 13, color: '#0f172a' }}>{p.label}</div>
+                          <div style={{ fontSize: 11, color: '#94a3b8' }}>{p.start}–{p.end}</div>
+                        </td>
+                        {DAYS.map((d, dayIdx) => {
+                          const dayNum = dayIdx + 1
+                          const key = `${dayNum}-${p.number}`
+                          const cellSlots = slotMap[key] || []
+
+                          return (
+                            <td key={d} style={{ padding: '6px', verticalAlign: 'top', borderRight: dayIdx < 4 ? '1px solid #f1f5f9' : 'none', minWidth: 130 }}>
+                              {cellSlots.map(s => {
+                                const tc = s.teacher_classes
+                                return (
+                                  <div key={s.id} style={{ background: '#eff6ff', borderRadius: 8, padding: '6px 8px', marginBottom: 4, position: 'relative' }}>
+                                    <div style={{ fontWeight: 600, fontSize: 12, color: '#1d4ed8' }}>
+                                      {tc?.classes?.grades?.name} {tc?.classes?.name}
+                                    </div>
+                                    <div style={{ fontSize: 11, color: '#64748b' }}>
+                                      {tc?.teachers?.full_name}{tc?.subject ? ` · ${tc.subject}` : ''}
+                                    </div>
+                                    {s.room && <div style={{ fontSize: 10, color: '#94a3b8' }}>📍 {s.room}</div>}
+                                    <button onClick={() => removeSlot(s.id)}
+                                      style={{ position: 'absolute', top: 2, right: 4, background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: 12, padding: 2 }}
+                                      title="Remove">✕</button>
+                                  </div>
+                                )
+                              })}
+                              {/* Add slot dropdown */}
+                              <select
+                                value=""
+                                onChange={e => assignSlot(dayNum, p.number, e.target.value)}
+                                style={{ width: '100%', padding: '5px 6px', border: '1.5px dashed #e2e8f0', borderRadius: 8, fontSize: 11, color: '#94a3b8', cursor: 'pointer', background: '#fafafa', outline: 'none' }}
+                              >
+                                <option value="">+ assign…</option>
+                                {tcOptions.map(tc => (
+                                  <option key={tc.id} value={tc.id}>{tc.label}</option>
+                                ))}
+                              </select>
+                            </td>
+                          )
+                        })}
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {tcOptions.length === 0 && teachablePeriods.length > 0 && (
+            <div style={{ marginTop: 16, padding: '12px 16px', background: '#fef3c7', border: '1px solid #fde68a', borderRadius: 10, fontSize: 13, color: '#a16207' }}>
+              ⚠️ No teacher-class assignments found. Assign teachers to classes first in the Teachers tab.
+            </div>
+          )}
+
+          <div style={{ marginTop: 16, padding: '12px 16px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, fontSize: 13, color: '#15803d' }}>
+            💡 Teachers will see this timetable on their dashboard. Select a teacher-class from the dropdown to fill each slot.
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 function GradeScaleTab({ school, refreshSchool, toast }) {
   const [rows,   setRows]   = useState([])
