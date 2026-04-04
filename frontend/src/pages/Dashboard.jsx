@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import api from '../lib/api'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts'
 
 const MONTHS = ['January','February','March','April','May','June',
                 'July','August','September','October','November','December']
@@ -648,193 +649,243 @@ function WeeklyTimetable({ periods, slots, todayNum }) {
 
 
 // ════════════════════════════════════════════════════════════════
-// ADMIN / BURSAR / PRINCIPAL DASHBOARD (original)
+// RECHARTS CUSTOM TOOLTIP
+// ════════════════════════════════════════════════════════════════
+
+const ChartTooltip = ({ active, payload, label, sym }) => {
+  if (!active || !payload?.length) return null
+  return (
+    <div style={{ background: '#0f172a', padding: '10px 14px', borderRadius: 9, boxShadow: '0 4px 12px rgba(0,0,0,.3)' }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: '#fff', marginBottom: 6 }}>{label}</div>
+      {payload.map((p, i) => (
+        <div key={i} style={{ fontSize: 12, color: p.color, display: 'flex', gap: 8, alignItems: 'center' }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: p.color, flexShrink: 0 }} />
+          <span style={{ color: '#94a3b8' }}>{p.name}:</span>
+          <span style={{ fontWeight: 700 }}>{sym ? `${sym}${Number(p.value).toLocaleString()}` : `${p.value}%`}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+const CHART_COLORS = ['#2563eb', '#16a34a', '#f59e0b', '#db2777', '#7c3aed', '#0891b2', '#ea580c', '#8b5cf6']
+
+
+// ════════════════════════════════════════════════════════════════
+// ADMIN / BURSAR DASHBOARD (balanced overview with charts)
 // ════════════════════════════════════════════════════════════════
 
 function AdminDashboard() {
   const { school, user } = useAuth()
-  const isPrincipal = user?.role === 'principal'
   const navigate  = useNavigate()
   const sym       = school?.countries?.currency_symbol || 'R'
   const now       = new Date()
-  const thisMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`
-  const monthLabel = `${MONTHS[now.getMonth()]} ${now.getFullYear()}`
+  const year      = now.getFullYear()
+  const monthLabel = `${MONTHS[now.getMonth()]} ${year}`
 
-  const [ledger,   setLedger]   = useState([])
-  const [learners, setLearners] = useState([])
-  const [events,   setEvents]   = useState([])
-  const [loading,  setLoading]  = useState(true)
-  const [drawer,   setDrawer]   = useState(false)
+  const [data, setData]       = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [drawer, setDrawer]   = useState(false)
+  const [ledger, setLedger]   = useState([])
 
   useEffect(() => {
+    const thisMonth = `${year}-${String(now.getMonth()+1).padStart(2,'0')}`
     Promise.all([
+      api.get('/dashboard/summary'),
       api.get(`/fee-ledger?month=${thisMonth}`),
-      api.get('/learners'),
-      api.get(`/events?from=${now.toISOString().slice(0,10)}`),
-    ]).then(([l, lr, ev]) => {
+    ]).then(([s, l]) => {
+      setData(s.data)
       setLedger(l.data || [])
-      setLearners(lr.data || [])
-      setEvents((ev.data || []).slice(0, 5))
       setLoading(false)
     }).catch(() => setLoading(false))
   }, [])
 
-  // ── Stats ─────────────────────────────────────────────────
-  const monthDue       = ledger.reduce((s,e) => s + Number(e.amount_due), 0)
-  const monthPaid      = ledger.reduce((s,e) => s + Number(e.amount_paid), 0)
-  const monthBalance   = monthDue - monthPaid
-  const collectionRate = monthDue > 0 ? Math.round(monthPaid/monthDue*100) : 0
-  const unpaidEntries  = ledger.filter(e => e.status !== 'paid')
-  const overdueCount   = ledger.filter(e => e.status === 'overdue').length
-
-  // ── Grade breakdown ───────────────────────────────────────
-  const grades = useMemo(() => {
-    const g = {}
-    ledger.forEach(e => {
-      const name = e.learners?.classes?.grades?.name || 'Unassigned'
-      if (!g[name]) g[name] = { name, due:0, paid:0, unpaid:0, overdue:0 }
-      g[name].due    += Number(e.amount_due)
-      g[name].paid   += Number(e.amount_paid)
-      g[name].unpaid += e.status !== 'paid' ? 1 : 0
-      g[name].overdue += e.status === 'overdue' ? 1 : 0
-    })
-    return Object.values(g)
-      .map(g => ({ ...g, pct: g.due > 0 ? Math.round(g.paid/g.due*100) : 0 }))
-      .sort((a,b) => a.name.localeCompare(b.name, undefined, { numeric:true }))
-  }, [ledger])
+  const unpaidEntries = ledger.filter(e => e.status !== 'paid')
+  const monthBalance  = ledger.reduce((s,e) => s + Number(e.amount_due) - Number(e.amount_paid), 0)
 
   const rc = r => r >= 80 ? '#16a34a' : r >= 50 ? '#ca8a04' : '#dc2626'
-  const rb = r => r >= 80 ? '#16a34a' : r >= 50 ? '#f59e0b' : '#ef4444'
 
   const hour = now.getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
   const firstName = user?.full_name?.split(' ')[0] || 'there'
 
+  if (loading) return <div style={{ padding: 48, textAlign: 'center', color: '#64748b' }}>Loading your dashboard…</div>
+
+  const fs = data?.feeStats || {}
+
   return (
     <>
       <style>{CSS}</style>
 
-      {/* Page header */}
-      <div style={{ marginBottom:24 }}>
-        <h1 style={{ fontSize:22, fontWeight:800, color:'#0f172a', letterSpacing:'-0.3px' }}>
+      {/* Header */}
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>
           {greeting}, {firstName}
         </h1>
-        <p style={{ fontSize:14, color:'#64748b', marginTop:2 }}>
-          {now.toLocaleDateString('en-ZA', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}
-          {isPrincipal && <span style={{ marginLeft:10, fontSize:12, background:'#f0fdf4', color:'#15803d', padding:'2px 8px', borderRadius:20, fontWeight:600 }}>Principal view</span>}
+        <p style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>
+          {now.toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          <span style={{ marginLeft: 10, fontSize: 12, background: '#eff6ff', color: '#2563eb', padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>
+            {user?.role === 'bursar' ? 'Bursar' : 'Admin'}
+          </span>
         </p>
       </div>
 
       {/* Stat cards */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:14, marginBottom:24 }}>
-        <StatCard delay="0ms"   label="Total learners"       value={learners.length}                             sub={`${school?.name || ''}`}              onClick={() => navigate('/learners')} />
-        <StatCard delay="60ms"  label={`${monthLabel} — due`} value={`${sym}${monthDue.toLocaleString()}`}      sub={`${ledger.length} entries`}           onClick={() => navigate('/fees')} />
-        <StatCard delay="120ms" label="Collected"             value={`${sym}${monthPaid.toLocaleString()}`}      sub={`${sym}${monthBalance.toLocaleString()} outstanding`} accent="#16a34a" onClick={() => navigate('/fees')} />
-        <StatCard delay="180ms" label="Collection rate"       value={`${collectionRate}%`}
-          sub={overdueCount > 0 ? `⚠ ${overdueCount} overdue` : unpaidEntries.length > 0 ? `${unpaidEntries.length} pending` : 'All collected ✓'}
-          accent={rc(collectionRate)} onClick={() => setDrawer(true)} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 24 }}>
+        <StatCard delay="0ms"   label="Total learners"     value={data?.learnerCount || 0}
+          sub={`${data?.teacherCount || 0} teachers · ${data?.classCount || 0} classes`} onClick={() => navigate('/learners')} />
+        <StatCard delay="60ms"  label="Fee collection"     value={`${fs.collectionRate || 0}%`}
+          sub={`${sym}${(fs.totalPaid||0).toLocaleString()} of ${sym}${(fs.totalDue||0).toLocaleString()}`}
+          accent={rc(fs.collectionRate || 0)} onClick={() => navigate('/fees')} />
+        <StatCard delay="120ms" label="Attendance rate"     value={data?.attendanceRate != null ? `${data.attendanceRate}%` : '—'}
+          sub={`${monthLabel} school-wide`}
+          accent={rc(data?.attendanceRate || 0)} onClick={() => navigate('/attendance')} />
+        <StatCard delay="180ms" label="Outstanding"         value={`${sym}${(fs.outstanding||0).toLocaleString()}`}
+          sub={fs.overdueCount > 0 ? `${fs.overdueCount} overdue entries` : 'No overdue fees'}
+          accent={fs.outstanding > 0 ? '#dc2626' : '#16a34a'} onClick={() => setDrawer(true)} />
       </div>
 
-      {/* Main grid */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom:16 }}>
+      {/* Charts row */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
 
-        {/* Grade breakdown */}
-        <div className="dash-card" style={{ animationDelay:'240ms' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:18 }}>
-            <div>
-              <div style={{ fontWeight:700, fontSize:15, color:'#0f172a' }}>Collection by grade</div>
-              <div style={{ fontSize:13, color:'#94a3b8', marginTop:2 }}>{monthLabel}</div>
-            </div>
-            <Link to="/fees" style={{ fontSize:12, color:'#0f2044', fontWeight:700, textDecoration:'none' }}>View all →</Link>
-          </div>
-          {loading && <div style={{ color:'#94a3b8', fontSize:13, padding:'20px 0' }}>Loading…</div>}
-          {!loading && grades.length === 0 && (
-            <div style={{ color:'#94a3b8', fontSize:13, padding:'20px 0', textAlign:'center' }}>
-              No fee entries for {monthLabel}.<br/>
-              <Link to="/settings" style={{ color:'#0f2044', fontWeight:600 }}>Check fee plans →</Link>
+        {/* ── Monthly fee trend (Recharts bar chart) ── */}
+        <div className="dash-card" style={{ animationDelay: '240ms' }}>
+          <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>Fee collection trend</div>
+          <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 16 }}>Last 6 months — due vs collected</div>
+          {data?.monthlyTrend?.length > 0 ? (
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={data.monthlyTrend} barGap={2}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false}
+                  tickFormatter={v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} />
+                <Tooltip content={<ChartTooltip sym={sym} />} />
+                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
+                <Bar dataKey="due" name="Due" fill="#e2e8f0" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="paid" name="Collected" fill="#16a34a" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div style={{ height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 13 }}>
+              No fee data for this year yet.
             </div>
           )}
-          {grades.map(g => (
+        </div>
+
+        {/* ── Attendance by grade (Recharts bar chart) ── */}
+        <div className="dash-card" style={{ animationDelay: '300ms' }}>
+          <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>Attendance by grade</div>
+          <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 16 }}>{monthLabel} — attendance rate %</div>
+          {data?.attGradeStats?.length > 0 ? (
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={data.attGradeStats} layout="vertical" barSize={18}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false}
+                  tickFormatter={v => `${v}%`} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 12, fill: '#374151', fontWeight: 600 }}
+                  axisLine={false} tickLine={false} width={70} />
+                <Tooltip content={<ChartTooltip />} />
+                <Bar dataKey="rate" name="Attendance" radius={[0, 6, 6, 0]}>
+                  {(data.attGradeStats || []).map((entry, i) => (
+                    <Cell key={i} fill={entry.rate >= 80 ? '#16a34a' : entry.rate >= 60 ? '#f59e0b' : '#ef4444'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div style={{ height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 13 }}>
+              No attendance data for this month yet.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Second row */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+
+        {/* ── Fee collection by grade (CSS bars + data) ── */}
+        <div className="dash-card" style={{ animationDelay: '360ms' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>Collection by grade</div>
+              <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 2 }}>{year} year to date</div>
+            </div>
+            <Link to="/fees" style={{ fontSize: 12, color: '#0f2044', fontWeight: 700, textDecoration: 'none' }}>View all →</Link>
+          </div>
+          {(data?.feeGradeStats || []).length === 0 && (
+            <div style={{ color: '#94a3b8', fontSize: 13, padding: '20px 0', textAlign: 'center' }}>
+              No fee entries yet.<br/>
+              <Link to="/settings" style={{ color: '#0f2044', fontWeight: 600 }}>Check fee plans →</Link>
+            </div>
+          )}
+          {(data?.feeGradeStats || []).map(g => (
             <div key={g.name} className="grade-row">
-              <div style={{ width:68, fontSize:13, fontWeight:600, color:'#0f172a', flexShrink:0 }}>{g.name}</div>
+              <div style={{ width: 68, fontSize: 13, fontWeight: 600, color: '#0f172a', flexShrink: 0 }}>{g.name}</div>
               <div className="progress-bar">
-                <div className="progress-fill" style={{ width:`${g.pct}%`, background:rb(g.pct) }} />
+                <div className="progress-fill" style={{ width: `${g.rate}%`, background: rc(g.rate) }} />
               </div>
-              <div style={{ width:34, textAlign:'right', fontSize:12, fontWeight:800, color:rc(g.pct), flexShrink:0 }}>{g.pct}%</div>
-              <div style={{ width:100, textAlign:'right', fontSize:11, color:'#94a3b8', flexShrink:0 }}>{sym}{g.paid.toLocaleString()}/{sym}{g.due.toLocaleString()}</div>
-              {g.overdue > 0
-                ? <span style={{ fontSize:11, fontWeight:700, color:'#dc2626', background:'#fee2e2', padding:'1px 7px', borderRadius:20, whiteSpace:'nowrap', flexShrink:0 }}>⚠ {g.overdue}</span>
-                : g.unpaid > 0
-                  ? <span style={{ fontSize:11, fontWeight:600, color:'#64748b', background:'#f1f5f9', padding:'1px 7px', borderRadius:20, whiteSpace:'nowrap', flexShrink:0 }}>{g.unpaid}</span>
-                  : <span style={{ fontSize:14, flexShrink:0 }}>✅</span>
-              }
+              <div style={{ width: 34, textAlign: 'right', fontSize: 12, fontWeight: 800, color: rc(g.rate), flexShrink: 0 }}>{g.rate}%</div>
+              <div style={{ width: 110, textAlign: 'right', fontSize: 11, color: '#94a3b8', flexShrink: 0 }}>
+                {sym}{g.paid.toLocaleString()}/{sym}{g.due.toLocaleString()}
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Right column */}
-        <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+        {/* ── Quick actions + Events ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-          {/* Quick actions — role aware */}
-          <div className="dash-card" style={{ animationDelay:'300ms' }}>
-            <div style={{ fontWeight:700, fontSize:15, color:'#0f172a', marginBottom:14 }}>
-              {isPrincipal ? 'Principal actions' : 'Quick actions'}
-            </div>
+          <div className="dash-card" style={{ animationDelay: '360ms' }}>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 14 }}>Quick actions</div>
 
             {unpaidEntries.length > 0 && (
               <button className="quick-link" onClick={() => setDrawer(true)}
-                style={{ background:'#fff7ed', border:'1px solid #fed7aa' }}>
-                <span style={{ color:'#c2410c' }}>
+                style={{ background: '#fff7ed', border: '1px solid #fed7aa' }}>
+                <span style={{ color: '#c2410c' }}>
                   💰 {unpaidEntries.length} unpaid — {sym}{monthBalance.toLocaleString()} outstanding
                 </span>
-                <span style={{ color:'#94a3b8' }}>→</span>
+                <span style={{ color: '#94a3b8' }}>→</span>
               </button>
             )}
 
-            {/* Waiver queue — prominent for principal */}
-            <WaiverQueueLink isPrincipal={isPrincipal} />
+            <WaiverQueueLink isPrincipal={false} />
 
             <Link to="/fees" className="quick-link">
-              <span>📋 Fee overview — {monthLabel}</span>
-              <span style={{ color:'#94a3b8' }}>→</span>
+              <span>📋 Fee overview</span>
+              <span style={{ color: '#94a3b8' }}>→</span>
             </Link>
-
             <Link to="/learners" className="quick-link">
-              <span>🎒 Learners ({learners.length})</span>
-              <span style={{ color:'#94a3b8' }}>→</span>
+              <span>🎒 Learners ({data?.learnerCount || 0})</span>
+              <span style={{ color: '#94a3b8' }}>→</span>
             </Link>
-
             <Link to="/announcements" className="quick-link">
-              <span>📢 {isPrincipal ? 'Post announcement' : 'Send announcement'}</span>
-              <span style={{ color:'#94a3b8' }}>→</span>
+              <span>📢 Send announcement</span>
+              <span style={{ color: '#94a3b8' }}>→</span>
             </Link>
-
-            {!isPrincipal && (
-              <Link to="/settings" className="quick-link">
-                <span>⚙ Settings</span>
-                <span style={{ color:'#94a3b8' }}>→</span>
-              </Link>
-            )}
+            <Link to="/settings" className="quick-link">
+              <span>⚙ Settings</span>
+              <span style={{ color: '#94a3b8' }}>→</span>
+            </Link>
           </div>
 
           {/* Events */}
-          <div className="dash-card" style={{ flex:1, animationDelay:'360ms' }}>
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
-              <div style={{ fontWeight:700, fontSize:15, color:'#0f172a' }}>Upcoming events</div>
-              <Link to="/events" style={{ fontSize:12, color:'#0f2044', fontWeight:700, textDecoration:'none' }}>View all →</Link>
+          <div className="dash-card" style={{ flex: 1, animationDelay: '420ms' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>Upcoming events</div>
+              <Link to="/events" style={{ fontSize: 12, color: '#0f2044', fontWeight: 700, textDecoration: 'none' }}>View all →</Link>
             </div>
-            {events.length === 0 && (
-              <div style={{ color:'#94a3b8', fontSize:13 }}>
-                No events. <Link to="/events" style={{ color:'#0f2044', fontWeight:600, textDecoration:'none' }}>Add one →</Link>
+            {(data?.upcomingEvents || []).length === 0 && (
+              <div style={{ color: '#94a3b8', fontSize: 13 }}>
+                No events. <Link to="/events" style={{ color: '#0f2044', fontWeight: 600, textDecoration: 'none' }}>Add one →</Link>
               </div>
             )}
-            {events.map(ev => (
-              <div key={ev.id} style={{ display:'flex', gap:10, marginBottom:12, paddingBottom:12, borderBottom:'1px solid #f8fafc' }}>
-                <div style={{ width:3, borderRadius:4, flexShrink:0, background:EVENT_COLORS[ev.event_type]||'#94a3b8' }} />
+            {(data?.upcomingEvents || []).map(ev => (
+              <div key={ev.id} style={{ display: 'flex', gap: 10, marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #f8fafc' }}>
+                <div style={{ width: 3, borderRadius: 4, flexShrink: 0, background: EVENT_COLORS[ev.event_type] || '#94a3b8' }} />
                 <div>
-                  <div style={{ fontWeight:600, fontSize:13, color:'#0f172a' }}>{ev.title}</div>
-                  <div style={{ fontSize:11, color:'#94a3b8', marginTop:2 }}>
-                    {new Date(ev.event_date).toLocaleDateString('en-ZA', { weekday:'short', day:'numeric', month:'short' })}
+                  <div style={{ fontWeight: 600, fontSize: 13, color: '#0f172a' }}>{ev.title}</div>
+                  <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
+                    {new Date(ev.event_date).toLocaleDateString('en-ZA', { weekday: 'short', day: 'numeric', month: 'short' })}
                     {ev.event_type && ` · ${ev.event_type}`}
                   </div>
                 </div>
@@ -844,65 +895,228 @@ function AdminDashboard() {
         </div>
       </div>
 
-      {/* Pending / overdue cards */}
-      {unpaidEntries.length > 0 && (
-        <div className="dash-card" style={{ animationDelay:'420ms' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
-            <div>
-              <div style={{ fontWeight:700, fontSize:15, color:'#0f172a' }}>Needs collection — {monthLabel}</div>
-              <div style={{ fontSize:13, color:'#94a3b8', marginTop:2 }}>
-                {overdueCount > 0 && <span style={{ color:'#dc2626', fontWeight:600, marginRight:10 }}>⚠ {overdueCount} overdue</span>}
-                {unpaidEntries.length - overdueCount > 0 && `${unpaidEntries.length - overdueCount} pending`}
-              </div>
-            </div>
-            <button onClick={() => setDrawer(true)}
-              style={{ padding:'7px 14px', background:'#0f2044', color:'#fff', border:'none', borderRadius:8, fontSize:12, fontWeight:700, cursor:'pointer' }}>
-              View all
-            </button>
-          </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(220px, 1fr))', gap:8 }}>
-            {unpaidEntries.slice(0, 8).map(e => {
-              const balance   = Number(e.amount_due) - Number(e.amount_paid)
-              const isOverdue = e.status === 'overdue'
-              return (
-                <div key={e.id} className="pending-card"
-                  onClick={() => navigate(`/learners/${e.learners?.id}`)}
-                  style={{ background: isOverdue ? '#fff9f9' : '#f8fafc', border:`1px solid ${isOverdue?'#fca5a5':'#e2e8f0'}` }}>
-                  <div>
-                    <div style={{ fontWeight:600, fontSize:13, color:'#0f172a' }}>{e.learners?.first_name} {e.learners?.last_name}</div>
-                    <div style={{ fontSize:11, color:'#94a3b8', marginTop:1 }}>{e.learners?.classes?.grades?.name} {e.learners?.classes?.name}</div>
-                  </div>
-                  <div style={{ textAlign:'right', flexShrink:0, marginLeft:8 }}>
-                    <div style={{ fontWeight:800, fontSize:13, color: isOverdue?'#dc2626':'#374151' }}>{sym}{balance.toLocaleString()}</div>
-                    <div style={{ fontSize:10, fontWeight:700, color: isOverdue?'#dc2626':'#64748b' }}>{e.status}</div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-          {unpaidEntries.length > 8 && (
-            <button onClick={() => setDrawer(true)}
-              style={{ marginTop:12, fontSize:12, color:'#64748b', background:'none', border:'none', cursor:'pointer', textDecoration:'underline', padding:0 }}>
-              + {unpaidEntries.length - 8} more → view all
-            </button>
-          )}
-        </div>
-      )}
-
       {/* ── Attendance alerts ── */}
       <AttendanceAlertsCard delay="480ms" />
 
-      {/* All paid celebration */}
-      {!loading && ledger.length > 0 && unpaidEntries.length === 0 && (
-        <div className="dash-card" style={{ textAlign:'center', padding:'36px', animationDelay:'420ms' }}>
-          <div style={{ fontSize:32, marginBottom:10 }}>🎉</div>
-          <div style={{ fontWeight:800, fontSize:17, color:'#16a34a', marginBottom:4 }}>All fees collected for {monthLabel}!</div>
-          <div style={{ fontSize:13, color:'#94a3b8' }}>{sym}{monthPaid.toLocaleString()} collected from {learners.length} learner{learners.length!==1?'s':''}.</div>
+      {/* Outstanding drawer */}
+      {drawer && <OutstandingDrawer entries={unpaidEntries} sym={sym} onClose={() => setDrawer(false)} />}
+    </>
+  )
+}
+
+
+// ════════════════════════════════════════════════════════════════
+// PRINCIPAL DASHBOARD (high-level KPIs)
+// ════════════════════════════════════════════════════════════════
+
+function PrincipalDashboard() {
+  const { school, user } = useAuth()
+  const navigate  = useNavigate()
+  const sym       = school?.countries?.currency_symbol || 'R'
+  const now       = new Date()
+  const year      = now.getFullYear()
+  const monthLabel = `${MONTHS[now.getMonth()]} ${year}`
+
+  const [data, setData]       = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    api.get('/dashboard/summary').then(r => {
+      setData(r.data)
+      setLoading(false)
+    }).catch(() => setLoading(false))
+  }, [])
+
+  const hour = now.getHours()
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+  const firstName = user?.full_name?.split(' ')[0] || 'there'
+
+  const rc = r => r >= 80 ? '#16a34a' : r >= 50 ? '#ca8a04' : '#dc2626'
+
+  if (loading) return <div style={{ padding: 48, textAlign: 'center', color: '#64748b' }}>Loading your dashboard…</div>
+
+  const fs = data?.feeStats || {}
+
+  // Learner distribution by grade for pie chart
+  const gradeDistribution = Object.entries(data?.learnersByGrade || {}).map(([name, count], i) => ({
+    name, value: count, fill: CHART_COLORS[i % CHART_COLORS.length]
+  }))
+
+  return (
+    <>
+      <style>{CSS}</style>
+
+      {/* Header */}
+      <div style={{ marginBottom: 28 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>
+          {greeting}, {firstName}
+        </h1>
+        <p style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>
+          {now.toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          <span style={{ marginLeft: 10, fontSize: 12, background: '#f0fdf4', color: '#15803d', padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>Principal</span>
+        </p>
+      </div>
+
+      {/* Big KPI cards — 3x2 grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 28 }}>
+
+        {/* Learners */}
+        <div className="dash-card stat-card" onClick={() => navigate('/learners')}
+          style={{ animationDelay: '0ms', textAlign: 'center', padding: '28px 20px' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 12 }}>Total learners</div>
+          <div style={{ fontSize: 42, fontWeight: 900, color: '#0f172a', letterSpacing: '-1px', lineHeight: 1 }}>{data?.learnerCount || 0}</div>
+          <div style={{ fontSize: 13, color: '#64748b', marginTop: 10 }}>{data?.classCount || 0} classes</div>
+        </div>
+
+        {/* Teachers */}
+        <div className="dash-card stat-card" style={{ animationDelay: '60ms', textAlign: 'center', padding: '28px 20px' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 12 }}>Teaching staff</div>
+          <div style={{ fontSize: 42, fontWeight: 900, color: '#0f172a', letterSpacing: '-1px', lineHeight: 1 }}>{data?.teacherCount || 0}</div>
+          <div style={{ fontSize: 13, color: '#64748b', marginTop: 10 }}>
+            {data?.learnerCount && data?.teacherCount
+              ? `1:${Math.round(data.learnerCount / data.teacherCount)} ratio`
+              : '—'}
+          </div>
+        </div>
+
+        {/* Attendance */}
+        <div className="dash-card stat-card" onClick={() => navigate('/attendance')}
+          style={{ animationDelay: '120ms', textAlign: 'center', padding: '28px 20px' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 12 }}>Attendance rate</div>
+          <div style={{ fontSize: 42, fontWeight: 900, color: rc(data?.attendanceRate || 0), letterSpacing: '-1px', lineHeight: 1 }}>
+            {data?.attendanceRate != null ? `${data.attendanceRate}%` : '—'}
+          </div>
+          <div style={{ fontSize: 13, color: '#64748b', marginTop: 10 }}>{monthLabel}</div>
+        </div>
+
+        {/* Fee collection */}
+        <div className="dash-card stat-card" onClick={() => navigate('/fees')}
+          style={{ animationDelay: '180ms', textAlign: 'center', padding: '28px 20px' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 12 }}>Fee collection</div>
+          <div style={{ fontSize: 42, fontWeight: 900, color: rc(fs.collectionRate || 0), letterSpacing: '-1px', lineHeight: 1 }}>
+            {fs.collectionRate || 0}%
+          </div>
+          <div style={{ fontSize: 13, color: '#64748b', marginTop: 10 }}>
+            {sym}{(fs.totalPaid||0).toLocaleString()} collected
+          </div>
+        </div>
+
+        {/* Outstanding */}
+        <div className="dash-card stat-card"
+          style={{ animationDelay: '240ms', textAlign: 'center', padding: '28px 20px' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 12 }}>Outstanding</div>
+          <div style={{ fontSize: 36, fontWeight: 900, color: fs.outstanding > 0 ? '#dc2626' : '#16a34a', letterSpacing: '-0.5px', lineHeight: 1 }}>
+            {sym}{(fs.outstanding||0).toLocaleString()}
+          </div>
+          <div style={{ fontSize: 13, color: '#64748b', marginTop: 10 }}>
+            {fs.overdueCount > 0 ? `${fs.overdueCount} overdue` : 'No overdue'}
+          </div>
+        </div>
+
+        {/* Pending waivers */}
+        <div className="dash-card stat-card" onClick={() => navigate('/waivers')}
+          style={{ animationDelay: '300ms', textAlign: 'center', padding: '28px 20px',
+            border: (data?.pendingWaivers || 0) > 0 ? '2px solid #c4b5fd' : '2px solid transparent',
+            background: (data?.pendingWaivers || 0) > 0 ? '#faf5ff' : '#fff' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: (data?.pendingWaivers || 0) > 0 ? '#7c3aed' : '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 12 }}>
+            Waiver approvals
+          </div>
+          <div style={{ fontSize: 42, fontWeight: 900, color: (data?.pendingWaivers || 0) > 0 ? '#7c3aed' : '#0f172a', letterSpacing: '-1px', lineHeight: 1 }}>
+            {data?.pendingWaivers || 0}
+          </div>
+          <div style={{ fontSize: 13, color: '#64748b', marginTop: 10 }}>
+            {(data?.pendingWaivers || 0) > 0 ? 'Needs your review' : 'All clear'}
+          </div>
+        </div>
+      </div>
+
+      {/* Charts row */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+
+        {/* Learner distribution pie */}
+        <div className="dash-card" style={{ animationDelay: '360ms' }}>
+          <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>Learner distribution</div>
+          <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12 }}>By grade</div>
+          {gradeDistribution.length > 0 ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+              <ResponsiveContainer width="50%" height={180}>
+                <PieChart>
+                  <Pie data={gradeDistribution} dataKey="value" cx="50%" cy="50%"
+                    innerRadius={40} outerRadius={75} paddingAngle={2}>
+                    {gradeDistribution.map((entry, i) => (
+                      <Cell key={i} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(v, name) => [`${v} learners`, name]} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div style={{ flex: 1 }}>
+                {gradeDistribution.map((g, i) => (
+                  <div key={g.name} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                    <span style={{ width: 10, height: 10, borderRadius: 3, background: g.fill, flexShrink: 0 }} />
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#374151', flex: 1 }}>{g.name}</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{g.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 13 }}>
+              No learner data yet.
+            </div>
+          )}
+        </div>
+
+        {/* Fee trend chart */}
+        <div className="dash-card" style={{ animationDelay: '420ms' }}>
+          <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>Fee collection trend</div>
+          <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 16 }}>Last 6 months</div>
+          {data?.monthlyTrend?.length > 0 ? (
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart data={data.monthlyTrend} barGap={2}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false}
+                  tickFormatter={v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} />
+                <Tooltip content={<ChartTooltip sym={sym} />} />
+                <Bar dataKey="due" name="Due" fill="#e2e8f0" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="paid" name="Collected" fill="#16a34a" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div style={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: 13 }}>
+              No fee data yet.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Upcoming events */}
+      {(data?.upcomingEvents || []).length > 0 && (
+        <div className="dash-card" style={{ animationDelay: '480ms', marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>Upcoming events</div>
+            <Link to="/events" style={{ fontSize: 12, color: '#0f2044', fontWeight: 700, textDecoration: 'none' }}>View all →</Link>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 10 }}>
+            {(data?.upcomingEvents || []).map(ev => (
+              <div key={ev.id} style={{ display: 'flex', gap: 10, padding: '10px 12px', background: '#f8fafc', borderRadius: 9 }}>
+                <div style={{ width: 3, borderRadius: 4, flexShrink: 0, background: EVENT_COLORS[ev.event_type] || '#94a3b8' }} />
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 13, color: '#0f172a' }}>{ev.title}</div>
+                  <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
+                    {new Date(ev.event_date).toLocaleDateString('en-ZA', { weekday: 'short', day: 'numeric', month: 'short' })}
+                    {ev.event_type && ` · ${ev.event_type}`}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Outstanding drawer */}
-      {drawer && <OutstandingDrawer entries={unpaidEntries} sym={sym} onClose={() => setDrawer(false)} />}
+      {/* Attendance alerts */}
+      <AttendanceAlertsCard delay="540ms" />
     </>
   )
 }
@@ -915,6 +1129,7 @@ function AdminDashboard() {
 export default function Dashboard() {
   const { user } = useAuth()
 
-  if (user?.role === 'teacher') return <TeacherDashboard />
+  if (user?.role === 'teacher')   return <TeacherDashboard />
+  if (user?.role === 'principal') return <PrincipalDashboard />
   return <AdminDashboard />
 }
