@@ -1,5 +1,5 @@
 # Skolo — Development Progress
-*Last updated: 3 April 2026*
+*Last updated: 4 April 2026*
 
 ---
 
@@ -20,6 +20,7 @@
 - **Backend:** Express.js → Render (free tier — spins down after inactivity, ~30s cold start)
 - **Database:** Supabase PostgreSQL
 - **Auth:** JWT stored in localStorage as `sk_token` and `sk_user`
+- **Email:** Resend API — FROM: `noreply@4dcs.co.za` (verified domain)
 
 ---
 
@@ -31,6 +32,7 @@ SUPABASE_URL=https://sxhjsmajoetvdgrpuawa.supabase.co
 SUPABASE_SERVICE_KEY=<service role key>
 JWT_SECRET=<jwt secret>
 FRONTEND_URL=https://skolo.pages.dev
+RESEND_API_KEY=<resend api key — get from resend.com, revoke old ones>
 PORT=3001
 ```
 
@@ -41,17 +43,19 @@ VITE_API_URL=https://skolo-api.onrender.com
 
 ---
 
-## 👤 User Roles
+## 👤 User Roles & Access
 
 | Role | Access |
 |---|---|
-| admin | Full access — all settings, all data |
-| bursar | Fee management, learner records, payments |
-| principal | View-only dashboards + reports |
+| `admin` | Full access — all settings, fees, learners, staff management |
+| `principal` | Read-only fees + learners, approve/reject waivers, announcements, events |
+| `bursar` | Fees (full), learners, no settings |
+| `teacher` | My Classes only — their assigned classes + learner profiles (no fees) |
 
-**JWT keys in localStorage:**
-- `sk_token` — JWT bearer token
-- `sk_user`  — user object (id, school_id, role, email, full_name)
+**Nav by role:**
+- `admin/bursar` — Dashboard, Learners, Fees, Waivers, Events, Announcements, Settings
+- `principal` — Dashboard, Learners (read-only), Fees (read-only), Waivers (approval), Events, Announcements
+- `teacher` — Dashboard, My Classes, Events, Announcements
 
 ---
 
@@ -63,128 +67,179 @@ skolo/
 │   ├── server.js
 │   ├── lib/
 │   │   ├── supabase.js
-│   │   └── sequences.js        # Reference number generator
+│   │   ├── sequences.js        # Reference number generator (00001, T-0001)
+│   │   ├── autoGenerate.js     # Auto fee generation (monthly, idempotent)
+│   │   └── email.js            # Resend email helper (invite, waiver, decision)
 │   ├── middleware/
 │   │   └── auth.js
 │   └── routes/
-│       ├── auth.js             # Login + school registration
-│       ├── schools.js          # School config, countries, regions, PATCH /me
-│       ├── learners.js         # CRUD + bulk import + /bulk
+│       ├── auth.js             # Login, register-school, set-password, verify-invite
+│       ├── schools.js          # School config, PATCH /me, countries, regions
+│       ├── learners.js         # CRUD + bulk import + auto-generate fees on enrol
 │       ├── grades.js           # Grades + classes CRUD
-│       ├── fees.js             # Old fee schedules + arrears (legacy)
-│       ├── fee-plans.js        # Fee plans per grade
-│       ├── fee-ledger.js       # Smart ledger: generate, pay, summary
+│       ├── fees.js             # Legacy fee schedules (kept for old data)
+│       ├── fee-plans.js        # Fee plans (monthly/termly per grade)
+│       ├── fee-ledger.js       # Smart ledger: auto-generate, pay, waive, summary, preview
 │       ├── events.js           # School calendar
-│       ├── announcements.js    # Bulk SMS + announcements
-│       ├── teachers.js         # Teacher management
-│       ├── users.js            # Staff account management
-│       ├── upload.js           # Logo upload → Supabase Storage
-│       ├── receipts.js         # PDF receipt generation (pdfkit)
-│       └── portal.js           # Parent portal (public, token-secured)
+│       ├── announcements.js    # Announcements
+│       ├── teachers.js         # Teacher records CRUD
+│       ├── teacher-classes.js  # Teacher↔class assignments + /my endpoint
+│       ├── users.js            # Staff accounts (invite flow, no password on create)
+│       ├── upload.js           # Logo upload → base64 in DB
+│       ├── portal.js           # Parent portal (public, token-secured)
+│       ├── learner-profile.js  # Exam results, awards, notes CRUD
+│       ├── waivers.js          # Waiver request → approve/reject flow + emails
+│       └── notifications.js    # Bell notifications (unread count, mark read)
 └── frontend/src/
     ├── App.jsx                 # Routes + ProtectedRoute
     ├── contexts/
-    │   ├── AuthContext.jsx     # useAuth() — login, logout, school config
+    │   ├── AuthContext.jsx     # useAuth() — login, logout, school, refreshSchool
     │   └── ToastContext.jsx    # useToast() — success/error/warning/info
     ├── components/
-    │   ├── Layout.jsx          # Dark navy sidebar, topbar
-    │   └── ui.jsx              # Shared icons, badges, ActionBtn, t (design tokens)
+    │   ├── Layout.jsx          # Role-gated nav, bell icon, notification dropdown
+    │   └── ui.jsx              # Icons, badges, ActionBtn, design tokens
     └── pages/
-        ├── Login.jsx           # Blue chalkboard with physics formulas
-        ├── Register.jsx        # School registration (country → region cascade)
-        ├── Dashboard.jsx       # Stats cards (clickable), arrears, events
-        ├── Learners.jsx        # Table + add/view/edit modals + bulk import + portal link
-        ├── Fees.jsx            # Bursar-first ledger: search, grade groups, pay, receipt
-        ├── Events.jsx          # School calendar cards
-        ├── Announcements.jsx   # Announcements + SMS toggle
-        ├── Settings.jsx        # Grades, fee plans, teachers, profile, staff
-        └── ParentPortal.jsx    # Public parent fee portal (no login)
+        ├── Login.jsx           # Login + 4DCS branding footer
+        ├── Register.jsx        # School registration
+        ├── SetPassword.jsx     # Invite accept + set password (public)
+        ├── Dashboard.jsx       # Role-aware: KPIs, grade collection bars, pending cards
+        ├── Learners.jsx        # Table + add/edit/delete + import + role guards
+        ├── LearnerProfile.jsx  # 5-tab profile: Overview, Fees, Exam Grades🔒, Awards🔒, Notes🔒
+        ├── Fees.jsx            # Bursar-first: search, grade groups, pay, waive request, receipt
+        ├── Waivers.jsx         # Waiver queue (submit / approve / reject)
+        ├── Events.jsx          # Calendar
+        ├── Announcements.jsx   # Feed + compose
+        ├── Settings.jsx        # Grades, Fee Plans, Teachers (w/ class assign), Profile, Staff
+        ├── MyClasses.jsx       # Teacher view — their assigned classes + learners
+        └── ParentPortal.jsx    # Public parent fee portal (no login, token URL)
 ```
 
 ---
 
 ## ✅ Completed Features
 
-### Core
-- [x] Multi-school, multi-tenant architecture (school_id on every table, RLS)
-- [x] Country-aware: Lesotho (LSL, M) + South Africa (ZAR, R)
-- [x] School registration → admin account created in one flow
-- [x] JWT auth + role-based access (admin/bursar/principal)
+### Auth & Users
+- [x] School registration → admin account
+- [x] JWT login + role-based access
+- [x] Invite-by-email flow (Resend) — no password set by admin
+- [x] Set-password page (`/set-password/:token`) — auto-login after setting
+- [x] Resend invite + Copy link to clipboard
+- [x] Delete staff account
+- [x] Role-gated navigation (admin/principal/bursar/teacher see different nav)
 
 ### Learners
-- [x] CRUD with guardian linkage (one learner → many guardians)
-- [x] Bulk import from CSV or Excel (template downloadable)
-- [x] Unique reference numbers: `00001`–`99999` per school
-- [x] View modal with parent portal link generation
-- [x] Search by name
+- [x] CRUD with guardian linkage
+- [x] Bulk import CSV/Excel
+- [x] Reference numbers `00001–99999` per school
+- [x] Parent portal link from learner profile
+- [x] Medical fields (condition, doctor, phone) — optional, with consent note
+- [x] Role guards — principal read-only, teacher via My Classes only
 
 ### Fee System
-- [x] Fee Plans (monthly/termly, per grade)
-- [x] Ledger generation (per month or per term, idempotent)
-- [x] Bursar view: search, grade-grouped, collapsible, status pills
+- [x] Fee Plans (monthly/termly, per grade, due_day)
+- [x] **Auto-generation** — runs on page load + on learner enrol (idempotent, month-level dedup)
+- [x] Bursar view: search, grade-grouped collapsible, status pills
 - [x] Pay (full or partial), auto-status update
-- [x] PDF receipt auto-download after payment
-- [x] Receipt button on any paid/partial row
-- [x] Export to Excel (filtered month)
-- [x] Monthly totals bar (Due/Collected/Outstanding/Rate)
+- [x] **Waiver request flow** — bursar requests → principal gets email + bell → approves/rejects → bursar notified
+- [x] Waiver reasons + custom reason for "Other"
+- [x] PDF receipt — browser print/save, includes school logo, PAID/WAIVED stamp
+- [x] Export to Excel (filtered month + totals row)
+- [x] Monthly totals bar (Due/Collected/Outstanding/Rate%)
+- [x] Read-only for principal (no Pay/Waive/Delete buttons)
+- [x] Status badges: paid / partial / partial_waiver / waived / overdue / pending
+
+### Learner Profile (5 tabs)
+- [x] Overview — details, guardian, portal link
+- [x] Fees — this learner's ledger, pay button
+- [x] Exam Grades 🔒 PRO — subjects × Term 1–4, auto A/B/C/D/F
+- [x] Awards 🔒 PRO — achievement cards
+- [x] Notes 🔒 PRO — timestamped staff notes
+
+### Notifications & Waivers
+- [x] Bell icon in sidebar with unread count badge
+- [x] Notification dropdown — click to navigate, mark as read
+- [x] Waiver request → email to principal + in-app notification
+- [x] Approval/rejection → email to bursar + in-app notification
+- [x] Waivers page with filter tabs (pending/approved/rejected/all)
+
+### Teachers
+- [x] Teacher records with reference numbers (T-0001)
+- [x] **Auto-created** when staff account with role `teacher` is invited
+- [x] Class assignments (many-to-many) — teacher teaches multiple classes
+- [x] Home class designation 🏠
+- [x] My Classes page — teacher sees their classes + learners, click → profile
+- [x] Link teacher record to login account (auto on invite, manual fallback)
 
 ### Settings
-- [x] Grades & Classes — add standard grades R–12, add class letters A/B/C
+- [x] Grades & Classes — add standard grades R–12, class letters
 - [x] Fee Plans — create, activate/pause, delete
-- [x] Teachers — add with name/email/phone/subject + T-0001 IDs
-- [x] School Profile — edit + logo upload (requires school-logos bucket)
-- [x] Staff Accounts — add/edit/disable/enable (cannot disable self)
-
-### Events & Communication
-- [x] School calendar (academic/sports/meeting/holiday/general)
-- [x] Announcements with SMS queue (Africa's Talking integration pending)
-
-### Parent Portal
-- [x] Token-based secure link (no login required)
-- [x] Shows: guardian name, all children, fee summary, recent history
-- [x] Generated from Learner → View modal
+- [x] Teachers — class assignment, link account, auto-appears on teacher invite
+- [x] School Profile — edit + logo upload (base64 in DB, no bucket needed)
+- [x] Staff Accounts — invite (email), resend, copy link, disable, delete
+- [x] Role selector includes: Teacher / Bursar / Principal / Admin
 
 ### Dashboard
-- [x] Clickable stat cards (Total learners → drawer, Outstanding → modal, etc.)
-- [x] Arrears snapshot, upcoming events
+- [x] Personalised greeting by time of day
+- [x] 4 KPI stat cards (learners, due, collected, rate)
+- [x] Collection by grade — progress bars (red/amber/green)
+- [x] Pending/overdue cards — click → learner profile
+- [x] Outstanding drawer (slide-in, searchable)
+- [x] Quick actions — role-aware (waiver queue prominent for principal)
+- [x] All-paid celebration state 🎉
+
+### Parent Portal
+- [x] Token-based secure URL (no login)
+- [x] Shows: guardian name, all children, fee summary, recent history, overdue warnings
+- [x] Generated from Learner → Overview tab
 
 ### Infrastructure
-- [x] Toast notifications (success/error/warning/info)
-- [x] PDF receipts (pdfkit)
-- [x] Supabase Storage for logos (bucket: school-logos, must be public)
+- [x] Email: Resend API, `noreply@4dcs.co.za` (verified domain)
+- [x] CORS: allows `skolo.pages.dev` + all preview subdomains
+- [x] Logo: base64 stored in DB (no Supabase Storage bucket needed)
+- [x] Mobile responsive: hamburger drawer + bottom nav on mobile
+
+---
+
+## 🗄️ Database Migrations (all run in Supabase SQL Editor)
+
+| File | Description | Status |
+|---|---|---|
+| `001_initial_schema.sql` | Core tables, RLS, seed data | ✅ Run |
+| `002_rls_policies.sql` | RLS policies | ✅ Run |
+| `003_logo_url.sql` | `logo_url TEXT` on schools | ✅ Run |
+| `004_fee_ledger.sql` | fee_plans, fee_ledger, teachers | ✅ Run |
+| `005_reference_numbers.sql` | reference_no for learners + teachers | ✅ Run |
+| `006_portal_tokens.sql` | portal_token on guardians | ✅ Run |
+| `007_learner_profile.sql` | exam_results, learner_awards, learner_notes | ✅ Run |
+| `008_medical_fields.sql` | medical_condition, doctor_name, doctor_phone | ✅ Run |
+| `009_waivers.sql` | amount_waived, waiver_reason, waiver_note, waived_by on fee_ledger | ✅ Run |
+| `010_waiver_requests.sql` | waiver_requests + notifications tables | ✅ Run |
+| `011_invite_tokens.sql` | invite_token, invite_expires_at, password_set on users | ✅ Run |
+| `012_teacher_classes.sql` | teacher_classes junction table + user_id on teachers | ✅ Run |
 
 ---
 
 ## 🔲 Still To Do
 
-### Next
-- [ ] Mobile responsive sidebar (hamburger menu for phone use)
-- [ ] Bulk SMS via Africa's Talking (LS support pending)
-- [ ] Bank reconciliation — upload statement, match by reference no (paid feature)
-- [ ] Parent portal: send link via SMS
+### Near-term
+- [ ] **Bulk SMS "remind all overdue"** — Africa's Talking API (needs AT account)
+- [ ] **Custom domain** — `skolo.co.za` or `skolo.app` — register + point to Cloudflare
+- [ ] **Register page 4DCS footer** — same as login page
+- [ ] **Forgot password** — email reset link flow
+- [ ] **Teacher — enter exam grades** for their subject across their classes
+- [ ] **Bank reconciliation** (paid feature) — upload bank statement, match by reference_no
 
 ### Phase 2
 - [ ] Attendance tracking
-- [ ] Parent-teacher direct messaging
+- [ ] Timetable / teacher scheduling (calendar-based class assignment)
+- [ ] Parent portal: SMS delivery on enrolment
 - [ ] Read receipts on announcements
+- [ ] Report cards
 
 ### Phase 3
 - [ ] Digital assignments
-- [ ] Results and report cards
 - [ ] AI homework assistant
-
----
-
-## 🗄️ Database Migrations (run in order in Supabase SQL Editor)
-
-| File | Description | Status |
-|---|---|---|
-| `001_initial_schema.sql` | All core tables + RLS + seed data | ✅ Run |
-| `002_rls_policies.sql` | RLS policies (service role bypass) | ✅ Run |
-| `003_logo_url.sql` | Add logo_url to schools | ✅ Run |
-| `004_fee_ledger.sql` | fee_plans, fee_ledger, teachers | ✅ Run |
-| `005_reference_numbers.sql` | reference_no for learners + teachers, backfill | ✅ Run |
-| `006_portal_tokens.sql` | portal_token for guardians, backfill | ⏳ Run next |
+- [ ] Results and report cards export
 
 ---
 
@@ -203,12 +258,16 @@ cd ~/Projects/skolo/frontend && npm run dev
 ## ⚠️ Important Technical Notes
 
 - Render free tier spins down after inactivity — first request ~30s delay
-- `sk_token` is the localStorage JWT key — all auth code must use this exact key
-- CORS allows all `*.skolo.pages.dev` subdomains + localhost
+- `sk_token` is the localStorage JWT key
+- CORS allows `skolo.pages.dev` + `*.skolo.pages.dev` + localhost
 - Supabase service role key bypasses RLS — all backend ops use this
-- Logo upload requires `school-logos` bucket to exist in Supabase Storage (public)
-- Reference numbers are school-scoped and sequential — tracked in `school_sequences` table
-- Portal links use 48-char hex tokens stored in `guardians.portal_token`
+- Logo: base64 data URL in `schools.logo_url` — no bucket required
+- Fee dedup is **month-level** (`YYYY-MM`) not date-level — prevents duplicates
+- Auto-generate runs on: Fees page load, learner enrolment, learner profile fees tab
+- Invite tokens expire in 48 hours — admin can resend or copy link
+- Teacher records auto-created when `teacher` role user accepts invite
+- Email FROM: `noreply@4dcs.co.za` (Resend, verified via `4dcs.co.za`)
+- Waiver approval: bursar requests → principal email+bell → approve/reject → bursar email+bell
 
 ---
 
@@ -219,13 +278,18 @@ cd ~/Projects/skolo/frontend && npm run dev
 | Lesotho | M500–M800/month | ~R375–R600 |
 | South Africa | R800–R1,500/month | Cheaper than any alternative |
 
+PRO features (locked): Exam Grades, Awards, Notes on learner profile
+
 ---
 
-## 🚀 Deployment Steps (new school)
+## 🚀 Onboarding a New School
 
-1. School registers at `/register` → picks country → district/province
-2. Admin creates grades in Settings → Grades & Classes
-3. Admin creates fee plans in Settings → Fee Plans
-4. Admin imports learners via CSV/Excel or adds manually
-5. Each month: Fees → Generate fees → Bursar collects
-6. Guardian gets portal link from Learner view → sees balance on phone
+1. School registers at `/register` → picks country → district
+2. Admin creates grades → Settings → Grades & Classes
+3. Admin creates fee plans → Settings → Fee Plans
+4. Admin imports learners or adds manually
+5. Admin invites staff → Settings → Staff Accounts (invite email sent automatically)
+6. Teachers appear in Teachers tab automatically after accepting invite
+7. Admin assigns classes to teachers → Settings → Teachers → + class
+8. Fees auto-generate monthly — bursar just collects
+9. Parent gets portal link from Learner → Overview tab
