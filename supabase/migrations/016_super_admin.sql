@@ -42,7 +42,12 @@ CREATE INDEX IF NOT EXISTS idx_activity_school ON activity_logs(school_id);
 CREATE INDEX IF NOT EXISTS idx_activity_action ON activity_logs(action);
 CREATE INDEX IF NOT EXISTS idx_activity_time   ON activity_logs(created_at DESC);
 
--- RLS policies (service role bypasses, but good practice)
+-- RLS
 ALTER TABLE platform_admins ENABLE ROW LEVEL SECURITY;
 ALTER TABLE login_logs      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE activity_logs   ENABLE ROW LEVEL SECURITY;
+
+-- Allow service-role access (required even with service key in some Supabase configs)
+CREATE POLICY "service_role_all" ON platform_admins FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "service_role_all" ON login_logs      FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "service_role_all" ON activity_logs   FOR ALL USING (true) WITH CHECK (true);
