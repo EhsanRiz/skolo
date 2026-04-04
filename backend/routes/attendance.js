@@ -1,6 +1,7 @@
 const express  = require('express')
 const supabase = require('../lib/supabase')
 const auth     = require('../middleware/auth')
+const { logActivity } = require('../lib/activityLog')
 
 const router = express.Router()
 router.use(auth)
@@ -118,6 +119,7 @@ router.post('/bulk', async (req, res) => {
       .upsert(upserts, { onConflict: 'learner_id,date' })
 
     if (error) throw error
+    logActivity({ school_id: req.user.school_id, user_id: req.user.id, action: 'attendance_saved', entity_type: 'attendance', metadata: { class_id, date, count: upserts.length } })
     res.json({ saved: upserts.length })
   } catch (err) { res.status(500).json({ error: err.message }) }
 })

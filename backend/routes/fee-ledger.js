@@ -1,6 +1,7 @@
 const express = require('express')
 const supabase = require('../lib/supabase')
 const auth     = require('../middleware/auth')
+const { logActivity } = require('../lib/activityLog')
 
 const router = express.Router()
 router.use(auth)
@@ -399,6 +400,7 @@ router.post('/:id/pay', async (req, res) => {
       .single()
 
     if (error) throw error
+    logActivity({ school_id, user_id: req.user.id, action: 'fee_paid', entity_type: 'fee_ledger', entity_id: req.params.id, metadata: { amount: Number(amount) } })
     res.json(data)
   } catch (err) { res.status(500).json({ error: err.message }) }
 })

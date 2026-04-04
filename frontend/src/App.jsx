@@ -19,6 +19,8 @@ import Attendance from './pages/Attendance'
 import SetPassword from './pages/SetPassword'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import SuperAdmin from './pages/SuperAdmin'
+import SuperAdminLogin from './pages/SuperAdminLogin'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -40,6 +42,10 @@ export default function App() {
       <ToastProvider>
       <BrowserRouter>
         <Routes>
+          {/* Super Admin (separate auth) */}
+          <Route path="/super-admin" element={<SuperAdmin />} />
+          <Route path="/super-admin/login" element={<SuperAdminLogin />} />
+
           {/* Public */}
           <Route path="/parent/:token" element={<ParentPortal />} />
           <Route path="/set-password/:token" element={<SetPassword />} />

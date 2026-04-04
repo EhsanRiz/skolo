@@ -100,6 +100,16 @@ router.post('/login', async (req, res) => {
       { expiresIn: '7d' }
     )
 
+    // Log the login event (fire-and-forget)
+    const ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || null
+    const ua = req.headers['user-agent'] || null
+    supabase.from('login_logs').insert({
+      user_id: user.id,
+      school_id: user.school_id,
+      ip_address: typeof ip === 'string' ? ip.split(',')[0].trim() : ip,
+      user_agent: ua,
+    }).then(() => {}).catch(() => {})
+
     res.json({
       token,
       user: { id: user.id, full_name: user.full_name, email: user.email, role: user.role, school_id: user.school_id }

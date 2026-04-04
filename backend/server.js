@@ -17,7 +17,8 @@ app.use(cors({
     if (!origin) return callback(null, true)
     // Allow skolo.pages.dev (production) and any subdomain preview URLs
     if (origin === 'https://skolo.pages.dev') return callback(null, true)
-    if (origin.endsWith('.skolo.pages.dev') || origin.endsWith('.skolo.app')) return callback(null, true)
+    if (origin === 'https://myskolo.co.za') return callback(null, true)
+    if (origin.endsWith('.skolo.pages.dev') || origin.endsWith('.skolo.app') || origin.endsWith('.myskolo.co.za')) return callback(null, true)
     if (allowedOrigins.includes(origin)) return callback(null, true)
     callback(new Error(`CORS: origin ${origin} not allowed`))
   },
@@ -53,6 +54,7 @@ app.use('/timetable',     require('./routes/timetable'))
 app.use('/report-cards',       require('./routes/report-cards'))
 app.use('/attendance-alerts',  require('./routes/attendance-alerts'))
 app.use('/dashboard',          require('./routes/dashboard'))
+app.use('/super-admin',        require('./routes/super-admin'))
 
 // ─── 404 fallback ─────────────────────────────────────────────
 app.use((req, res) => res.status(404).json({ error: 'Route not found' }))

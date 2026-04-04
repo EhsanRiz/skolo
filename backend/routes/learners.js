@@ -3,6 +3,7 @@ const supabase = require('../lib/supabase')
 const auth = require('../middleware/auth')
 const { nextRefNo } = require('../lib/sequences')
 const { autoGenerateMonthlyFees } = require('../lib/autoGenerate')
+const { logActivity } = require('../lib/activityLog')
 
 const router = express.Router()
 
@@ -73,6 +74,8 @@ router.post('/', async (req, res) => {
         .from('learner_guardians')
         .insert({ learner_id: newLearner.id, guardian_id: newGuardian.id, is_primary: true })
     }
+
+    logActivity({ school_id, user_id: req.user.id, action: 'learner_created', entity_type: 'learner', entity_id: newLearner.id, metadata: { name: `${learner.first_name} ${learner.last_name}` } })
 
     res.status(201).json(newLearner)
   } catch (err) {
