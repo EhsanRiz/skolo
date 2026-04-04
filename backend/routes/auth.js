@@ -266,7 +266,8 @@ router.post('/forgot-password', async (req, res) => {
       .update({ reset_token: token, reset_expires_at: expires })
       .eq('id', user.id)
 
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`
+    const frontendUrl = process.env.FRONTEND_URL || 'https://skolo.pages.dev'
+    const resetLink = `${frontendUrl}/reset-password/${token}`
     await sendPasswordReset({ to: user.email, fullName: user.full_name || 'there', resetLink })
 
     res.json({ ok: true })
