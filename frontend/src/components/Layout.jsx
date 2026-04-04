@@ -6,7 +6,8 @@ import { useAuth } from '../contexts/AuthContext'
 const NAV_ITEMS = [
   { to: '/',            label: 'Dashboard',     icon: DashIcon,    roles: null },
   { to: '/my-classes',  label: 'My Classes',    icon: UsersIcon,   roles: ['teacher'] },
-  { to: '/exam-grades', label: 'Grades',         icon: CalIcon,     roles: ['teacher', 'admin', 'principal'] },
+  { to: '/exam-grades', label: 'Grades',      icon: CalIcon,     roles: ['teacher', 'admin', 'principal'] },
+  { to: '/attendance',  label: 'Attendance',  icon: AttendIcon,  roles: ['teacher', 'admin', 'principal'] },
   { to: '/learners',    label: 'Learners',      icon: UsersIcon,   roles: ['admin', 'bursar', 'principal'] },
   { to: '/fees',        label: 'Fees',          icon: FeeIcon,     roles: ['admin', 'bursar', 'principal'] },
   { to: '/waivers',     label: 'Waivers',       icon: WaiverIcon,  roles: ['admin', 'bursar', 'principal'] },
@@ -23,6 +24,7 @@ function SendIcon()  { return <svg width="17" height="17" viewBox="0 0 24 24" fi
 function GearIcon()  { return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> }
 
 function WaiverIcon()  { return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> }
+function AttendIcon()  { return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> }
 
 function HamburgerIcon({ open }) {
   return open
