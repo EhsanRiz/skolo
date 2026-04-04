@@ -400,23 +400,66 @@ export default function Settings() {
           </div>
           <Card>
             <table style={{width:'100%',borderCollapse:'collapse'}}>
-              <thead><tr>{['Ref No','Name','Email','Phone','Subject',''].map(h=><th key={h} style={t.th}>{h}</th>)}</tr></thead>
+              <thead><tr>{['Ref','Name','Email','Classes assigned','Login account',''].map(h=><th key={h} style={t.th}>{h}</th>)}</tr></thead>
               <tbody>
-                {teachers.filter(tc=>tc.is_active).map(tc=>(
-                  <tr key={tc.id}>
-                    <td style={{...t.td,fontSize:12,color:'#94a3b8',fontWeight:600,letterSpacing:'0.5px'}}>{tc.reference_no||'—'}</td>
-                    <td style={{...t.td,fontWeight:600}}>{tc.full_name}</td>
-                    <td style={t.td}>{tc.email||'—'}</td>
-                    <td style={t.td}>{tc.phone||'—'}</td>
-                    <td style={t.td}>{tc.subject||'—'}</td>
-                    <td style={t.td}>
-                      <div style={{display:'flex',gap:6}}>
-                        <ActionBtn onClick={()=>openEditTeacher(tc)} title="Edit"><IconEdit/></ActionBtn>
-                        <button style={{...t.btn.danger,padding:'5px 10px',fontSize:12}} onClick={()=>deactivateTeacher(tc.id)}>Remove</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {teachers.filter(tc=>tc.is_active).map(tc=>{
+                  const myClasses  = teacherClasses.filter(c=>c.teacher_id===tc.id)
+                  const linkedUser = users.find(u=>u.id===tc.user_id)
+                  return (
+                    <tr key={tc.id}>
+                      <td style={{...t.td,fontSize:11,color:'#94a3b8',fontWeight:700}}>{tc.reference_no||'—'}</td>
+                      <td style={{...t.td,fontWeight:600}}>
+                        {tc.full_name}
+                        {tc.phone && <div style={{fontSize:11,color:'#94a3b8'}}>{tc.phone}</div>}
+                      </td>
+                      <td style={t.td}>{tc.email||'—'}</td>
+                      <td style={t.td}>
+                        <div style={{display:'flex',flexWrap:'wrap',gap:4,alignItems:'center'}}>
+                          {myClasses.length === 0
+                            ? <span style={{color:'#94a3b8',fontSize:12}}>None assigned</span>
+                            : myClasses.map(c=>(
+                                <span key={c.id} style={{display:'inline-flex',alignItems:'center',gap:3,
+                                  background:c.is_home_class?'#0f2044':'#f1f5f9',
+                                  color:c.is_home_class?'#fff':'#374151',
+                                  borderRadius:20,padding:'2px 8px',fontSize:11,fontWeight:600}}>
+                                  {c.classes?.grades?.name} {c.classes?.name}
+                                  {c.subject ? ` · ${c.subject}` : ''}
+                                  {c.is_home_class ? ' 🏠' : ''}
+                                  <button onClick={()=>removeTeacherClass(c.id)}
+                                    style={{background:'none',border:'none',cursor:'pointer',
+                                      color:c.is_home_class?'rgba(255,255,255,0.6)':'#94a3b8',
+                                      fontSize:12,padding:'0 0 0 2px',lineHeight:1}}>✕</button>
+                                </span>
+                              ))
+                          }
+                          <button onClick={()=>openAssignClass(tc)}
+                            style={{background:'none',border:'1px dashed #cbd5e1',borderRadius:20,
+                              padding:'2px 8px',fontSize:11,color:'#64748b',cursor:'pointer',fontWeight:600}}>
+                            + class
+                          </button>
+                        </div>
+                      </td>
+                      <td style={t.td}>
+                        {linkedUser
+                          ? <span style={{fontSize:11,background:'#dcfce7',color:'#15803d',padding:'2px 8px',borderRadius:20,fontWeight:600}}>
+                              ✓ {linkedUser.full_name}
+                            </span>
+                          : <button onClick={()=>openLinkUser(tc)}
+                              style={{fontSize:11,background:'#faf5ff',border:'1px solid #c4b5fd',
+                                borderRadius:20,padding:'3px 10px',cursor:'pointer',color:'#7c3aed',fontWeight:600}}>
+                              🔗 Link account
+                            </button>
+                        }
+                      </td>
+                      <td style={t.td}>
+                        <div style={{display:'flex',gap:6}}>
+                          <ActionBtn onClick={()=>openEditTeacher(tc)} title="Edit"><IconEdit/></ActionBtn>
+                          <button style={{...t.btn.danger,padding:'5px 10px',fontSize:12}} onClick={()=>deactivateTeacher(tc.id)}>Remove</button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
                 {!teachers.filter(tc=>tc.is_active).length && (
                   <tr><td colSpan={6} style={{...t.td,color:'#94a3b8',textAlign:'center',padding:40}}>No teachers yet.</td></tr>
                 )}
