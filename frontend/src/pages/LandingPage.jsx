@@ -214,30 +214,14 @@ const LandingPage = () => {
         box-shadow: 0 20px 60px rgba(0,0,0,.12);
         background: var(--navy); aspect-ratio: 16/9;
       }
+      .video-wrapper video {
+        position: absolute; top: 0; left: 0;
+        width: 100%; height: 100%; object-fit: cover;
+        border-radius: 16px;
+      }
       .video-wrapper iframe {
         position: absolute; top: 0; left: 0;
         width: 100%; height: 100%; border: none;
-      }
-      .video-placeholder {
-        position: absolute; inset: 0;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        background: linear-gradient(135deg, var(--navy) 0%, #1a3a6b 100%);
-        cursor: pointer; transition: all .3s;
-      }
-      .video-placeholder:hover { background: linear-gradient(135deg, #0d1a38 0%, #162d5a 100%); }
-      .video-placeholder:hover .play-btn { transform: scale(1.1); box-shadow: 0 8px 30px rgba(37,99,235,.5); }
-      .play-btn {
-        width: 80px; height: 80px; border-radius: 50%;
-        background: var(--blue); display: flex; align-items: center; justify-content: center;
-        transition: all .3s; box-shadow: 0 4px 20px rgba(37,99,235,.4);
-      }
-      .play-btn svg { width: 32px; height: 32px; margin-left: 4px; }
-      .video-placeholder-text {
-        margin-top: 20px; font-size: 16px; font-weight: 600;
-        color: rgba(255,255,255,.7); letter-spacing: 0.3px;
-      }
-      .video-placeholder-sub {
-        margin-top: 6px; font-size: 13px; color: rgba(255,255,255,.4);
       }
 
       /* ── CTA ─────────────────────────────────────── */
@@ -435,15 +419,10 @@ const LandingPage = () => {
           <h2 className="section-title">Watch how Skolo works</h2>
           <p className="section-sub" style={{ margin:'0 auto' }}>See how schools in Lesotho and South Africa are using Skolo to manage fees, attendance, grades, and more — all from one platform.</p>
           <div className="video-wrapper">
-            {/* Replace YOUTUBE_VIDEO_ID with your actual YouTube video ID */}
-            {/* <iframe src="https://www.youtube.com/embed/YOUTUBE_VIDEO_ID" title="Skolo Demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe> */}
-            <div className="video-placeholder" onClick={() => window.open('https://www.youtube.com/watch?v=REPLACE_WITH_VIDEO_ID', '_blank')}>
-              <div className="play-btn">
-                <svg viewBox="0 0 24 24" fill="white" stroke="none"><polygon points="5,3 19,12 5,21" /></svg>
-              </div>
-              <div className="video-placeholder-text">Watch the 2-minute demo</div>
-              <div className="video-placeholder-sub">Coming soon — video demo in production</div>
-            </div>
+            <video controls preload="metadata" poster="">
+              <source src="/skolo-promo.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
           </div>
         </div>
       </section>
