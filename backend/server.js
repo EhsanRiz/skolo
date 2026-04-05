@@ -55,6 +55,7 @@ app.use('/report-cards',       require('./routes/report-cards'))
 app.use('/attendance-alerts',  require('./routes/attendance-alerts'))
 app.use('/dashboard',          require('./routes/dashboard'))
 app.use('/super-admin',        require('./routes/super-admin'))
+app.use('/demo-requests',     require('./routes/demo-requests'))
 
 // ─── 404 fallback ─────────────────────────────────────────────
 app.use((req, res) => res.status(404).json({ error: 'Route not found' }))

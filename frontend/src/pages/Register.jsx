@@ -36,7 +36,7 @@ export default function Register() {
       const { data } = await api.post('/auth/register-school', { school, admin })
       localStorage.setItem('sk_token', data.token)
       localStorage.setItem('sk_user', JSON.stringify(data.user))
-      navigate('/')
+      navigate('/dashboard')
     } catch (err) { setError(err.response?.data?.error || 'Registration failed') }
     finally { setLoading(false) }
   }

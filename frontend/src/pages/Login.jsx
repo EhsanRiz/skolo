@@ -46,7 +46,7 @@ export default function Login() {
 
   const submit = async e => {
     e.preventDefault(); setError(''); setLoading(true)
-    try { await login(form.email, form.password); navigate('/') }
+    try { await login(form.email, form.password); navigate('/dashboard') }
     catch (err) { setError(err.response?.data?.error || 'Invalid email or password') }
     finally { setLoading(false) }
   }

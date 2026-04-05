@@ -21,19 +21,28 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import SuperAdmin from './pages/SuperAdmin'
 import SuperAdminLogin from './pages/SuperAdminLogin'
+import LandingPage from './pages/LandingPage'
+import RequestDemo from './pages/RequestDemo'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
   if (loading) return <div style={{ padding: 40, color: '#64748b' }}>Loading…</div>
-  if (!user) return <Navigate to="/login" replace />
+  if (!user) return <Navigate to="/" replace />
   return children
 }
 
 function PublicRoute({ children }) {
   const { user, loading } = useAuth()
   if (loading) return null
-  if (user) return <Navigate to="/" replace />
+  if (user) return <Navigate to="/dashboard" replace />
   return children
+}
+
+function HomeRoute() {
+  const { user, loading } = useAuth()
+  if (loading) return <div style={{ padding: 40, color: '#64748b' }}>Loading…</div>
+  if (user) return <Navigate to="/dashboard" replace />
+  return <LandingPage />
 }
 
 export default function App() {
@@ -46,7 +55,9 @@ export default function App() {
           <Route path="/super-admin" element={<SuperAdmin />} />
           <Route path="/super-admin/login" element={<SuperAdminLogin />} />
 
-          {/* Public */}
+          {/* Landing / Public */}
+          <Route path="/" element={<HomeRoute />} />
+          <Route path="/request-demo" element={<RequestDemo />} />
           <Route path="/parent/:token" element={<ParentPortal />} />
           <Route path="/set-password/:token" element={<SetPassword />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -55,8 +66,10 @@ export default function App() {
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
 
           {/* Protected */}
-          <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+          <Route path="/dashboard" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
+          </Route>
+          <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="learners"      element={<Learners />} />
             <Route path="learners/:id" element={<LearnerProfile />} />
             <Route path="waivers"      element={<Waivers />} />

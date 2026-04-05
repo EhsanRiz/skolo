@@ -45,7 +45,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('sk_user')
     setUser(null)
     setSchool(null)
-    window.location.href = '/login'
+    window.location.href = '/'
   }
 
   return (
