@@ -1,8 +1,10 @@
 const express  = require('express')
 const bcrypt   = require('bcryptjs')
 const jwt      = require('jsonwebtoken')
+const crypto   = require('crypto')
 const supabase = require('../lib/supabase')
 const superAuth = require('../middleware/superAdmin')
+const { sendSchoolInviteEmail } = require('../lib/email')
 
 const router = express.Router()
 
@@ -319,6 +321,104 @@ router.get('/usage-stats', async (req, res) => {
     })
   } catch (err) {
     console.error('super-admin usage-stats error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// ─── POST /super-admin/invite-school ──────────────────────
+// Send an invite to a new school admin to register
+router.post('/invite-school', async (req, res) => {
+  try {
+    const { email } = req.body
+    if (!email) return res.status(400).json({ error: 'Email is required' })
+
+    const cleanEmail = email.toLowerCase().trim()
+
+    // Check if this email already has a pending (unused, non-expired) invite
+    const { data: existing } = await supabase
+      .from('school_invites')
+      .select('id, expires_at, used')
+      .eq('email', cleanEmail)
+      .eq('used', false)
+      .gte('expires_at', new Date().toISOString())
+      .maybeSingle()
+
+    if (existing) {
+      return res.status(409).json({ error: 'An active invite already exists for this email' })
+    }
+
+    // Check if this email is already registered as a school admin
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', cleanEmail)
+      .eq('role', 'admin')
+      .maybeSingle()
+
+    if (existingUser) {
+      return res.status(409).json({ error: 'This email is already registered as a school admin' })
+    }
+
+    // Generate token and create invite
+    const token = crypto.randomBytes(32).toString('hex')
+    const expires_at = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+
+    const { data: invite, error: insertErr } = await supabase
+      .from('school_invites')
+      .insert({
+        email: cleanEmail,
+        token,
+        invited_by: req.admin.id,
+        expires_at,
+      })
+      .select()
+      .single()
+
+    if (insertErr) throw insertErr
+
+    // Send invite email
+    const frontendUrl = process.env.FRONTEND_URL || 'https://myskolo.co.za'
+    const registerUrl = `${frontendUrl}/register?token=${token}`
+
+    await sendSchoolInviteEmail({
+      to: cleanEmail,
+      registerUrl,
+      expiresIn: '7 days',
+    })
+
+    res.status(201).json({ invite: { id: invite.id, email: cleanEmail, expires_at, sent: true } })
+  } catch (err) {
+    console.error('invite-school error:', err)
+    res.status(500).json({ error: err.message || 'Failed to send invite' })
+  }
+})
+
+// ─── GET /super-admin/invites ─────────────────────────────
+// List all school invites
+router.get('/invites', async (req, res) => {
+  try {
+    const { data: invites, error } = await supabase
+      .from('school_invites')
+      .select('id, email, used, used_at, school_id, expires_at, created_at, schools(name)')
+      .order('created_at', { ascending: false })
+      .limit(100)
+
+    if (error) throw error
+
+    const rows = (invites || []).map(i => ({
+      id: i.id,
+      email: i.email,
+      used: i.used,
+      used_at: i.used_at,
+      school_name: i.schools?.name || null,
+      expires_at: i.expires_at,
+      created_at: i.created_at,
+      status: i.used ? 'registered' : new Date(i.expires_at) < new Date() ? 'expired' : 'pending',
+    }))
+
+    res.json({ invites: rows })
+  } catch (err) {
+    console.error('list invites error:', err)
     res.status(500).json({ error: err.message })
   }
 })

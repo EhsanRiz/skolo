@@ -96,6 +96,10 @@ export default function SuperAdmin() {
   const [schoolSearch, setSchoolSearch] = useState('')
   const [loginSearch, setLoginSearch] = useState('')
   const [error, setError] = useState(null)
+  const [invites, setInvites] = useState([])
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteLoading, setInviteLoading] = useState(false)
+  const [inviteMsg, setInviteMsg] = useState(null)
 
   // Check super-admin auth
   useEffect(() => {
@@ -109,8 +113,10 @@ export default function SuperAdmin() {
 
   const saApi = useMemo(() => {
     const token = localStorage.getItem('sa_token')
+    const headers = { Authorization: `Bearer ${token}` }
     return {
-      get: (url) => api.get(url, { headers: { Authorization: `Bearer ${token}` } }),
+      get: (url) => api.get(url, { headers }),
+      post: (url, data) => api.post(url, data, { headers }),
     }
   }, [])
 
@@ -152,6 +158,29 @@ export default function SuperAdmin() {
     } catch {}
   }
 
+  async function loadInvites() {
+    try {
+      const { data } = await saApi.get('/super-admin/invites')
+      setInvites(data.invites || [])
+    } catch {}
+  }
+
+  async function sendInvite() {
+    if (!inviteEmail) return
+    setInviteLoading(true)
+    setInviteMsg(null)
+    try {
+      await saApi.post('/super-admin/invite-school', { email: inviteEmail })
+      setInviteMsg({ type: 'success', text: `Invite sent to ${inviteEmail}` })
+      setInviteEmail('')
+      loadInvites()
+    } catch (err) {
+      setInviteMsg({ type: 'error', text: err.response?.data?.error || 'Failed to send invite' })
+    } finally {
+      setInviteLoading(false)
+    }
+  }
+
   async function loadSchoolDetail(id) {
     try {
       setSchoolDetail(null)
@@ -165,6 +194,7 @@ export default function SuperAdmin() {
     if (tab === 'logins' && logins.length === 0) loadLogins()
     if (tab === 'activity' && activity.length === 0) loadActivity()
     if (tab === 'usage' && !usageStats) loadUsageStats()
+    if (tab === 'invites') loadInvites()
   }, [tab])
 
   // ── Loading / Error states ──
@@ -230,9 +260,9 @@ export default function SuperAdmin() {
 
         {/* ── Tabs ── */}
         <div style={{ background:'#fff', borderBottom:'1px solid #e2e8f0', padding:'0 32px', display:'flex', gap:4, overflowX:'auto' }}>
-          {['overview','schools','logins','activity','usage'].map(t => (
+          {['overview','schools','invites','logins','activity','usage'].map(t => (
             <button key={t} className={`sa-tab ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>
-              {t === 'overview' ? '📊 Overview' : t === 'schools' ? '🏫 Schools' : t === 'logins' ? '🔐 Logins' : t === 'activity' ? '📋 Activity' : '📈 Usage'}
+              {t === 'overview' ? '📊 Overview' : t === 'schools' ? '🏫 Schools' : t === 'invites' ? '✉️ Invites' : t === 'logins' ? '🔐 Logins' : t === 'activity' ? '📋 Activity' : '📈 Usage'}
             </button>
           ))}
         </div>
@@ -440,6 +470,77 @@ export default function SuperAdmin() {
                   </div>
                 </div>
               )}
+            </>
+          )}
+
+          {/* ══════ INVITES TAB ══════ */}
+          {tab === 'invites' && (
+            <>
+              {/* Send invite form */}
+              <div className="sa-card" style={{ marginBottom:20 }}>
+                <div style={{ fontSize:15, fontWeight:800, color:'#0f172a', marginBottom:4 }}>Invite a New School</div>
+                <div style={{ fontSize:12, color:'#94a3b8', marginBottom:16 }}>Enter the email of the school admin. They'll receive a unique registration link valid for 7 days.</div>
+                <div style={{ display:'flex', gap:10, alignItems:'flex-start' }}>
+                  <input
+                    className="sa-search"
+                    type="email"
+                    placeholder="e.g. admin@schoolname.co.za"
+                    value={inviteEmail}
+                    onChange={e => setInviteEmail(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && sendInvite()}
+                    style={{ flex:1 }}
+                  />
+                  <button
+                    onClick={sendInvite}
+                    disabled={inviteLoading || !inviteEmail}
+                    style={{
+                      padding:'10px 24px', background: inviteLoading ? '#94a3b8' : '#2563eb', color:'#fff',
+                      border:'none', borderRadius:10, fontWeight:700, fontSize:14, cursor: inviteLoading ? 'default' : 'pointer',
+                      whiteSpace:'nowrap', transition:'background .15s'
+                    }}
+                  >
+                    {inviteLoading ? 'Sending…' : 'Send Invite'}
+                  </button>
+                </div>
+                {inviteMsg && (
+                  <div style={{
+                    marginTop:12, padding:'10px 14px', borderRadius:8, fontSize:13, fontWeight:600,
+                    background: inviteMsg.type === 'success' ? '#f0fdf4' : '#fef2f2',
+                    color: inviteMsg.type === 'success' ? '#16a34a' : '#dc2626',
+                    border: `1px solid ${inviteMsg.type === 'success' ? '#bbf7d0' : '#fecaca'}`
+                  }}>
+                    {inviteMsg.text}
+                  </div>
+                )}
+              </div>
+
+              {/* Invites table */}
+              <div className="sa-card" style={{ padding:0 }}>
+                <div style={{ overflowX:'auto', maxHeight:'55vh', overflowY:'auto' }}>
+                  <table className="sa-table">
+                    <thead>
+                      <tr><th>Email</th><th>Status</th><th>School</th><th>Sent</th><th>Expires</th></tr>
+                    </thead>
+                    <tbody>
+                      {invites.map(i => (
+                        <tr key={i.id}>
+                          <td style={{ fontWeight:600, color:'#0f172a' }}>{i.email}</td>
+                          <td>
+                            <Badge
+                              text={i.status}
+                              color={i.status === 'registered' ? '#16a34a' : i.status === 'expired' ? '#ef4444' : '#f59e0b'}
+                            />
+                          </td>
+                          <td>{i.school_name || '—'}</td>
+                          <td style={{ color:'#64748b', fontSize:12 }}>{new Date(i.created_at).toLocaleDateString('en-ZA')}</td>
+                          <td style={{ color:'#94a3b8', fontSize:12 }}>{new Date(i.expires_at).toLocaleDateString('en-ZA')}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {invites.length === 0 && <EmptyState icon="✉️" title="No invites sent yet" sub="Use the form above to invite a school" />}
+              </div>
             </>
           )}
 

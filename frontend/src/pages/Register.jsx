@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import api from '../lib/api'
 
 const CSS = `
@@ -11,13 +11,35 @@ const CSS = `
 
 export default function Register() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const inviteToken = searchParams.get('token')
+
   const [countries, setCountries] = useState([])
   const [regions,   setRegions]   = useState([])
   const [error,     setError]     = useState('')
   const [loading,   setLoading]   = useState(false)
+  const [validating, setValidating] = useState(true)
+  const [inviteValid, setInviteValid] = useState(false)
 
   const [school, setSchool] = useState({ name: '', country_id: '', region_id: '', address: '', phone: '', email: '', school_reg_number: '' })
   const [admin,  setAdmin]  = useState({ full_name: '', email: '', password: '' })
+
+  // Validate invite token on mount
+  useEffect(() => {
+    if (!inviteToken) {
+      setValidating(false)
+      return
+    }
+    api.get(`/auth/validate-invite/${inviteToken}`)
+      .then(r => {
+        setInviteValid(true)
+        setAdmin(a => ({ ...a, email: r.data.email }))
+      })
+      .catch(err => {
+        setError(err.response?.data?.error || 'Invalid or expired invite link')
+      })
+      .finally(() => setValidating(false))
+  }, [inviteToken])
 
   useEffect(() => { api.get('/schools/countries').then(r => setCountries(r.data)) }, [])
   useEffect(() => {
@@ -33,12 +55,84 @@ export default function Register() {
   const submit = async e => {
     e.preventDefault(); setError(''); setLoading(true)
     try {
-      const { data } = await api.post('/auth/register-school', { school, admin })
+      const { data } = await api.post('/auth/register-school', { school, admin, invite_token: inviteToken })
       localStorage.setItem('sk_token', data.token)
       localStorage.setItem('sk_user', JSON.stringify(data.user))
       navigate('/dashboard')
     } catch (err) { setError(err.response?.data?.error || 'Registration failed') }
     finally { setLoading(false) }
+  }
+
+  // No invite token — redirect to login
+  if (!validating && !inviteToken) {
+    return (
+      <>
+        <style>{CSS}</style>
+        <div style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(160deg, #1a3a6b 0%, #1d4ed8 50%, #1e40af 100%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px'
+        }}>
+          <div style={{
+            background: '#fff', borderRadius: 20, padding: '40px 36px',
+            width: '100%', maxWidth: 420, textAlign: 'center',
+            boxShadow: '0 32px 80px rgba(0,0,0,0.25)',
+            animation: 'fadeIn 0.5s ease both'
+          }}>
+            <div style={{ fontSize: 28, fontWeight: 800, color: '#1d4ed8', letterSpacing: '-0.5px', marginBottom: 12 }}>Skolo</div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>Registration is by invite only</div>
+            <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, marginBottom: 24 }}>
+              To register your school on Skolo, you need an invite from the platform admin. If you already have an account, you can sign in below.
+            </div>
+            <Link to="/login" style={{ display: 'inline-block', padding: '12px 28px', background: '#0f2044', color: '#fff', borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+              Go to Sign In
+            </Link>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  // Invalid token
+  if (!validating && inviteToken && !inviteValid) {
+    return (
+      <>
+        <style>{CSS}</style>
+        <div style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(160deg, #1a3a6b 0%, #1d4ed8 50%, #1e40af 100%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px'
+        }}>
+          <div style={{
+            background: '#fff', borderRadius: 20, padding: '40px 36px',
+            width: '100%', maxWidth: 420, textAlign: 'center',
+            boxShadow: '0 32px 80px rgba(0,0,0,0.25)',
+            animation: 'fadeIn 0.5s ease both'
+          }}>
+            <div style={{ fontSize: 28, fontWeight: 800, color: '#1d4ed8', letterSpacing: '-0.5px', marginBottom: 12 }}>Skolo</div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: '#dc2626', marginBottom: 8 }}>Invalid Invite Link</div>
+            <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, marginBottom: 24 }}>
+              {error || 'This invite link is not valid. It may have expired or already been used. Please contact the platform admin for a new invite.'}
+            </div>
+            <Link to="/login" style={{ display: 'inline-block', padding: '12px 28px', background: '#0f2044', color: '#fff', borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+              Go to Sign In
+            </Link>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  // Still validating
+  if (validating) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #1a3a6b 0%, #1d4ed8 50%, #1e40af 100%)' }}>
+        <div style={{ textAlign: 'center', color: '#fff' }}>
+          <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.5px' }}>Skolo</div>
+          <div style={{ fontSize: 14, marginTop: 8, opacity: 0.7 }}>Verifying your invite...</div>
+        </div>
+      </div>
+    )
   }
 
   const inp = { width: '100%', padding: '10px 13px', border: '1.5px solid #e2e8f0', borderRadius: 9, fontSize: 14, outline: 'none', marginBottom: 14, background: '#fff', boxSizing: 'border-box' }
@@ -106,7 +200,7 @@ export default function Register() {
             <label style={lbl}>Your full name *</label>
             <input style={inp} name="full_name" value={admin.full_name} onChange={ha} required />
             <label style={lbl}>Your email *</label>
-            <input style={inp} name="email" type="email" value={admin.email} onChange={ha} required />
+            <input style={{ ...inp, ...(inviteToken ? { background: '#f1f5f9', color: '#64748b' } : {}) }} name="email" type="email" value={admin.email} onChange={ha} required readOnly={!!inviteToken} />
             <label style={lbl}>Password *</label>
             <input style={inp} name="password" type="password" value={admin.password} onChange={ha} required minLength={8} />
 

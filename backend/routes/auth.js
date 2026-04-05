@@ -7,10 +7,39 @@ const { sendPasswordReset } = require('../lib/email')
 
 const router = express.Router()
 
+// ─── GET /auth/validate-invite/:token ───────────────────────
+// Check if a school registration invite token is valid
+router.get('/validate-invite/:token', async (req, res) => {
+  try {
+    const token = req.params.token
+    if (!token || token.length < 10) {
+      return res.status(400).json({ valid: false, error: 'Invalid token format' })
+    }
+
+    const { data: invite, error } = await supabase
+      .from('school_invites')
+      .select('id, email, used, expires_at')
+      .eq('token', token)
+      .maybeSingle()
+
+    if (error) throw error
+    if (!invite) return res.status(404).json({ valid: false, error: 'Invite not found or already used' })
+    if (invite.used) return res.status(400).json({ valid: false, error: 'This invite has already been used' })
+    if (new Date(invite.expires_at) < new Date()) {
+      return res.status(400).json({ valid: false, error: 'This invite has expired — contact the platform admin for a new one' })
+    }
+
+    res.json({ valid: true, email: invite.email })
+  } catch (err) {
+    console.error('validate-invite error:', err)
+    res.status(500).json({ valid: false, error: 'Server error' })
+  }
+})
+
 // ─── POST /auth/register-school ─────────────────────────────
-// Creates a school + first admin user in one transaction
+// Creates a school + first admin user — requires a valid invite token
 router.post('/register-school', async (req, res) => {
-  const { school, admin } = req.body
+  const { school, admin, invite_token } = req.body
 
   // school: { name, country_id, region_id, address, phone, email, school_reg_number }
   // admin:  { full_name, email, password }
@@ -19,7 +48,31 @@ router.post('/register-school', async (req, res) => {
     return res.status(400).json({ error: 'Missing required fields' })
   }
 
+  // Require invite token
+  if (!invite_token) {
+    return res.status(403).json({ error: 'Registration requires an invite. Contact the platform admin.' })
+  }
+
   try {
+    // Validate invite token
+    const { data: invite, error: invErr } = await supabase
+      .from('school_invites')
+      .select('id, email, used, expires_at')
+      .eq('token', invite_token)
+      .maybeSingle()
+
+    if (invErr) throw invErr
+    if (!invite) return res.status(403).json({ error: 'Invalid invite token' })
+    if (invite.used) return res.status(403).json({ error: 'This invite has already been used' })
+    if (new Date(invite.expires_at) < new Date()) {
+      return res.status(403).json({ error: 'This invite has expired — contact the platform admin for a new one' })
+    }
+
+    // Ensure the registering email matches the invite email
+    if (admin.email.toLowerCase().trim() !== invite.email.toLowerCase().trim()) {
+      return res.status(403).json({ error: 'This invite was sent to a different email address' })
+    }
+
     // 1. Create school
     const { data: newSchool, error: schoolErr } = await supabase
       .from('schools')
@@ -55,7 +108,13 @@ router.post('/register-school', async (req, res) => {
 
     if (userErr) throw userErr
 
-    // 3. Sign JWT
+    // 3. Mark invite as used
+    await supabase
+      .from('school_invites')
+      .update({ used: true, used_at: new Date().toISOString(), school_id: newSchool.id })
+      .eq('id', invite.id)
+
+    // 4. Sign JWT
     const token = jwt.sign(
       { id: newUser.id, school_id: newSchool.id, role: newUser.role, email: newUser.email },
       process.env.JWT_SECRET,
