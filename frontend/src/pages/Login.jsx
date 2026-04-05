@@ -114,11 +114,6 @@ export default function Login() {
             </button>
           </form>
 
-          <div style={{ textAlign:'center', marginTop:22, fontSize:13, color:'#94a3b8' }}>
-            New school?{' '}
-            <Link to="/register" style={{ color:'#1d4ed8', fontWeight:700, textDecoration:'none' }}>Register here</Link>
-          </div>
-
           {/* 4DCS branding */}
           <div style={{ marginTop:28, paddingTop:18, borderTop:'1px solid #f1f5f9', textAlign:'center' }}>
             <div style={{ fontSize:10, color:'#cbd5e1', marginBottom:8, fontWeight:500, textTransform:'uppercase', letterSpacing:'0.8px' }}>Developed by</div>
