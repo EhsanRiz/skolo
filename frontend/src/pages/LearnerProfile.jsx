@@ -156,11 +156,11 @@ function OverviewTab({ learner, school }) {
   )
 
   return (
-    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+    <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:20 }}>
       {/* Learner details */}
       <div style={{ background:'#fff', borderRadius:12, padding:'20px 24px', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>
         <div style={{ fontWeight:700, fontSize:15, marginBottom:18, color:'#0f172a' }}>Learner details</div>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:16 }}>
           <Field label="Reference No."    value={learner.reference_no} />
           <Field label="Grade / Class"    value={grade} />
           <Field label="Date of birth"    value={learner.date_of_birth ? new Date(learner.date_of_birth).toLocaleDateString('en-ZA') : null} />
@@ -176,7 +176,7 @@ function OverviewTab({ learner, school }) {
           <div style={{ fontWeight:700, fontSize:15, color:'#0f172a' }}>Medical information</div>
           <span style={{ fontSize:11, color:'#94a3b8', fontStyle:'italic' }}>Optional · shared only with consent</span>
         </div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:16 }}>
           <Field label="Medical condition" value={learner.medical_condition} />
           <Field label="Doctor / clinic"   value={learner.doctor_name} />
           <Field label="Doctor phone"      value={learner.doctor_phone} />
@@ -191,7 +191,7 @@ function OverviewTab({ learner, school }) {
         <div style={{ fontWeight:700, fontSize:15, marginBottom:18, color:'#0f172a' }}>Parent / Guardian</div>
         {guardian ? (
           <>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom:16 }}>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:16, marginBottom:16 }}>
               <Field label="Name"         value={`${guardian.first_name} ${guardian.last_name}`} />
               <Field label="Relationship" value={guardian.relationship} />
               <Field label="Phone"        value={guardian.phone} />
@@ -304,7 +304,7 @@ function FeesTab({ learnerId, sym, isReadOnly }) {
       )}
 
       {/* Summary */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12, marginBottom:20 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))', gap:12, marginBottom:20 }}>
         {[
           { label:'Total due',    value:`${sym}${totalDue.toLocaleString()}`,             color:'#0f172a' },
           { label:'Paid',         value:`${sym}${totalPaid.toLocaleString()}`,            color:'#16a34a' },

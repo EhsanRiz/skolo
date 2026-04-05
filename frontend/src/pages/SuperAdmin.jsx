@@ -282,7 +282,7 @@ export default function SuperAdmin() {
               </div>
 
               {/* Charts row */}
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom:28 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:16, marginBottom:28 }}>
                 {/* Users by Role */}
                 <div className="sa-card">
                   <div style={{ fontSize:15, fontWeight:800, color:'#0f172a', marginBottom:16 }}>Users by Role</div>
@@ -400,7 +400,7 @@ export default function SuperAdmin() {
 
                     <div style={{ flex:1, overflowY:'auto', padding:'20px 28px 28px' }}>
                       {/* Stats grid */}
-                      <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:12, marginBottom:24 }}>
+                      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))', gap:12, marginBottom:24 }}>
                         {[
                           { label:'Users', value: schoolDetail.stats.users, accent:'#2563eb' },
                           { label:'Learners', value: schoolDetail.stats.activeLearners, accent:'#16a34a' },

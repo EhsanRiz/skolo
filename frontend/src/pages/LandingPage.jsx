@@ -503,7 +503,7 @@ const LandingPage = () => {
             <h2 className="section-title" style={{ color:'#fff' }}>Smart tools that learn<br />with your school.</h2>
             <p className="section-sub" style={{ margin:'0 auto', color:'rgba(255,255,255,.6)' }}>Skolo doesn't just store data — it works with it. Our AI layer turns your school's information into insights, predictions, and time-saving automation.</p>
           </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'20px', marginTop:'48px' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:'20px', marginTop:'48px' }}>
             <div className="animate" style={{ background:'rgba(255,255,255,.06)', border:'1px solid rgba(255,255,255,.1)', borderRadius:'14px', padding:'28px' }}>
               <div style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'14px' }}>
                 <div style={{ width:'40px', height:'40px', borderRadius:'10px', background:'rgba(124,58,237,.2)', display:'flex', alignItems:'center', justifyContent:'center' }}>

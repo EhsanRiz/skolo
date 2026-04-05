@@ -103,7 +103,7 @@ export default function Events() {
               <input style={t.input} name="title" value={form.title} onChange={hf} required />
               <label style={t.label}>Description</label>
               <textarea style={{ ...t.input, resize: 'vertical', minHeight: 80 }} name="description" value={form.description} onChange={hf} />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
                 <div><label style={t.label}>Start date *</label><input style={t.input} name="event_date" type="date" value={form.event_date} onChange={hf} required /></div>
                 <div><label style={t.label}>End date</label><input style={t.input} name="end_date" type="date" value={form.end_date} onChange={hf} /></div>
               </div>

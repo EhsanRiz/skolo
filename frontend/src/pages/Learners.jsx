@@ -408,11 +408,11 @@ export default function Learners() {
             <h2 style={{ fontSize: 19, fontWeight: 800, marginBottom: 20 }}>Add learner</h2>
             <form onSubmit={save}>
               <div style={t.sectionLabel}>Learner details</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
                 <div><label style={t.label}>First name *</label><input style={t.input} name="first_name" value={form.first_name} onChange={hf} required /></div>
                 <div><label style={t.label}>Last name *</label><input style={t.input} name="last_name" value={form.last_name} onChange={hf} required /></div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
                 <div><label style={t.label}>Date of birth</label><input style={t.input} name="date_of_birth" type="date" value={form.date_of_birth} onChange={hf} /></div>
                 <div><label style={t.label}>Gender</label>
                   <select style={t.input} name="gender" value={form.gender} onChange={hf}>
@@ -421,11 +421,11 @@ export default function Learners() {
               </div>
               <GradeSelect />
               <div style={t.sectionLabel}>Parent / Guardian</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
                 <div><label style={t.label}>First name *</label><input style={t.input} name="first_name" value={guardian.first_name} onChange={hg} required /></div>
                 <div><label style={t.label}>Last name *</label><input style={t.input} name="last_name" value={guardian.last_name} onChange={hg} required /></div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
                 <div>
                   <label style={t.label}>Phone * ({phonePlaceholder(cc)})</label>
                   <input style={t.input} name="phone" value={guardian.phone} onChange={hg} placeholder={phonePlaceholder(cc)} maxLength={phoneMaxLen(cc)} required />
@@ -452,11 +452,11 @@ export default function Learners() {
           <div style={t.modal}>
             <h2 style={{ fontSize: 19, fontWeight: 800, marginBottom: 20 }}>{selected.first_name} {selected.last_name}</h2>
             <div style={t.sectionLabel}>Learner details</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 8 }}>
               <Field label="Date of birth" value={selected.date_of_birth ? new Date(selected.date_of_birth).toLocaleDateString('en-ZA') : null} />
               <Field label="Gender" value={selected.gender} />
             </div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))',gap:8}}>
               <Field label="Reference No" value={selected.reference_no} />
               <Field label="Grade / Class" value={getClassName(selected)} />
             </div>
@@ -466,11 +466,11 @@ export default function Learners() {
               const g = lg.guardians
               return (
                 <div key={g.id}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 8 }}>
                     <Field label="Name" value={`${g.first_name} ${g.last_name}`} />
                     <Field label="Relationship" value={g.relationship} />
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 8 }}>
                     <Field label="Phone" value={g.phone} />
                     <Field label="Email" value={g.email} />
                   </div>
@@ -497,11 +497,11 @@ export default function Learners() {
             <h2 style={{ fontSize: 19, fontWeight: 800, marginBottom: 20 }}>Edit — {selected.first_name} {selected.last_name}</h2>
             <form onSubmit={update}>
               <div style={t.sectionLabel}>Learner details</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
                 <div><label style={t.label}>First name *</label><input style={t.input} name="first_name" value={form.first_name} onChange={hf} required /></div>
                 <div><label style={t.label}>Last name *</label><input style={t.input} name="last_name" value={form.last_name} onChange={hf} required /></div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
                 <div><label style={t.label}>Date of birth</label><input style={t.input} name="date_of_birth" type="date" value={form.date_of_birth} onChange={hf} /></div>
                 <div><label style={t.label}>Gender</label>
                   <select style={t.input} name="gender" value={form.gender} onChange={hf}>
@@ -516,7 +516,7 @@ export default function Learners() {
                 </div>
                 <div><label style={t.label}>Medical condition</label>
                   <input style={t.input} value={form.medical_condition||''} onChange={e=>setForm(f=>({...f,medical_condition:e.target.value}))} placeholder="e.g. Asthma, Diabetes, Epilepsy" /></div>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:12 }}>
                   <div><label style={t.label}>Doctor / clinic</label>
                     <input style={t.input} value={form.doctor_name||''} onChange={e=>setForm(f=>({...f,doctor_name:e.target.value}))} placeholder="Dr. Name or clinic name" /></div>
                   <div><label style={t.label}>Doctor phone</label>

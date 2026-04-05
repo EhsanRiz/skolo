@@ -759,7 +759,7 @@ export default function Fees() {
                 )}
                 <div style={{ fontSize:13, color:'#94a3b8', marginTop:3 }}>{waiveEntry.description}</div>
               </div>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:18, padding:'12px 14px', background:'#faf5ff', borderRadius:10, border:'1px solid #e9d5ff' }}>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:12, marginBottom:18, padding:'12px 14px', background:'#faf5ff', borderRadius:10, border:'1px solid #e9d5ff' }}>
                 <div>
                   <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', marginBottom:3 }}>Total due</div>
                   <div style={{ fontWeight:700, fontSize:18 }}>{sym}{Number(waiveEntry.amount_due).toLocaleString()}</div>
@@ -833,7 +833,7 @@ export default function Fees() {
                 )}
                 <div style={{ fontSize:13, color:'#94a3b8', marginTop:3 }}>{payEntry.description}</div>
               </div>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:18, padding:'12px 14px', background:'#f8fafc', borderRadius:10 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:12, marginBottom:18, padding:'12px 14px', background:'#f8fafc', borderRadius:10 }}>
                 <div>
                   <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', marginBottom:3 }}>Total due</div>
                   <div style={{ fontWeight:800, fontSize:20 }}>{sym}{Number(payEntry.amount_due).toLocaleString()}</div>

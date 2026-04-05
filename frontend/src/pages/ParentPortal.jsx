@@ -53,7 +53,7 @@ function LearnerCard({ learner, sym }) {
       </div>
 
       {/* Fee summary bar */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', borderTop:'1px solid #f1f5f9' }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', borderTop:'1px solid #f1f5f9' }}>
         {[
           { label:'Total due',   value:`${sym}${fs.total_due.toLocaleString()}` },
           { label:'Paid',        value:`${sym}${fs.total_paid.toLocaleString()}`, color:'#16a34a' },

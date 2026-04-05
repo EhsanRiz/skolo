@@ -171,7 +171,7 @@ export default function Register() {
             <label style={lbl}>School name *</label>
             <input style={inp} name="name" value={school.name} onChange={hs} required />
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
               <div>
                 <label style={lbl}>Country *</label>
                 <select style={inp} name="country_id" value={school.country_id} onChange={hs} required>
@@ -188,7 +188,7 @@ export default function Register() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
               <div><label style={lbl}>School phone</label><input style={inp} name="phone" value={school.phone} onChange={hs} /></div>
               <div><label style={lbl}>School email</label><input style={inp} name="email" type="email" value={school.email} onChange={hs} /></div>
             </div>

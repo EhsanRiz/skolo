@@ -1,0 +1,85 @@
+/* ═══════════════════════════════════════════════════════════
+   Skolo — Global Responsive Overrides
+   Applied across all pages for consistent mobile experience
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── MOBILE: max-width 768px ─────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* Drawers: full width on mobile */
+  .skolo-drawer,
+  .sa-drawer {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Tables: horizontal scroll */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  th, td {
+    white-space: nowrap;
+    font-size: 12px !important;
+  }
+
+  /* Desktop topbar hidden on mobile (Layout handles this too) */
+  .desktop-topbar {
+    display: none !important;
+  }
+
+  /* Notification dropdown: fit mobile screen */
+  .skolo-notif-dropdown {
+    width: calc(100vw - 32px) !important;
+    right: -8px !important;
+  }
+}
+
+/* ── SMALL MOBILE: max-width 480px ───────────────────────── */
+@media (max-width: 480px) {
+
+  /* Reduce card padding */
+  .dash-card,
+  .sa-card {
+    padding: 14px 16px !important;
+  }
+
+  /* Mobile bottom nav: allow horizontal scroll if too many items */
+  .mobile-bottom {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start !important;
+    gap: 2px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  .mob-nav-link {
+    min-width: 56px !important;
+    flex: 0 0 auto !important;
+    font-size: 9px !important;
+  }
+}
+
+/* ── TABLET: 769px to 1024px ─────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+  /* Reduce sidebar width on small tablets */
+  .desktop-sidebar {
+    width: 200px !important;
+  }
+}
+
+/* ── PRINT ───────────────────────────────────────────────── */
+@media print {
+  .desktop-sidebar,
+  .mobile-topbar,
+  .mobile-bottom,
+  .desktop-topbar,
+  .no-print {
+    display: none !important;
+  }
+  .main-padding {
+    padding: 0 !important;
+  }
+}

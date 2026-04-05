@@ -174,7 +174,7 @@ export default function Waivers() {
 
             {/* Waiver summary */}
             <div style={{ background:'#faf5ff', border:'1px solid #e9d5ff', borderRadius:12, padding:'18px', marginBottom:20 }}>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:14 }}>
                 {[
                   ['Learner',       `${selected.learners?.first_name} ${selected.learners?.last_name}`],
                   ['Amount',        `${sym}${Number(selected.amount_requested).toLocaleString()}`],

@@ -61,7 +61,8 @@ const CSS = `
   .desktop-sidebar { display: none !important; }
   .mobile-topbar   { display: flex !important; }
   .mobile-bottom   { display: flex !important; }
-  .main-padding    { padding: 16px !important; padding-bottom: 80px !important; }
+  .main-padding    { padding: 16px !important; padding-top: 72px !important; padding-bottom: 90px !important; }
+  .desktop-topbar  { display: none !important; }
 }
 @media (min-width: 769px) {
   .desktop-sidebar { display: flex !important; }
@@ -306,7 +307,7 @@ export default function Layout() {
         <div style={{ flex:1, display:'flex', flexDirection:'column', minWidth:0 }}>
 
           {/* Desktop topbar */}
-          <header style={{
+          <header className="desktop-topbar" style={{
             background:'#fff', borderBottom:'1px solid #e2e8f0',
             padding:'0 32px', height:60,
             display:'flex', alignItems:'center', justifyContent:'space-between',
@@ -332,9 +333,10 @@ export default function Layout() {
         {/* ── MOBILE BOTTOM NAV ── */}
         <div className="mobile-bottom" style={{
           display:'none', position:'fixed', bottom:0, left:0, right:0,
-          background:'#0f2044', padding:'6px 8px 10px',
+          background:'#0f2044', padding:'6px 8px env(safe-area-inset-bottom, 10px)',
           zIndex:150, justifyContent:'space-around', alignItems:'center',
-          boxShadow:'0 -2px 12px rgba(0,0,0,0.2)'
+          boxShadow:'0 -2px 12px rgba(0,0,0,0.2)',
+          overflowX:'auto', WebkitOverflowScrolling:'touch'
         }}>
           {NAV_ITEMS.filter(item => !item.roles || item.roles.includes(user?.role)).map(({ to, label, icon: Icon }) => (
             <NavLink key={to} to={to} end={to==='/'} className={({isActive}) => `mob-nav-link${isActive?' active':''}`}>

@@ -508,7 +508,7 @@ export default function Settings() {
           <form onSubmit={saveProfile}>
             <label style={t.label}>School name *</label>
             <input style={t.input} value={profile.name} onChange={e=>setProfile(p=>({...p,name:e.target.value}))} required/>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))',gap:12}}>
               <div><label style={t.label}>Phone</label><input style={t.input} value={profile.phone} onChange={e=>setProfile(p=>({...p,phone:e.target.value}))}/></div>
               <div><label style={t.label}>Email</label><input style={t.input} type="email" value={profile.email} onChange={e=>setProfile(p=>({...p,email:e.target.value}))}/></div>
             </div>
@@ -601,7 +601,7 @@ export default function Settings() {
                 <option value="">All grades</option>
                 {grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}
               </select>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+              <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))',gap:12}}>
                 <div><label style={t.label}>Amount *</label><input style={t.input} type="number" step="0.01" value={fpForm.amount} onChange={e=>setFpForm(f=>({...f,amount:e.target.value}))} required/></div>
                 <div><label style={t.label}>Year *</label><input style={t.input} type="number" value={fpForm.year} onChange={e=>setFpForm(f=>({...f,year:Number(e.target.value)}))} required/></div>
               </div>
@@ -639,7 +639,7 @@ export default function Settings() {
             <form onSubmit={saveTeacher}>
               <label style={t.label}>Full name *</label>
               <input style={t.input} value={tcForm.full_name} onChange={e=>setTcForm(f=>({...f,full_name:e.target.value}))} required/>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+              <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))',gap:12}}>
                 <div><label style={t.label}>Email</label><input style={t.input} type="email" value={tcForm.email} onChange={e=>setTcForm(f=>({...f,email:e.target.value}))}/></div>
                 <div>
                   <label style={t.label}>Phone{school?.countries?.code==='LS'?' (XXXX XXXX)':school?.countries?.code==='ZA'?' (0XX XXX XXXX)':''}</label>

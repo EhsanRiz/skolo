@@ -60,7 +60,7 @@ function OutstandingDrawer({ entries, sym, onClose }) {
   return (
     <div style={{ position:'fixed', inset:0, zIndex:200, display:'flex', justifyContent:'flex-end' }}>
       <div onClick={onClose} style={{ position:'absolute', inset:0, background:'rgba(15,23,42,0.5)', backdropFilter:'blur(2px)' }} />
-      <div style={{ position:'relative', zIndex:1, width:'62%', maxWidth:700, background:'#fff', height:'100vh', display:'flex', flexDirection:'column', boxShadow:'-12px 0 40px rgba(0,0,0,.15)', animation:'drawerIn .3s cubic-bezier(0.16,1,0.3,1) both' }}>
+      <div className="skolo-drawer" style={{ position:'relative', zIndex:1, width:'62%', maxWidth:700, background:'#fff', height:'100vh', display:'flex', flexDirection:'column', boxShadow:'-12px 0 40px rgba(0,0,0,.15)', animation:'drawerIn .3s cubic-bezier(0.16,1,0.3,1) both' }}>
         <div style={{ padding:'24px 28px 16px', borderBottom:'1px solid #f1f5f9', flexShrink:0 }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
             <div>
@@ -324,7 +324,7 @@ function TeacherDashboard() {
       </div>
 
       {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 14, marginBottom: 24 }}>
         <StatCard delay="0ms"   label="My classes"     value={totalClasses}    sub={`${totalLearners} learners total`} onClick={() => navigate('/my-classes')} />
         <StatCard delay="60ms"  label="Total learners" value={totalLearners}   sub={school?.name || ''} onClick={() => navigate('/my-classes')} />
         <StatCard delay="120ms" label="Attendance today" value={`${attendanceTaken}/${totalClasses}`}
@@ -336,7 +336,7 @@ function TeacherDashboard() {
       </div>
 
       {/* Main grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 16 }}>
 
         {/* ── Today's timetable ── */}
         <div className="dash-card" style={{ animationDelay: '240ms' }}>
@@ -731,7 +731,7 @@ function AdminDashboard() {
       </div>
 
       {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 14, marginBottom: 24 }}>
         <StatCard delay="0ms"   label="Total learners"     value={data?.learnerCount || 0}
           sub={`${data?.teacherCount || 0} teachers · ${data?.classCount || 0} classes`} onClick={() => navigate('/learners')} />
         <StatCard delay="60ms"  label="Fee collection"     value={`${fs.collectionRate || 0}%`}
@@ -746,7 +746,7 @@ function AdminDashboard() {
       </div>
 
       {/* Charts row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 16 }}>
 
         {/* ── Monthly fee trend (Recharts bar chart) ── */}
         <div className="dash-card" style={{ animationDelay: '240ms' }}>
@@ -801,7 +801,7 @@ function AdminDashboard() {
       </div>
 
       {/* Second row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 16 }}>
 
         {/* ── Fee collection by grade (CSS bars + data) ── */}
         <div className="dash-card" style={{ animationDelay: '360ms' }}>
@@ -958,7 +958,7 @@ function PrincipalDashboard() {
       </div>
 
       {/* Big KPI cards — 3x2 grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 28 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 28 }}>
 
         {/* Learners */}
         <div className="dash-card stat-card" onClick={() => navigate('/learners')}
@@ -1031,7 +1031,7 @@ function PrincipalDashboard() {
       </div>
 
       {/* Charts row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 16 }}>
 
         {/* Learner distribution pie */}
         <div className="dash-card" style={{ animationDelay: '360ms' }}>
