@@ -205,6 +205,41 @@ const LandingPage = () => {
       .pricing-features li { padding: 6px 0; font-size: 14px; color: #374151; display: flex; gap: 8px; align-items: flex-start; }
       .pricing-features li::before { content: '✓'; color: var(--green); font-weight: 700; }
 
+      /* ── DEMO VIDEO ────────────────────────────────── */
+      .demo-video { padding: 100px 0; background: #fff; }
+      .demo-video .container { text-align: center; }
+      .video-wrapper {
+        max-width: 800px; margin: 48px auto 0; position: relative;
+        border-radius: 16px; overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,.12);
+        background: var(--navy); aspect-ratio: 16/9;
+      }
+      .video-wrapper iframe {
+        position: absolute; top: 0; left: 0;
+        width: 100%; height: 100%; border: none;
+      }
+      .video-placeholder {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, var(--navy) 0%, #1a3a6b 100%);
+        cursor: pointer; transition: all .3s;
+      }
+      .video-placeholder:hover { background: linear-gradient(135deg, #0d1a38 0%, #162d5a 100%); }
+      .video-placeholder:hover .play-btn { transform: scale(1.1); box-shadow: 0 8px 30px rgba(37,99,235,.5); }
+      .play-btn {
+        width: 80px; height: 80px; border-radius: 50%;
+        background: var(--blue); display: flex; align-items: center; justify-content: center;
+        transition: all .3s; box-shadow: 0 4px 20px rgba(37,99,235,.4);
+      }
+      .play-btn svg { width: 32px; height: 32px; margin-left: 4px; }
+      .video-placeholder-text {
+        margin-top: 20px; font-size: 16px; font-weight: 600;
+        color: rgba(255,255,255,.7); letter-spacing: 0.3px;
+      }
+      .video-placeholder-sub {
+        margin-top: 6px; font-size: 13px; color: rgba(255,255,255,.4);
+      }
+
       /* ── CTA ─────────────────────────────────────── */
       .cta {
         padding: 80px 0;
@@ -313,7 +348,7 @@ const LandingPage = () => {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 Request a Demo
               </Link>
-              <a href="#features" className="btn btn-outline">See how it works</a>
+              <a href="#demo" className="btn btn-outline">See how it works</a>
             </div>
           </div>
           <div className="hero-visual animate delay-2">
@@ -388,6 +423,26 @@ const LandingPage = () => {
                 <div className="pain-title">No real-time picture</div>
               </div>
               <div className="pain-desc">Principals can't see how the school is performing without chasing teachers and bursars for manual reports.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ DEMO VIDEO ═══════ */}
+      <section className="demo-video" id="demo">
+        <div className="container">
+          <span className="section-label">See it in action</span>
+          <h2 className="section-title">Watch how Skolo works</h2>
+          <p className="section-sub" style={{ margin:'0 auto' }}>See how schools in Lesotho and South Africa are using Skolo to manage fees, attendance, grades, and more — all from one platform.</p>
+          <div className="video-wrapper">
+            {/* Replace YOUTUBE_VIDEO_ID with your actual YouTube video ID */}
+            {/* <iframe src="https://www.youtube.com/embed/YOUTUBE_VIDEO_ID" title="Skolo Demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe> */}
+            <div className="video-placeholder" onClick={() => window.open('https://www.youtube.com/watch?v=REPLACE_WITH_VIDEO_ID', '_blank')}>
+              <div className="play-btn">
+                <svg viewBox="0 0 24 24" fill="white" stroke="none"><polygon points="5,3 19,12 5,21" /></svg>
+              </div>
+              <div className="video-placeholder-text">Watch the 2-minute demo</div>
+              <div className="video-placeholder-sub">Coming soon — video demo in production</div>
             </div>
           </div>
         </div>

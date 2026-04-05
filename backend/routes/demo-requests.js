@@ -62,7 +62,7 @@ router.post('/', async (req, res) => {
     try {
       await resend.emails.send({
         from: FROM,
-        to: 'sehsan.rizvi@gmail.com',
+        to: 'info@4dcs.co.za',
         subject: `New Demo Request: ${school_name}`,
         html: emailHtml
       })
@@ -72,7 +72,7 @@ router.post('/', async (req, res) => {
       try {
         await resend.emails.send({
           from: FALLBACK_FROM,
-          to: 'sehsan.rizvi@gmail.com',
+          to: 'info@4dcs.co.za',
           subject: `New Demo Request: ${school_name}`,
           html: emailHtml
         })
