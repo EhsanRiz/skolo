@@ -18,6 +18,9 @@ app.use(cors({
     // Allow skolo.pages.dev (production) and any subdomain preview URLs
     if (origin === 'https://skolo.pages.dev') return callback(null, true)
     if (origin === 'https://myskolo.co.za') return callback(null, true)
+    // Parent PWA
+    if (origin === 'https://parent.myskolo.co.za') return callback(null, true)
+    if (origin === 'http://localhost:5174') return callback(null, true)
     if (origin.endsWith('.skolo.pages.dev') || origin.endsWith('.skolo.app') || origin.endsWith('.myskolo.co.za')) return callback(null, true)
     if (allowedOrigins.includes(origin)) return callback(null, true)
     callback(new Error(`CORS: origin ${origin} not allowed`))
@@ -56,6 +59,11 @@ app.use('/attendance-alerts',  require('./routes/attendance-alerts'))
 app.use('/dashboard',          require('./routes/dashboard'))
 app.use('/super-admin',        require('./routes/super-admin'))
 app.use('/demo-requests',     require('./routes/demo-requests'))
+
+// ─── Parent PWA Routes ───────────────────────────────────────
+app.use('/parent-auth',       require('./routes/parent-auth'))
+app.use('/parent-data',       require('./routes/parent-data'))
+app.use('/messaging',         require('./routes/messaging'))
 
 // ─── 404 fallback ─────────────────────────────────────────────
 app.use((req, res) => res.status(404).json({ error: 'Route not found' }))

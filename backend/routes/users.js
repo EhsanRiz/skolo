@@ -133,6 +133,125 @@ router.patch('/:id', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }) }
 })
 
+// ─── POST /users/invite-parent — invite a guardian to create parent account ──
+router.post('/invite-parent', async (req, res) => {
+  try {
+    const { guardian_id } = req.body
+    if (!guardian_id) return res.status(400).json({ error: 'Guardian ID required' })
+
+    // Get guardian
+    const { data: guardian, error: gErr } = await supabase
+      .from('guardians')
+      .select('*')
+      .eq('id', guardian_id)
+      .eq('school_id', req.user.school_id)
+      .single()
+
+    if (gErr || !guardian) return res.status(404).json({ error: 'Guardian not found' })
+    if (guardian.user_id) return res.status(400).json({ error: 'Guardian already has a parent account' })
+
+    // Generate invite token
+    const invite_token = crypto.randomBytes(24).toString('hex')
+    const PARENT_URL = process.env.PARENT_APP_URL || 'https://parent.myskolo.co.za'
+
+    await supabase
+      .from('guardians')
+      .update({ invite_token, invite_sent_at: new Date().toISOString() })
+      .eq('id', guardian_id)
+
+    // Get school name
+    const { data: school } = await supabase
+      .from('schools').select('name').eq('id', req.user.school_id).single()
+
+    // Send invite email
+    const inviteUrl = `${PARENT_URL}/set-password/${invite_token}`
+    if (guardian.email) {
+      const { Resend } = require('resend')
+      const resend = new Resend(process.env.RESEND_API_KEY)
+      await resend.emails.send({
+        from: 'Skolo <noreply@4dcs.co.za>',
+        to: guardian.email,
+        subject: `${school?.name || 'Your school'} invites you to Skolo Parent`,
+        html: `
+          <div style="font-family: -apple-system, sans-serif; max-width: 500px; margin: 0 auto;">
+            <div style="background: #0f2044; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+              <h2 style="margin: 0;">Skolo Parent</h2>
+            </div>
+            <div style="padding: 24px; background: #fff; border: 1px solid #e2e8f0;">
+              <p>Hi ${guardian.first_name},</p>
+              <p><strong>${school?.name}</strong> has invited you to join the Skolo Parent portal. You'll be able to view your child's fees, attendance, announcements, and communicate with the school.</p>
+              <a href="${inviteUrl}" style="display: inline-block; background: #1d4ed8; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; margin: 16px 0;">Set Up Your Account</a>
+              <p style="color: #64748b; font-size: 13px;">If you didn't expect this email, you can safely ignore it.</p>
+            </div>
+          </div>
+        `
+      })
+    }
+
+    res.json({ success: true, invite_url: inviteUrl, email_sent: !!guardian.email })
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
+// ─── POST /users/bulk-invite-parents — invite all guardians without accounts ──
+router.post('/bulk-invite-parents', async (req, res) => {
+  try {
+    // Get all guardians without user accounts
+    const { data: guardians } = await supabase
+      .from('guardians')
+      .select('id, first_name, last_name, email, phone, user_id')
+      .eq('school_id', req.user.school_id)
+      .is('user_id', null)
+
+    if (!guardians || guardians.length === 0) {
+      return res.json({ invited: 0, message: 'All guardians already have accounts' })
+    }
+
+    const { data: school } = await supabase
+      .from('schools').select('name').eq('id', req.user.school_id).single()
+
+    const PARENT_URL = process.env.PARENT_APP_URL || 'https://parent.myskolo.co.za'
+    let invited = 0
+    let emailsSent = 0
+
+    for (const guardian of guardians) {
+      const invite_token = crypto.randomBytes(24).toString('hex')
+      await supabase
+        .from('guardians')
+        .update({ invite_token, invite_sent_at: new Date().toISOString() })
+        .eq('id', guardian.id)
+
+      if (guardian.email) {
+        const inviteUrl = `${PARENT_URL}/set-password/${invite_token}`
+        try {
+          const { Resend } = require('resend')
+          const resend = new Resend(process.env.RESEND_API_KEY)
+          await resend.emails.send({
+            from: 'Skolo <noreply@4dcs.co.za>',
+            to: guardian.email,
+            subject: `${school?.name || 'Your school'} invites you to Skolo Parent`,
+            html: `
+              <div style="font-family: -apple-system, sans-serif; max-width: 500px; margin: 0 auto;">
+                <div style="background: #0f2044; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                  <h2 style="margin: 0;">Skolo Parent</h2>
+                </div>
+                <div style="padding: 24px; background: #fff; border: 1px solid #e2e8f0;">
+                  <p>Hi ${guardian.first_name},</p>
+                  <p><strong>${school?.name}</strong> has invited you to Skolo Parent. View your child's fees, attendance, and more.</p>
+                  <a href="${inviteUrl}" style="display: inline-block; background: #1d4ed8; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; margin: 16px 0;">Set Up Your Account</a>
+                </div>
+              </div>
+            `
+          })
+          emailsSent++
+        } catch (e) { /* continue on email failure */ }
+      }
+      invited++
+    }
+
+    res.json({ invited, emails_sent: emailsSent, total_guardians: guardians.length })
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
 // ─── DELETE /users/:id — remove a staff account ──────────────
 router.delete('/:id', async (req, res) => {
   const school_id = req.user.school_id

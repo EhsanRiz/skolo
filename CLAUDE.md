@@ -6,20 +6,24 @@
 ## Quick Start
 
 ```bash
-# Frontend (React/Vite PWA)
+# Frontend — Staff App (React/Vite PWA)
 cd frontend && npm install && npm run dev    # http://localhost:5173
+
+# Parent App — Separate PWA for parents
+cd parent-app && npm install && npm run dev  # http://localhost:5174
 
 # Backend (Express.js)
 cd backend && npm install && npm run dev     # http://localhost:3001
 ```
 
-Both require `.env` files — see `.env.example` in each directory.
+All three require `.env` files — see `.env.example` in each directory.
 
 ## Live URLs
 
 | Service | URL |
 |---------|-----|
-| Frontend | https://myskolo.co.za (Cloudflare Pages) |
+| Staff Frontend | https://myskolo.co.za (Cloudflare Pages) |
+| Parent App | https://parent.myskolo.co.za (Cloudflare Pages) |
 | Backend API | https://skolo-api.onrender.com (Render) |
 | Database | Supabase PostgreSQL |
 | Email | Resend (from: noreply@4dcs.co.za) |
@@ -62,8 +66,11 @@ skolo/
 │   ├── server.js              # Express entry (port 3001)
 │   ├── lib/                   # Supabase client, email, auto-fee generation
 │   ├── middleware/             # JWT auth, super-admin auth
-│   └── routes/                # 26 route files (see below)
-├── frontend/
+│   └── routes/                # 29 route files (see below)
+│       ├── parent-auth.js     # Parent login, set-password, forgot/reset
+│       ├── parent-data.js     # Parent dashboard, fees, attendance, announcements, events
+│       └── messaging.js       # Conversations + messages (staff & parent)
+├── frontend/                  # Staff App (UNTOUCHED by parent system)
 │   ├── src/
 │   │   ├── App.jsx            # Routes + ProtectedRoute wrapper
 │   │   ├── contexts/          # AuthContext, ToastContext
@@ -72,7 +79,17 @@ skolo/
 │   │   └── lib/api.js         # Axios instance with JWT interceptor
 │   ├── public/                # PWA icons, skolo-promo.mp4
 │   └── vite.config.js         # React + PWA config
-├── supabase/migrations/       # 17 SQL migration files
+├── parent-app/                # Parent PWA (separate app, port 5174)
+│   ├── src/
+│   │   ├── App.jsx            # Routes (login, dashboard, fees, attendance, etc.)
+│   │   ├── contexts/          # AuthContext (sk_parent_token), ToastContext
+│   │   ├── components/        # Layout (mobile-first, bottom nav)
+│   │   ├── pages/             # 9 pages (Login, Dashboard, Fees, Attendance, etc.)
+│   │   └── lib/api.js         # Axios instance (same backend, different token key)
+│   ├── public/                # PWA icons (icon-192.png, icon-512.png)
+│   └── vite.config.js         # React + PWA config (Skolo Parent manifest)
+├── supabase/migrations/       # 19 SQL migration files
+│   └── 019_messaging_and_parent_auth.sql  # Parent auth + messaging tables
 ├── PROGRESS.md                # Detailed dev notes
 └── CLAUDE.md                  # This file
 ```
@@ -179,10 +196,29 @@ skolo/
 2. Principal approves/rejects from dashboard
 3. Approved → ledger updated + notification created
 
-### Parent Portal
+### Parent Portal (Legacy — Token-based)
 - Admin generates public link for guardian (hex token)
 - No login required — guardian sees linked learners + fee summary
 - Read-only, current year only
+- Still works at `/parent/:token` in the staff frontend
+
+### Parent App (New — Separate PWA)
+- Separate React/Vite PWA at `parent-app/` directory
+- Deploys independently to `parent.myskolo.co.za`
+- Parents download and save as shortcut on their phones
+- Auth: `parent` role added to `users` table, linked via `guardian_id`
+- Token stored as `sk_parent_token` (separate from staff `sk_token`)
+- Features: Dashboard, Fees, Attendance, Announcements, Events, Messages
+- Invite flow: Admin invites guardian → email with set-password link → parent creates account
+- Backend routes: `/parent-auth/*`, `/parent-data/*`, `/messaging/*`
+
+### Internal Messaging System
+- Conversations model: `conversations` + `conversation_participants` + `messages`
+- Types: direct (1:1 staff↔parent), class, grade, school-wide
+- Staff creates conversations, parents can reply
+- Real-time: 5-second polling (Supabase Realtime planned for Phase 2)
+- Unread count polling every 30 seconds (badge in bottom nav)
+- Database: migration 019 adds conversations, messages, push_subscriptions tables
 
 ## Environment Variables
 
@@ -196,7 +232,12 @@ FRONTEND_URL=https://myskolo.co.za
 RESEND_API_KEY=<resend-api-key>
 ```
 
-### Frontend (.env)
+### Staff Frontend (.env)
+```
+VITE_API_URL=https://skolo-api.onrender.com
+```
+
+### Parent App (.env)
 ```
 VITE_API_URL=https://skolo-api.onrender.com
 ```
