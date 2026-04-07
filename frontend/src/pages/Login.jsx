@@ -84,7 +84,7 @@ export default function Login() {
           animation:'cardIn 0.55s cubic-bezier(0.16,1,0.3,1) both'
         }}>
           <div style={{ marginBottom:28 }}>
-            <img src="/skolo-logo.png" alt="Skolo" style={{ height:80, objectFit:'contain', display:'block' }} />
+            <img src="/skolo-logo.png" alt="Skolo" style={{ height:160, objectFit:'contain', display:'block', maxWidth:'100%' }} />
           </div>
 
           <div style={{ fontSize:19, fontWeight:700, color:'#0f172a', marginBottom:22 }}>Sign in to your school</div>

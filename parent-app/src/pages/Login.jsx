@@ -27,17 +27,14 @@ export default function Login() {
     <div style={{ minHeight: '100vh', minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <div style={{
-        background: '#0f2044', padding: '40px 20px 32px', textAlign: 'center', color: '#fff'
+        background: '#fff', padding: '36px 20px 20px', textAlign: 'center',
+        borderBottom: '1px solid #e2e8f0'
       }}>
-        <div style={{
-          width: 100, height: 100, borderRadius: 20, background: '#fff',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          margin: '0 auto 16px', boxShadow: '0 4px 16px rgba(0,0,0,0.15)'
-        }}>
-          <img src="/skolo-logo.png" alt="Skolo" style={{ height: 72, objectFit: 'contain' }} />
-        </div>
-        <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>Skolo Parent</h1>
-        <p style={{ fontSize: 13, opacity: 0.7, marginTop: 4 }}>Stay connected with your child's school</p>
+        <img src="/skolo-logo.png" alt="Skolo" style={{
+          height: 80, objectFit: 'contain', margin: '0 auto 10px', display: 'block'
+        }} />
+        <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, color: '#0f2044' }}>Parent Portal</h1>
+        <p style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>Stay connected with your child's school</p>
       </div>
 
       {/* Form */}
