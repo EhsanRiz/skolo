@@ -29,10 +29,13 @@ export default function Login() {
       <div style={{
         background: '#0f2044', padding: '40px 20px 32px', textAlign: 'center', color: '#fff'
       }}>
-        <img src="/skolo-logo.png" alt="Skolo" style={{
-          height: 80, objectFit: 'contain', margin: '0 auto 12px', display: 'block',
-          filter: 'brightness(0) invert(1)', opacity: 0.95
-        }} />
+        <div style={{
+          width: 100, height: 100, borderRadius: 20, background: '#fff',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          margin: '0 auto 16px', boxShadow: '0 4px 16px rgba(0,0,0,0.15)'
+        }}>
+          <img src="/skolo-logo.png" alt="Skolo" style={{ height: 72, objectFit: 'contain' }} />
+        </div>
         <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>Skolo Parent</h1>
         <p style={{ fontSize: 13, opacity: 0.7, marginTop: 4 }}>Stay connected with your child's school</p>
       </div>
