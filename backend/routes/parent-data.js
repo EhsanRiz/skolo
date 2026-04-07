@@ -80,11 +80,73 @@ router.get('/dashboard', async (req, res) => {
       }
     }
 
+    // Attendance per learner for current month
+    const curMonth = new Date().getMonth() + 1
+    const curYear = new Date().getFullYear()
+    const mStart = `${curYear}-${String(curMonth).padStart(2, '0')}-01`
+    const mEnd = new Date(curYear, curMonth, 0).toISOString().split('T')[0]
+
+    for (const learner of learners) {
+      const { data: att } = await supabase
+        .from('attendance').select('status')
+        .eq('learner_id', learner.id).eq('school_id', school_id)
+        .gte('attend_date', mStart).lte('attend_date', mEnd)
+      const recs = att || []
+      const total = recs.length
+      const present = recs.filter(r => r.status === 'present').length
+      const late = recs.filter(r => r.status === 'late').length
+      const absent = recs.filter(r => r.status === 'absent').length
+      const excused = recs.filter(r => r.status === 'excused').length
+      learner.attendance = { total, present, late, absent, excused, rate: total > 0 ? Math.round(((present + late) / total) * 100) : null }
+
+      // Latest term grades
+      const { data: grades } = await supabase
+        .from('exam_results').select('mark, term')
+        .eq('learner_id', learner.id).eq('school_id', school_id).eq('year', curYear)
+      if (grades?.length > 0) {
+        const latestTerm = Math.max(...grades.map(g => g.term))
+        const termMarks = grades.filter(g => g.term === latestTerm).map(g => g.mark).filter(m => m != null)
+        learner.latest_grade = {
+          term: latestTerm,
+          average: termMarks.length > 0 ? Math.round(termMarks.reduce((a, b) => a + b, 0) / termMarks.length) : null,
+          subject_count: termMarks.length
+        }
+      }
+    }
+
+    // Monthly fee breakdown for chart (current year)
+    const monthlyFees = []
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    for (let m = 0; m < 12; m++) {
+      const ms = `${currentYear}-${String(m + 1).padStart(2, '0')}-01`
+      const me = new Date(currentYear, m + 1, 0).toISOString().split('T')[0]
+      let due = 0, paid = 0
+      for (const learner of learners) {
+        const { data: fees } = await supabase
+          .from('fee_ledger').select('amount_due, amount_paid')
+          .eq('learner_id', learner.id).eq('school_id', school_id)
+          .gte('due_date', ms).lte('due_date', me)
+        for (const f of (fees || [])) {
+          due += parseFloat(f.amount_due || 0)
+          paid += parseFloat(f.amount_paid || 0)
+        }
+      }
+      if (due > 0 || paid > 0) monthlyFees.push({ month: MONTHS[m], due: Math.round(due), paid: Math.round(paid) })
+    }
+
     // Unread messages count
-    const { count: unreadMessages } = await supabase
-      .from('conversation_participants')
-      .select('conversation_id', { count: 'exact' })
-      .eq('user_id', req.user.id)
+    let unreadMessages = 0
+    try {
+      const { data: msgData } = await supabase.rpc ? null : null
+      // Simple approach: count via messaging endpoint logic
+      const { data: parts } = await supabase
+        .from('conversation_participants').select('conversation_id, last_read_at').eq('user_id', req.user.id)
+      for (const p of (parts || [])) {
+        const { count } = await supabase.from('messages').select('id', { count: 'exact', head: true })
+          .eq('conversation_id', p.conversation_id).gt('created_at', p.last_read_at || '1970-01-01').neq('sender_id', req.user.id)
+        unreadMessages += (count || 0)
+      }
+    } catch {}
 
     // Get recent announcements (last 5)
     const { data: announcements } = await supabase
@@ -110,7 +172,8 @@ router.get('/dashboard', async (req, res) => {
       learners,
       unread_messages: unreadMessages || 0,
       announcements: announcements || [],
-      events: events || []
+      events: events || [],
+      monthly_fees: monthlyFees
     })
   } catch (err) {
     console.error('Parent dashboard error:', err)
@@ -331,6 +394,52 @@ router.get('/events', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
+})
+
+// GET /parent-data/notifications — aggregated notifications for parent
+router.get('/notifications', async (req, res) => {
+  try {
+    const { guardian_id, school_id } = req.user
+    const items = []
+
+    // Unread messages
+    const { data: parts } = await supabase
+      .from('conversation_participants').select('conversation_id, last_read_at').eq('user_id', req.user.id)
+    let msgCount = 0
+    for (const p of (parts || [])) {
+      const { count } = await supabase.from('messages').select('id', { count: 'exact', head: true })
+        .eq('conversation_id', p.conversation_id).gt('created_at', p.last_read_at || '1970-01-01').neq('sender_id', req.user.id)
+      msgCount += (count || 0)
+    }
+    if (msgCount > 0) items.push({ type: 'message', title: `${msgCount} unread message${msgCount > 1 ? 's' : ''}`, body: 'Tap to view your conversations', link: '/messages', created_at: new Date().toISOString() })
+
+    // Recent announcements (last 7 days)
+    const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString()
+    const { data: ann } = await supabase.from('announcements').select('id, title, created_at')
+      .eq('school_id', school_id).gte('created_at', weekAgo).order('created_at', { ascending: false }).limit(5)
+    for (const a of (ann || [])) {
+      items.push({ type: 'announcement', title: a.title, body: 'New school announcement', link: '/announcements', created_at: a.created_at })
+    }
+
+    // Overdue fees
+    const learnerIds = await getParentLearnerIds(guardian_id)
+    if (learnerIds.length > 0) {
+      const today = new Date().toISOString().split('T')[0]
+      for (const lid of learnerIds) {
+        const { count } = await supabase.from('fee_ledger').select('id', { count: 'exact', head: true })
+          .eq('learner_id', lid).eq('school_id', school_id).lt('due_date', today).lt('amount_paid', supabase.raw ? 'amount_due' : '0')
+        // Simpler: just check status
+        const { data: overdue } = await supabase.from('fee_ledger').select('id')
+          .eq('learner_id', lid).eq('school_id', school_id).eq('status', 'overdue').limit(1)
+        if (overdue?.length > 0) {
+          const { data: l } = await supabase.from('learners').select('first_name').eq('id', lid).single()
+          items.push({ type: 'fee_overdue', title: `Overdue fees for ${l?.first_name || 'your child'}`, body: 'Tap to view fee details', link: '/fees', created_at: new Date().toISOString() })
+        }
+      }
+    }
+
+    res.json({ total_unread: items.length, items: items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) })
+  } catch (err) { res.status(500).json({ error: err.message }) }
 })
 
 // ─── Helper: get parent's linked learner IDs ─────────────────
