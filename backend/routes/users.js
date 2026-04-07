@@ -133,6 +133,33 @@ router.patch('/:id', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }) }
 })
 
+// ─── GET /users/guardians — list all guardians with invite status ────────────
+router.get('/guardians', async (req, res) => {
+  try {
+    const { data: guardians, error } = await supabase
+      .from('guardians')
+      .select('id, first_name, last_name, email, phone, relationship, user_id, invite_token, invite_sent_at, learner_guardians(learners(id, first_name, last_name))')
+      .eq('school_id', req.user.school_id)
+      .order('first_name')
+
+    if (error) throw error
+
+    const result = (guardians || []).map(g => ({
+      id: g.id,
+      first_name: g.first_name,
+      last_name: g.last_name,
+      email: g.email,
+      phone: g.phone,
+      relationship: g.relationship,
+      invite_sent_at: g.invite_sent_at,
+      status: g.user_id ? 'active' : g.invite_token ? 'invited' : 'not_invited',
+      learners: (g.learner_guardians || []).map(lg => lg.learners).filter(Boolean)
+    }))
+
+    res.json(result)
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
 // ─── POST /users/invite-parent — invite a guardian to create parent account ──
 router.post('/invite-parent', async (req, res) => {
   try {

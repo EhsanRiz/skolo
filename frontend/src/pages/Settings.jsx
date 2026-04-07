@@ -16,6 +16,8 @@ const UsersIcon    = () => <svg width="14" height="14" viewBox="0 0 24 24" fill=
 const EyeIcon      = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
 const ClockIcon    = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
 
+const ParentIcon   = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 8v6M19 11h6"/></svg>
+
 const TABS = [
   { key:'grades',     label:'Grades & Classes', Icon:GradeIcon   },
   { key:'feeplans',   label:'Fee Plans',         Icon:FeeIcon     },
@@ -24,6 +26,7 @@ const TABS = [
   { key:'gradescale', label:'Grade Scale',        Icon:EyeIcon     },
   { key:'profile',    label:'School Profile',    Icon:SchoolIcon  },
   { key:'users',      label:'Staff Accounts',    Icon:UsersIcon   },
+  { key:'parents',    label:'Parent Invitations', Icon:ParentIcon  },
 ]
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
@@ -57,6 +60,11 @@ export default function Settings() {
   const [userForm, setUserForm] = useState({ full_name:'', email:'', password:'', role:'bursar' })
   const [editForm, setEditForm] = useState({ full_name:'', email:'', role:'bursar', password:'' })
 
+  // Parent invitations
+  const [guardians, setGuardians] = useState([])
+  const [loadingGuardians, setLoadingGuardians] = useState(false)
+  const [inviting, setInviting] = useState(null) // guardian_id being invited
+
   // Profile
   const [profile, setProfile] = useState({ name:'', phone:'', email:'', school_reg_number:'' })
   const [logoPreview, setLogoPreview] = useState(null)
@@ -71,11 +79,16 @@ export default function Settings() {
   const [teacherClasses, setTeacherClasses] = useState([])
   const loadTeacherClasses = () => api.get('/teacher-classes').then(r=>setTeacherClasses(r.data)).catch(()=>{})
   const loadUsers    = () => api.get('/users').then(r=>setUsers(r.data)).catch(()=>{})
+  const loadGuardians = () => {
+    setLoadingGuardians(true)
+    api.get('/users/guardians').then(r=>setGuardians(r.data)).catch(()=>{}).finally(()=>setLoadingGuardians(false))
+  }
 
   useEffect(() => { loadGrades() }, [])
   useEffect(() => { if (tab==='feeplans') loadFeePlans() }, [tab])
   useEffect(() => { if (tab==='teachers') { loadTeachers(); loadGrades(); loadTeacherClasses() } }, [tab])
   useEffect(() => { if (tab==='users') loadUsers() }, [tab])
+  useEffect(() => { if (tab==='parents') loadGuardians() }, [tab])
   useEffect(() => {
     if (school) {
       setProfile({ name:school.name||'', phone:school.phone||'', email:school.email||'', school_reg_number:school.school_reg_number||'' })
@@ -585,6 +598,101 @@ export default function Settings() {
               </tbody>
             </table>
           </Card>
+        </div>
+      )}
+
+      {/* ── PARENT INVITATIONS ── */}
+      {tab==='parents' && (
+        <div>
+          {(() => {
+            const active = guardians.filter(g=>g.status==='active').length
+            const invited = guardians.filter(g=>g.status==='invited').length
+            const notInvited = guardians.filter(g=>g.status==='not_invited').length
+            return (
+              <>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16,flexWrap:'wrap',gap:12}}>
+                  <div style={{fontWeight:700,fontSize:16}}>Parent invitations</div>
+                  <button style={t.btn.primary} disabled={saving||!notInvited}
+                    onClick={async()=>{
+                      setSaving(true)
+                      try {
+                        const r = await api.post('/users/bulk-invite-parents')
+                        toast.success(`Invited ${r.data.invited} guardian(s), ${r.data.emails_sent} email(s) sent`)
+                        loadGuardians()
+                      } catch(e){ toast.error(e.response?.data?.error||'Bulk invite failed') }
+                      finally{ setSaving(false) }
+                    }}>
+                    {saving?'Sending…':`Invite all (${notInvited})`}
+                  </button>
+                </div>
+
+                {/* Summary */}
+                <div style={{display:'flex',gap:12,marginBottom:20,flexWrap:'wrap'}}>
+                  {[
+                    {label:'Total',     count:guardians.length, bg:'#f1f5f9', color:'#0f172a'},
+                    {label:'Active',    count:active,           bg:'#dcfce7', color:'#15803d'},
+                    {label:'Invited',   count:invited,          bg:'#fef9c3', color:'#a16207'},
+                    {label:'Not invited',count:notInvited,      bg:'#fee2e2', color:'#dc2626'},
+                  ].map(s=>(
+                    <div key={s.label} style={{background:s.bg,borderRadius:10,padding:'12px 20px',minWidth:100,flex:1}}>
+                      <div style={{fontSize:22,fontWeight:800,color:s.color}}>{s.count}</div>
+                      <div style={{fontSize:12,color:s.color,fontWeight:600,opacity:.8}}>{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <Card>
+                  {loadingGuardians ? (
+                    <div style={{textAlign:'center',padding:40,color:'#94a3b8'}}>Loading guardians…</div>
+                  ) : (
+                    <table style={{width:'100%',borderCollapse:'collapse'}}>
+                      <thead><tr>{['Guardian','Contact','Learner(s)','Status','Action'].map(h=><th key={h} style={t.th}>{h}</th>)}</tr></thead>
+                      <tbody>
+                        {guardians.map(g=>(
+                          <tr key={g.id}>
+                            <td style={{...t.td,fontWeight:600}}>{g.first_name} {g.last_name}{g.relationship?<span style={{marginLeft:6,fontSize:11,color:'#94a3b8'}}>({g.relationship})</span>:null}</td>
+                            <td style={t.td}>
+                              <div style={{fontSize:13}}>{g.email||<span style={{color:'#cbd5e1'}}>No email</span>}</div>
+                              {g.phone&&<div style={{fontSize:12,color:'#64748b'}}>{g.phone}</div>}
+                            </td>
+                            <td style={t.td}>
+                              {g.learners.length?g.learners.map(l=><div key={l.id} style={{fontSize:13}}>{l.first_name} {l.last_name}</div>):<span style={{color:'#cbd5e1',fontSize:13}}>—</span>}
+                            </td>
+                            <td style={t.td}>
+                              {g.status==='active'&&<span style={{background:'#dcfce7',color:'#15803d',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>Active</span>}
+                              {g.status==='invited'&&<span style={{background:'#fef9c3',color:'#a16207',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>Invited{g.invite_sent_at?<span style={{marginLeft:4,fontWeight:400}}>{new Date(g.invite_sent_at).toLocaleDateString()}</span>:null}</span>}
+                              {g.status==='not_invited'&&<span style={{background:'#f1f5f9',color:'#64748b',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>Not invited</span>}
+                            </td>
+                            <td style={t.td}>
+                              {g.status==='active' ? (
+                                <span style={{fontSize:12,color:'#94a3b8'}}>—</span>
+                              ) : (
+                                <button disabled={inviting===g.id||!g.email}
+                                  title={!g.email?'No email on file':''}
+                                  style={{...t.btn.ghost,padding:'5px 12px',fontSize:12,opacity:(!g.email)?.4:1,cursor:(!g.email)?'not-allowed':'pointer',border:'1px solid #1d4ed8',color:'#1d4ed8',fontWeight:600}}
+                                  onClick={async()=>{
+                                    setInviting(g.id)
+                                    try {
+                                      const r = await api.post('/users/invite-parent',{guardian_id:g.id})
+                                      toast.success(`Invite sent to ${g.first_name}${r.data.email_sent?' — email delivered':''}`)
+                                      loadGuardians()
+                                    } catch(e){ toast.error(e.response?.data?.error||'Invite failed') }
+                                    finally{ setInviting(null) }
+                                  }}>
+                                  {inviting===g.id?'Sending…':g.status==='invited'?'Resend':'Send invite'}
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                        {!guardians.length&&<tr><td colSpan={5} style={{...t.td,color:'#94a3b8',textAlign:'center',padding:40}}>No guardians found. Add guardians when creating learners.</td></tr>}
+                      </tbody>
+                    </table>
+                  )}
+                </Card>
+              </>
+            )
+          })()}
         </div>
       )}
 
