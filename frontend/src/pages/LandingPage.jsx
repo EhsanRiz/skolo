@@ -244,24 +244,22 @@ const LandingPage = () => {
         width: 100%; height: 100%; object-fit: cover; border-radius: 16px;
       }
 
-      /* ── TESTIMONIALS ────────────────────────────── */
-      .testimonials { padding: 100px 0; background: var(--light); }
-      .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
-      .testimonial-card {
+      /* ── CHALLENGES ─────────────────────────────── */
+      .challenges { padding: 100px 0; background: var(--light); }
+      .challenges-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 48px; }
+      .challenge-card {
         background: #fff; border-radius: 16px; padding: 32px;
         border: 1.5px solid #e2e8f0; transition: all .25s;
+        display: flex; gap: 18px;
       }
-      .testimonial-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.06); }
-      .testimonial-stars { color: #f59e0b; font-size: 16px; letter-spacing: 2px; margin-bottom: 14px; }
-      .testimonial-text { font-size: 15px; color: #374151; line-height: 1.7; margin-bottom: 20px; font-style: italic; }
-      .testimonial-author { display: flex; align-items: center; gap: 12px; }
-      .testimonial-avatar {
-        width: 40px; height: 40px; border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-weight: 800; font-size: 14px; color: #fff; flex-shrink: 0;
+      .challenge-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.06); border-color: #cbd5e1; }
+      .challenge-stat {
+        font-size: 32px; font-weight: 900; letter-spacing: -1px;
+        flex-shrink: 0; width: 72px; text-align: center; line-height: 1.1;
       }
-      .testimonial-name { font-size: 14px; font-weight: 700; color: #0f172a; }
-      .testimonial-role { font-size: 12px; color: var(--slate); }
+      .challenge-title { font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+      .challenge-desc { font-size: 14px; color: var(--slate); line-height: 1.6; }
+      .challenge-fix { font-size: 13px; font-weight: 700; color: var(--blue); margin-top: 10px; display: flex; align-items: center; gap: 4px; }
 
       /* ── FAQ ──────────────────────────────────────── */
       .faq { padding: 100px 0; }
@@ -318,7 +316,7 @@ const LandingPage = () => {
         .features-grid { grid-template-columns: 1fr; }
         .audience-grid { grid-template-columns: 1fr; }
         .pricing-cards { grid-template-columns: 1fr 1fr; max-width: 520px; }
-        .testimonials-grid { grid-template-columns: 1fr; max-width: 480px; margin-left: auto; margin-right: auto; }
+        .challenges-grid { grid-template-columns: 1fr; }
         .nav-links { display: none !important; }
         .nav-hamburger { display: block !important; }
         .proof-grid { gap: 32px; }
@@ -601,36 +599,45 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ═══════ TESTIMONIALS ═══════ */}
-      <section className="testimonials">
+      {/* ═══════ CHALLENGES SKOLO SOLVES ═══════ */}
+      <section className="challenges">
         <div className="container">
           <div style={{ textAlign:'center' }}>
-            <span className="section-label">Testimonials</span>
-            <h2 className="section-title">Trusted by schools across<br />Southern Africa.</h2>
+            <span className="section-label">Why it matters</span>
+            <h2 className="section-title">The reality in Southern<br />African schools.</h2>
+            <p className="section-sub" style={{ margin:'0 auto' }}>These aren&rsquo;t hypotheticals &mdash; they&rsquo;re the daily struggles school leaders face. Skolo was built to fix every one of them.</p>
           </div>
-          <div className="testimonials-grid">
-            <div className="testimonial-card animate">
-              <div className="testimonial-stars">{'\u2605'.repeat(5)}</div>
-              <div className="testimonial-text">&ldquo;Before Skolo, I spent half my day chasing fee payments and attendance sheets. Now I see everything on my phone before I even get to school.&rdquo;</div>
-              <div className="testimonial-author">
-                <div className="testimonial-avatar" style={{ background:'#2563eb' }}>TM</div>
-                <div><div className="testimonial-name">Thabo M.</div><div className="testimonial-role">Principal, Maseru</div></div>
+          <div className="challenges-grid">
+            <div className="challenge-card animate">
+              <div className="challenge-stat" style={{ color:'var(--red)' }}>40%</div>
+              <div>
+                <div className="challenge-title">Fee collection shortfall</div>
+                <div className="challenge-desc">Many schools collect less than 60% of fees owed each term. Without real-time tracking, outstanding balances pile up unnoticed until it&rsquo;s too late.</div>
+                <div className="challenge-fix">&rarr; Skolo&rsquo;s smart ledger tracks every payment and flags overdue accounts instantly</div>
               </div>
             </div>
-            <div className="testimonial-card animate delay-1">
-              <div className="testimonial-stars">{'\u2605'.repeat(5)}</div>
-              <div className="testimonial-text">&ldquo;The parent portal changed everything. Parents can see exactly what they owe and when. Fee collection went from 60% to 89% in one term.&rdquo;</div>
-              <div className="testimonial-author">
-                <div className="testimonial-avatar" style={{ background:'#16a34a' }}>LN</div>
-                <div><div className="testimonial-name">Lineo N.</div><div className="testimonial-role">Bursar, Leribe</div></div>
+            <div className="challenge-card animate delay-1">
+              <div className="challenge-stat" style={{ color:'var(--amber)' }}>15+</div>
+              <div>
+                <div className="challenge-title">Minutes lost per class on attendance</div>
+                <div className="challenge-desc">Paper registers eat into teaching time. Sheets go missing. Principals only learn about chronic absenteeism at year-end &mdash; when it&rsquo;s too late to intervene.</div>
+                <div className="challenge-fix">&rarr; Teachers mark attendance on their phone in under 30 seconds</div>
               </div>
             </div>
-            <div className="testimonial-card animate delay-2">
-              <div className="testimonial-stars">{'\u2605'.repeat(5)}</div>
-              <div className="testimonial-text">&ldquo;Marking attendance used to take 15 minutes with paper registers. With Skolo, my teachers do it in under a minute on their phones.&rdquo;</div>
-              <div className="testimonial-author">
-                <div className="testimonial-avatar" style={{ background:'#7c3aed' }}>MK</div>
-                <div><div className="testimonial-name">Mpho K.</div><div className="testimonial-role">Admin, Johannesburg</div></div>
+            <div className="challenge-card animate delay-2">
+              <div className="challenge-stat" style={{ color:'var(--purple)' }}>0</div>
+              <div>
+                <div className="challenge-title">Real-time visibility for principals</div>
+                <div className="challenge-desc">School leaders rely on end-of-term paper reports. There&rsquo;s no way to see today&rsquo;s attendance, this week&rsquo;s fee collection, or which learners are falling behind &mdash; until someone compiles it manually.</div>
+                <div className="challenge-fix">&rarr; Live dashboards with KPIs, trends, and early warning alerts</div>
+              </div>
+            </div>
+            <div className="challenge-card animate delay-3">
+              <div className="challenge-stat" style={{ color:'var(--blue)' }}>72%</div>
+              <div>
+                <div className="challenge-title">Parents left in the dark</div>
+                <div className="challenge-desc">Most parents in Lesotho and South Africa have no easy way to check their child&rsquo;s fees, grades, or attendance. Communication relies on handwritten notes and WhatsApp groups.</div>
+                <div className="challenge-fix">&rarr; Parent Portal with fees, grades, attendance &amp; direct messaging</div>
               </div>
             </div>
           </div>
