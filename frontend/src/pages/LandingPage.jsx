@@ -329,6 +329,7 @@ const LandingPage = () => {
         <div className="container">
           <div className="hero-text animate">
             <h1>Run your school<br /><span>without the chaos.</span></h1>
+            <img src="/skolo-logo-navy.svg" alt="Skolo — One platform. Whole school." style={{ height:56, objectFit:'contain', borderRadius:10, marginBottom:20 }} />
             <p>Skolo is an AI-powered school management platform built for schools in Lesotho and South Africa. Track fees, attendance, grades, and timetables — with smart insights that help you act before problems grow.</p>
             <div className="hero-buttons">
               <Link to="/request-demo" className="btn btn-primary">
