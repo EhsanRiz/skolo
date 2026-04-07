@@ -311,7 +311,7 @@ const LandingPage = () => {
       <nav className={`nav ${scrolled ? 'scrolled' : ''}`}>
         <div className="container">
           <a href="/" className="nav-logo" style={{ display:'flex', alignItems:'center', gap:8 }}>
-            <img src="/skolo-icon-navy.svg" alt="" style={{ height:30, width:30, borderRadius:6 }} />
+            <img src="/skolo-icon-white.svg" alt="" style={{ height:32, width:32, borderRadius:7 }} />
             skolo<span>.</span>
           </a>
           <div className="nav-links">
@@ -328,6 +328,7 @@ const LandingPage = () => {
       <section className="hero">
         <div className="container">
           <div className="hero-text animate">
+            <img src="/skolo-logo-navy.svg" alt="Skolo — One platform. Whole school." style={{ height:72, objectFit:'contain', marginBottom:24, borderRadius:12 }} />
             <h1>Run your school<br /><span>without the chaos.</span></h1>
             <p>Skolo is an AI-powered school management platform built for schools in Lesotho and South Africa. Track fees, attendance, grades, and timetables — with smart insights that help you act before problems grow.</p>
             <div className="hero-buttons">
@@ -676,6 +677,7 @@ const LandingPage = () => {
       {/* ═══════ FOOTER ═══════ */}
       <footer className="footer">
         <div className="container">
+          <img src="/skolo-icon-white.svg" alt="Skolo" style={{ height:36, width:36, borderRadius:8, marginBottom:12 }} />
           <p>&copy; 2026 4D Climate Solutions &middot; <a href="https://4dcs.co.za">4D Climate Solutions</a> &middot; Built in Lesotho, for Southern Africa.</p>
         </div>
       </footer>
