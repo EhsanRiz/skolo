@@ -310,9 +310,8 @@ const LandingPage = () => {
       {/* ═══════ NAV ═══════ */}
       <nav className={`nav ${scrolled ? 'scrolled' : ''}`}>
         <div className="container">
-          <a href="/" className="nav-logo" style={{ display:'flex', alignItems:'center', gap:8 }}>
-            <img src="/skolo-icon-white.svg" alt="" style={{ height:32, width:32, borderRadius:7 }} />
-            skolo<span>.</span>
+          <a href="/" className="nav-logo">
+            <img src="/skolo-logo-navy.svg" alt="Skolo — One platform. Whole school." style={{ height:44, objectFit:'contain', borderRadius:8 }} />
           </a>
           <div className="nav-links">
             <a href="#features">Features</a>
@@ -329,7 +328,6 @@ const LandingPage = () => {
         <div className="container">
           <div className="hero-text animate">
             <h1>Run your school<br /><span>without the chaos.</span></h1>
-            <img src="/skolo-logo-navy.svg" alt="Skolo — One platform. Whole school." style={{ height:56, objectFit:'contain', borderRadius:10, marginBottom:20 }} />
             <p>Skolo is an AI-powered school management platform built for schools in Lesotho and South Africa. Track fees, attendance, grades, and timetables — with smart insights that help you act before problems grow.</p>
             <div className="hero-buttons">
               <Link to="/request-demo" className="btn btn-primary">
