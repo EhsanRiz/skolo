@@ -1,0 +1,25 @@
+<svg width="280" height="88" viewBox="0 0 280 88" xmlns="http://www.w3.org/2000/svg">
+  <!-- Skolo Logo: Icon + Wordmark -->
+
+  <!-- Icon mark: navy rounded square -->
+  <rect x="0" y="0" width="88" height="88" rx="18" fill="#0f2044"/>
+
+  <!-- Blue accent bar at bottom of icon (clipped) -->
+  <clipPath id="iconClip">
+    <rect x="0" y="0" width="88" height="88" rx="18"/>
+  </clipPath>
+  <rect x="0" y="68" width="88" height="20" fill="#1d4ed8" clip-path="url(#iconClip)"/>
+
+  <!-- S letterform -->
+  <path d="M59 28 A15 15 0 0 0 29 28 C29 44 59 44 59 60 A15 15 0 0 1 29 60"
+        fill="none" stroke="#ffffff" stroke-width="7.5" stroke-linecap="round" clip-path="url(#iconClip)"/>
+
+  <!-- Wordmark "skolo" -->
+  <text x="107" y="62" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+        font-size="56" font-weight="800" fill="#0f2044" letter-spacing="-2">skolo</text>
+
+  <!-- Tagline with blue dot accent -->
+  <circle cx="107" cy="79" r="3" fill="#1d4ed8"/>
+  <text x="118" y="83" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
+        font-size="12" font-weight="400" fill="#64748b" letter-spacing="2">One platform. Whole school.</text>
+</svg>
