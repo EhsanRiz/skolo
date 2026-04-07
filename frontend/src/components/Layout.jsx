@@ -142,7 +142,7 @@ function NotificationBell({ user, school_id }) {
       </button>
 
       {open && (
-        <div style={{ position:'absolute', right:0, top:'calc(100% + 8px)', width:340, background:'#fff', borderRadius:14, boxShadow:'0 8px 32px rgba(0,0,0,.18)', zIndex:300, overflow:'hidden', border:'1px solid #e2e8f0' }}>
+        <div style={{ position:'absolute', left:0, bottom:'calc(100% + 8px)', width:340, background:'#fff', borderRadius:14, boxShadow:'0 8px 32px rgba(0,0,0,.18)', zIndex:300, overflow:'hidden', border:'1px solid #e2e8f0' }}>
           <div style={{ padding:'14px 16px 10px', display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:'1px solid #f1f5f9' }}>
             <div style={{ fontWeight:700, fontSize:14, color:'#0f172a' }}>Notifications</div>
             {notifs.some(n => !n.is_read) && (
