@@ -442,18 +442,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ═══════ SOCIAL PROOF STRIP ═══════ */}
-      <section className="proof-strip">
-        <div className="container">
-          <div className="proof-grid">
-            <div className="proof-item animate"><div className="proof-number">2</div><div className="proof-label">Countries</div></div>
-            <div className="proof-item animate delay-1"><div className="proof-number">500+</div><div className="proof-label">Learners managed</div></div>
-            <div className="proof-item animate delay-2"><div className="proof-number">99.9%</div><div className="proof-label">Uptime</div></div>
-            <div className="proof-item animate delay-3"><div className="proof-number">30 sec</div><div className="proof-label">Daily attendance</div></div>
-          </div>
-        </div>
-      </section>
-
       {/* ═══════ PAIN POINTS ═══════ */}
       <section className="pain">
         <div className="container">
