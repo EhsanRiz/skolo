@@ -61,15 +61,27 @@ router.get('/conversations', async (req, res) => {
       // Participants (names)
       const { data: parts } = await supabase
         .from('conversation_participants')
-        .select('user_id, role, users(full_name, role)')
+        .select('user_id, role, users(full_name, role, guardian_id)')
         .eq('conversation_id', conv.id)
 
-      conv.participants = (parts || []).map(p => ({
-        user_id: p.user_id,
-        name: p.users?.full_name,
-        role: p.users?.role,
-        conv_role: p.role
-      }))
+      conv.participants = []
+      for (const p of (parts || [])) {
+        const participant = {
+          user_id: p.user_id,
+          name: p.users?.full_name,
+          role: p.users?.role,
+          conv_role: p.role
+        }
+        // If participant is a parent, add their linked learner info
+        if (p.users?.role === 'parent' && p.users?.guardian_id) {
+          const { data: links } = await supabase
+            .from('learner_guardians')
+            .select('learners(first_name, last_name, classes(name, grades(name)))')
+            .eq('guardian_id', p.users.guardian_id)
+          participant.learners = (links || []).map(l => l.learners).filter(Boolean)
+        }
+        conv.participants.push(participant)
+      }
     }
 
     res.json({ conversations: conversations || [] })

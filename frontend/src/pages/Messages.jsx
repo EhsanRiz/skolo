@@ -105,6 +105,14 @@ export default function Messages() {
     return other?.role || ''
   }
 
+  function getConvLearnerInfo(conv) {
+    const other = conv.participants?.find(p => p.user_id !== user.id)
+    if (!other?.learners?.length) return null
+    return other.learners.map(l =>
+      `${l.first_name} ${l.last_name}${l.classes?.grades?.name ? ` · ${l.classes.grades.name} ${l.classes.name || ''}` : ''}`
+    ).join(', ')
+  }
+
   function formatTime(ts) {
     const d = new Date(ts)
     const now = new Date()
@@ -193,7 +201,12 @@ export default function Messages() {
           </div>
           <div>
             <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{getConvName(activeConv)}</div>
-            <div style={{ fontSize: 12, color: '#64748b', textTransform: 'capitalize' }}>{getConvRole(activeConv)}</div>
+            <div style={{ fontSize: 12, color: '#64748b', textTransform: 'capitalize' }}>
+              {getConvRole(activeConv)}
+              {getConvLearnerInfo(activeConv) && (
+                <span style={{ color: '#1d4ed8', marginLeft: 6 }}>· 👨‍🎓 {getConvLearnerInfo(activeConv)}</span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -327,6 +340,11 @@ export default function Messages() {
                     {conv.last_message ? formatTime(conv.last_message.created_at) : ''}
                   </div>
                 </div>
+                {getConvLearnerInfo(conv) && (
+                  <div style={{ fontSize: 11, color: '#1d4ed8', marginTop: 1, fontWeight: 500 }}>
+                    👨‍🎓 {getConvLearnerInfo(conv)}
+                  </div>
+                )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 3 }}>
                   <div style={{
                     fontSize: 13, color: '#64748b', whiteSpace: 'nowrap',

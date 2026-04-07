@@ -87,16 +87,42 @@ function NotificationBell({ user, school_id }) {
   const [open,    setOpen]    = useState(false)
   const [notifs,  setNotifs]  = useState([])
   const [unread,  setUnread]  = useState(0)
+  const [msgNotifs, setMsgNotifs] = useState([])
   const navigate = useNavigate()
   const ref = useRef()
   const api_ = { get: (url) => fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${url}`, { headers: { Authorization: `Bearer ${localStorage.getItem('sk_token')}` } }).then(r=>r.json()),
     patch: (url) => fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}${url}`, { method:'PATCH', headers: { Authorization: `Bearer ${localStorage.getItem('sk_token')}` } }).then(r=>r.json()) }
 
   const loadCount = async () => {
-    try { const data = await api_.get('/notifications/unread-count'); setUnread(data.count || 0) } catch {}
+    try {
+      const [nData, mData] = await Promise.all([
+        api_.get('/notifications/unread-count'),
+        api_.get('/messaging/unread-count')
+      ])
+      setUnread((nData.count || 0) + (mData.count || 0))
+    } catch {}
   }
   const loadAll = async () => {
-    try { const data = await api_.get('/notifications'); setNotifs(Array.isArray(data) ? data : []) } catch {}
+    try {
+      const [nData, mData] = await Promise.all([
+        api_.get('/notifications'),
+        api_.get('/messaging/conversations')
+      ])
+      setNotifs(Array.isArray(nData) ? nData : [])
+      // Convert unread conversations into notification-like items
+      const unreadConvs = (mData.conversations || []).filter(c => c.unread_count > 0).map(c => {
+        const other = c.participants?.find(p => p.user_id !== user?.id)
+        const learnerInfo = other?.learners?.length > 0
+          ? ` (${other.learners.map(l => l.first_name).join(', ')})`
+          : ''
+        return {
+          id: `msg-${c.id}`, title: `Message from ${other?.name || 'Parent'}${learnerInfo}`,
+          body: c.last_message?.body?.slice(0, 60) || '', link: '/messages',
+          is_read: false, created_at: c.last_message?.created_at || c.updated_at, _isMsg: true
+        }
+      })
+      setMsgNotifs(unreadConvs)
+    } catch {}
   }
   const markAllRead = async () => {
     await api_.patch('/notifications/mark-all-read')
@@ -150,9 +176,25 @@ function NotificationBell({ user, school_id }) {
             )}
           </div>
           <div style={{ maxHeight:360, overflowY:'auto' }}>
-            {notifs.length === 0 && (
+            {notifs.length === 0 && msgNotifs.length === 0 && (
               <div style={{ padding:'32px 16px', textAlign:'center', color:'#94a3b8', fontSize:13 }}>No notifications yet.</div>
             )}
+            {/* Unread messages first */}
+            {msgNotifs.map(n => (
+              <div key={n.id} onClick={() => { setOpen(false); navigate(n.link) }}
+                style={{ padding:'12px 16px', cursor:'pointer', background:'#eff6ff', borderBottom:'1px solid #f8fafc', transition:'background .1s' }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:8 }}>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontWeight:700, fontSize:13, color:'#0f172a', marginBottom:2 }}>
+                      <span style={{ marginRight:6 }}>💬</span>{n.title}
+                    </div>
+                    {n.body && <div style={{ fontSize:12, color:'#64748b', lineHeight:1.5, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{n.body}</div>}
+                  </div>
+                  <div style={{ fontSize:10, color:'#94a3b8', flexShrink:0, marginTop:2 }}>{timeAgo(n.created_at)}</div>
+                </div>
+              </div>
+            ))}
+            {/* Regular notifications */}
             {notifs.map(n => (
               <div key={n.id} onClick={() => handleClick(n)}
                 style={{ padding:'12px 16px', cursor:'pointer', background: n.is_read ? '#fff' : '#faf5ff', borderBottom:'1px solid #f8fafc', transition:'background .1s' }}>
@@ -168,9 +210,9 @@ function NotificationBell({ user, school_id }) {
             ))}
           </div>
           <div style={{ padding:'10px 16px', borderTop:'1px solid #f1f5f9', textAlign:'center' }}>
-            <button onClick={() => { navigate('/waivers'); setOpen(false) }}
-              style={{ fontSize:12, color:'#7c3aed', fontWeight:700, background:'none', border:'none', cursor:'pointer' }}>
-              View all waiver requests →
+            <button onClick={() => { navigate('/messages'); setOpen(false) }}
+              style={{ fontSize:12, color:'#1d4ed8', fontWeight:700, background:'none', border:'none', cursor:'pointer' }}>
+              View all messages →
             </button>
           </div>
         </div>
@@ -183,6 +225,23 @@ export default function Layout() {
   const { user, school, logout } = useAuth()
   const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [unreadMsgs, setUnreadMsgs] = useState(0)
+
+  // Poll unread messages
+  useEffect(() => {
+    const loadMsgCount = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/messaging/unread-count`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('sk_token')}` }
+        })
+        const data = await res.json()
+        setUnreadMsgs(data.count || 0)
+      } catch {}
+    }
+    loadMsgCount()
+    const iv = setInterval(loadMsgCount, 15000)
+    return () => clearInterval(iv)
+  }, [])
 
   // Close mobile menu on route change
   useEffect(() => { setMenuOpen(false) }, [location.pathname])
@@ -227,7 +286,14 @@ export default function Layout() {
       <nav style={{ flex:1, padding:'4px 12px', overflowY:'auto' }}>
         {NAV_ITEMS.filter(item => !item.roles || item.roles.includes(user?.role)).map(({ to, label, icon: Icon }) => (
           <NavLink key={to} to={to} end={to==='/'} className={({isActive}) => `nav-link${isActive?' active':''}`}>
-            <Icon />{label}
+            <Icon />
+            <span style={{ flex:1 }}>{label}</span>
+            {label === 'Messages' && unreadMsgs > 0 && (
+              <span style={{
+                background:'#dc2626', color:'#fff', fontSize:10, fontWeight:700,
+                borderRadius:10, padding:'1px 7px', minWidth:18, textAlign:'center'
+              }}>{unreadMsgs > 9 ? '9+' : unreadMsgs}</span>
+            )}
           </NavLink>
         ))}
       </nav>
