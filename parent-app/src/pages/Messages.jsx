@@ -10,6 +10,9 @@ export default function Messages() {
   const [newMsg, setNewMsg] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
+  const [showNewMsg, setShowNewMsg] = useState(false)
+  const [staff, setStaff] = useState([])
+  const [loadingStaff, setLoadingStaff] = useState(false)
   const messagesEndRef = useRef(null)
   const pollRef = useRef(null)
 
@@ -66,6 +69,31 @@ export default function Messages() {
     setSending(false)
   }
 
+  async function openNewMessage() {
+    setShowNewMsg(true)
+    setLoadingStaff(true)
+    try {
+      const { data } = await api.get('/messaging/staff')
+      setStaff(data.staff || [])
+    } catch {}
+    setLoadingStaff(false)
+  }
+
+  async function startConversation(staffMember) {
+    try {
+      const { data } = await api.post('/messaging/conversations', {
+        type: 'direct',
+        participant_ids: [staffMember.id]
+      })
+      setShowNewMsg(false)
+      const conv = data.conversation
+      // Add participant info so getConvName works
+      conv.participants = [{ user_id: staffMember.id, name: staffMember.full_name, role: staffMember.role }]
+      setActiveConv(conv)
+      loadConversations()
+    } catch {}
+  }
+
   function getConvName(conv) {
     if (conv.title) return conv.title
     // For direct messages, show the other person's name
@@ -87,6 +115,66 @@ export default function Messages() {
     }
     if (diff < 172800000) return 'Yesterday'
     return d.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })
+  }
+
+  function getRoleLabel(role) {
+    const labels = { admin: 'Admin', principal: 'Principal', bursar: 'Bursar', teacher: 'Teacher' }
+    return labels[role] || role
+  }
+
+  function getRoleColor(role) {
+    const colors = { admin: '#7c3aed', principal: '#0f766e', bursar: '#1d4ed8', teacher: '#c2410c' }
+    return colors[role] || '#64748b'
+  }
+
+  // Staff selection modal
+  if (showNewMsg) {
+    return (
+      <div style={{ maxWidth: 600, margin: '0 auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+          <button onClick={() => setShowNewMsg(false)} style={{
+            background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#1d4ed8', fontSize: 18
+          }}>&#8592;</button>
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', margin: 0 }}>New message</h1>
+        </div>
+        <p style={{ fontSize: 14, color: '#64748b', marginBottom: 16 }}>Select a staff member to message:</p>
+
+        {loadingStaff ? (
+          <div style={{ textAlign: 'center', padding: 40, color: '#94a3b8' }}>Loading...</div>
+        ) : staff.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: 40, color: '#94a3b8', fontSize: 14 }}>
+            No staff members available
+          </div>
+        ) : (
+          staff.map(s => (
+            <div key={s.id} onClick={() => startConversation(s)} style={{
+              display: 'flex', gap: 12, padding: '14px 16px', background: '#fff',
+              borderRadius: 12, border: '1px solid #e2e8f0', marginBottom: 8,
+              cursor: 'pointer', alignItems: 'center'
+            }}>
+              <div style={{
+                width: 42, height: 42, borderRadius: '50%', background: '#eff6ff',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontWeight: 700, color: '#1d4ed8', fontSize: 16, flexShrink: 0
+              }}>
+                {s.full_name.charAt(0).toUpperCase()}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, fontSize: 14, color: '#0f172a' }}>{s.full_name}</div>
+                <span style={{
+                  fontSize: 11, fontWeight: 600, color: getRoleColor(s.role),
+                  background: getRoleColor(s.role) + '15', padding: '2px 8px', borderRadius: 10,
+                  textTransform: 'capitalize', display: 'inline-block', marginTop: 2
+                }}>
+                  {getRoleLabel(s.role)}
+                </span>
+              </div>
+              <div style={{ color: '#cbd5e1', fontSize: 18 }}>&#8250;</div>
+            </div>
+          ))
+        )}
+      </div>
+    )
   }
 
   // Thread view
@@ -111,6 +199,11 @@ export default function Messages() {
 
         {/* Messages */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px', background: '#f8fafc' }}>
+          {messages.length === 0 && (
+            <div style={{ textAlign: 'center', padding: 40, color: '#94a3b8', fontSize: 14 }}>
+              Send a message to start the conversation
+            </div>
+          )}
           {messages.map(msg => {
             const isMine = msg.sender_id === user.id
             if (msg.is_system) return (
@@ -179,14 +272,23 @@ export default function Messages() {
 
   return (
     <div style={{ maxWidth: 600, margin: '0 auto' }}>
-      <h1 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', margin: '0 0 16px' }}>Messages</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', margin: 0 }}>Messages</h1>
+        <button onClick={openNewMessage} style={{
+          padding: '8px 16px', borderRadius: 20, border: 'none',
+          background: '#1d4ed8', color: '#fff', fontWeight: 600, fontSize: 13,
+          cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6
+        }}>
+          <span style={{ fontSize: 16, lineHeight: 1 }}>+</span> New message
+        </button>
+      </div>
 
       {conversations.length === 0 ? (
         <div style={{ textAlign: 'center', padding: 40 }}>
           <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.3 }}>&#128172;</div>
           <div style={{ color: '#94a3b8', fontSize: 14 }}>No messages yet</div>
-          <div style={{ color: '#94a3b8', fontSize: 13, marginTop: 4 }}>
-            Your school will reach out to you here
+          <div style={{ color: '#64748b', fontSize: 13, marginTop: 8 }}>
+            Tap <strong>"+ New message"</strong> to contact your school
           </div>
         </div>
       ) : (

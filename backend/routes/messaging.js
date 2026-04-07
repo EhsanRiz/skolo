@@ -303,6 +303,25 @@ router.get('/unread-count', async (req, res) => {
   }
 })
 
+// GET /messaging/staff — list staff for parents to contact
+router.get('/staff', async (req, res) => {
+  try {
+    if (req.user.role !== 'parent') return res.status(403).json({ error: 'Parents only' })
+
+    const { data: staff } = await supabase
+      .from('users')
+      .select('id, full_name, role')
+      .eq('school_id', req.user.school_id)
+      .eq('is_active', true)
+      .neq('role', 'parent')
+      .order('full_name')
+
+    res.json({ staff: staff || [] })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 // GET /messaging/parents — list parents for new conversation (staff only)
 router.get('/parents', async (req, res) => {
   try {
