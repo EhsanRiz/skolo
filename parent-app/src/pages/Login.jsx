@@ -29,15 +29,10 @@ export default function Login() {
       <div style={{
         background: '#0f2044', padding: '40px 20px 32px', textAlign: 'center', color: '#fff'
       }}>
-        <div style={{
-          width: 56, height: 56, borderRadius: 14, background: 'rgba(255,255,255,0.15)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px',
-          fontSize: 24
-        }}>
-          <svg width="28" height="28" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
-          </svg>
-        </div>
+        <img src="/skolo-logo.png" alt="Skolo" style={{
+          height: 80, objectFit: 'contain', margin: '0 auto 12px', display: 'block',
+          filter: 'brightness(0) invert(1)', opacity: 0.95
+        }} />
         <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>Skolo Parent</h1>
         <p style={{ fontSize: 13, opacity: 0.7, marginTop: 4 }}>Stay connected with your child's school</p>
       </div>
