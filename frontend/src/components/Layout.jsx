@@ -158,17 +158,17 @@ function NotificationBell({ user, school_id }) {
   return (
     <div ref={ref} style={{ position:'relative' }}>
       <button onClick={() => { setOpen(o => !o); if (unread > 0) markAllRead() }}
-        style={{ position:'relative', background:'none', border:'none', cursor:'pointer', color:'rgba(255,255,255,0.7)', padding:6, display:'flex', alignItems:'center', borderRadius:8, transition:'background .15s' }}>
+        style={{ position:'relative', background:'none', border:'none', cursor:'pointer', color:'#64748b', padding:6, display:'flex', alignItems:'center', borderRadius:8, transition:'background .15s' }}>
         <BellIcon />
         {unread > 0 && (
-          <span style={{ position:'absolute', top:2, right:2, width:16, height:16, background:'#dc2626', borderRadius:20, fontSize:9, fontWeight:800, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #0f2044' }}>
+          <span style={{ position:'absolute', top:2, right:2, width:16, height:16, background:'#dc2626', borderRadius:20, fontSize:9, fontWeight:800, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #fff' }}>
             {unread > 9 ? '9+' : unread}
           </span>
         )}
       </button>
 
       {open && (
-        <div style={{ position:'absolute', left:0, bottom:'calc(100% + 8px)', width:340, background:'#fff', borderRadius:14, boxShadow:'0 8px 32px rgba(0,0,0,.18)', zIndex:300, overflow:'hidden', border:'1px solid #e2e8f0' }}>
+        <div style={{ position:'absolute', right:0, top:'calc(100% + 8px)', width:340, background:'#fff', borderRadius:14, boxShadow:'0 8px 32px rgba(0,0,0,.18)', zIndex:300, overflow:'hidden', border:'1px solid #e2e8f0' }}>
           <div style={{ padding:'14px 16px 10px', display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:'1px solid #f1f5f9' }}>
             <div style={{ fontWeight:700, fontSize:14, color:'#0f172a' }}>Notifications</div>
             {notifs.some(n => !n.is_read) && (
@@ -300,11 +300,10 @@ export default function Layout() {
 
       {/* User footer */}
       <div style={{ padding:'16px 20px', borderTop:'1px solid rgba(255,255,255,0.08)' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:1 }}>
+        <div style={{ marginBottom:1 }}>
           <div style={{ fontSize:13, fontWeight:600, color:'rgba(255,255,255,0.8)' }}>
             {user?.full_name}
           </div>
-          <NotificationBell user={user} />
         </div>
         <div style={{ fontSize:11, color:'rgba(255,255,255,0.4)', marginBottom:10 }}>
           {user?.role} · {sym} {code}
@@ -385,6 +384,7 @@ export default function Layout() {
               {school?.name || '—'}
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+              <NotificationBell user={user} />
               <div style={{ fontSize:12, fontWeight:600, color:'#64748b',
                 background:'#f1f5f9', padding:'5px 12px', borderRadius:20 }}>
                 {sym} {code} · {user?.role}
