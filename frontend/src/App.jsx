@@ -23,6 +23,7 @@ import SuperAdmin from './pages/SuperAdmin'
 import SuperAdminLogin from './pages/SuperAdminLogin'
 import LandingPage from './pages/LandingPage'
 import RequestDemo from './pages/RequestDemo'
+import Messages from './pages/Messages'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -79,6 +80,7 @@ export default function App() {
             <Route path="fees"          element={<Fees />} />
             <Route path="events"        element={<Events />} />
             <Route path="announcements" element={<Announcements />} />
+            <Route path="messages" element={<Messages />} />
             <Route path="settings" element={<Settings />} />
           </Route>
 
