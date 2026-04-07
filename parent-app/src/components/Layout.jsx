@@ -80,6 +80,13 @@ export default function Layout() {
                   <div style={{ fontWeight: 600, color: '#0f172a', fontSize: 14 }}>{user?.full_name}</div>
                   <div style={{ color: '#64748b', fontSize: 12 }}>{user?.email}</div>
                 </div>
+                <button onClick={() => { setShowMenu(false); navigate('/profile') }} style={{
+                  width: '100%', padding: '12px 16px', border: 'none', background: 'none',
+                  color: '#0f172a', textAlign: 'left', cursor: 'pointer', fontSize: 14, fontWeight: 500,
+                  borderBottom: '1px solid #e2e8f0'
+                }}>
+                  Profile & Settings
+                </button>
                 <button onClick={handleLogout} style={{
                   width: '100%', padding: '12px 16px', border: 'none', background: 'none',
                   color: '#dc2626', textAlign: 'left', cursor: 'pointer', fontSize: 14, fontWeight: 500

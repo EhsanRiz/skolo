@@ -11,6 +11,9 @@ import Attendance from './pages/Attendance'
 import Announcements from './pages/Announcements'
 import Events from './pages/Events'
 import Messages from './pages/Messages'
+import Grades from './pages/Grades'
+import Timetable from './pages/Timetable'
+import Profile from './pages/Profile'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -44,6 +47,9 @@ export default function App() {
         <Route path="announcements" element={<Announcements />} />
         <Route path="events" element={<Events />} />
         <Route path="messages" element={<Messages />} />
+        <Route path="grades" element={<Grades />} />
+        <Route path="timetable" element={<Timetable />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

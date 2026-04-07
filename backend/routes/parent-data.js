@@ -1,4 +1,6 @@
 const express = require('express')
+const bcrypt = require('bcryptjs')
+const PDFDoc = require('pdfkit')
 const router = express.Router()
 const auth = require('../middleware/auth')
 const supabase = require('../lib/supabase')
@@ -329,6 +331,321 @@ router.get('/events', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
+})
+
+// ─── Helper: get parent's linked learner IDs ─────────────────
+async function getParentLearnerIds(guardian_id) {
+  const { data: links } = await supabase
+    .from('learner_guardians').select('learner_id').eq('guardian_id', guardian_id)
+  return (links || []).map(l => l.learner_id)
+}
+
+// ─── Helper: validate learner belongs to parent ───────────────
+async function validateLearnerOwnership(guardian_id, learner_id) {
+  const ids = await getParentLearnerIds(guardian_id)
+  return ids.includes(learner_id)
+}
+
+// GET /parent-data/grades — exam results for parent's children
+router.get('/grades', async (req, res) => {
+  try {
+    const { guardian_id, school_id } = req.user
+    const year = parseInt(req.query.year) || new Date().getFullYear()
+
+    const learnerIds = await getParentLearnerIds(guardian_id)
+    if (learnerIds.length === 0) return res.json({ learners: [] })
+
+    const { data: learners } = await supabase
+      .from('learners')
+      .select('id, first_name, last_name, reference_no, class_id, classes(name, grades(name))')
+      .in('id', learnerIds).eq('is_active', true)
+
+    // Get school grade boundaries
+    const { data: school } = await supabase
+      .from('schools').select('grade_boundaries').eq('id', school_id).single()
+
+    for (const learner of (learners || [])) {
+      const { data: results } = await supabase
+        .from('exam_results')
+        .select('id, subject, mark, term, year')
+        .eq('learner_id', learner.id).eq('school_id', school_id).eq('year', year)
+        .order('subject')
+
+      // Group by term
+      const byTerm = {}
+      for (const r of (results || [])) {
+        if (!byTerm[r.term]) byTerm[r.term] = []
+        byTerm[r.term].push(r)
+      }
+
+      // Calculate averages per term
+      const terms = {}
+      for (const [term, entries] of Object.entries(byTerm)) {
+        const marks = entries.map(e => e.mark).filter(m => m != null)
+        terms[term] = {
+          results: entries,
+          average: marks.length > 0 ? Math.round(marks.reduce((a, b) => a + b, 0) / marks.length) : null,
+          subject_count: entries.length
+        }
+      }
+
+      learner.terms = terms
+    }
+
+    res.json({ learners: learners || [], year, grade_boundaries: school?.grade_boundaries })
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
+// GET /parent-data/report-card/:learner_id — PDF report card for parent's child
+router.get('/report-card/:learner_id', async (req, res) => {
+  try {
+    const { guardian_id, school_id } = req.user
+    const learnerId = req.params.learner_id
+    const { term, year } = req.query
+
+    if (!term || !year) return res.status(400).json({ error: 'term and year required' })
+
+    // Validate ownership
+    const isOwner = await validateLearnerOwnership(guardian_id, learnerId)
+    if (!isOwner) return res.status(403).json({ error: 'Not your child' })
+
+    // Redirect to the report-cards route handler by making an internal-style call
+    // We'll replicate the PDF generation inline (same as report-cards.js)
+    const termNum = parseInt(term), yearNum = parseInt(year)
+
+    const { data: learner } = await supabase
+      .from('learners')
+      .select('*, classes(name, grades(name)), schools(id, name, phone, email, address, logo_url, grade_boundaries, countries(currency_symbol))')
+      .eq('id', learnerId).eq('school_id', school_id).single()
+
+    if (!learner) return res.status(404).json({ error: 'Learner not found' })
+
+    const { data: examResults } = await supabase
+      .from('exam_results').select('subject, mark')
+      .eq('learner_id', learnerId).eq('term', termNum).eq('year', yearNum).eq('school_id', school_id)
+
+    // Attendance for term
+    const termRanges = {
+      1: { s: `${yearNum}-01-01`, e: `${yearNum}-03-31` },
+      2: { s: `${yearNum}-04-01`, e: `${yearNum}-06-30` },
+      3: { s: `${yearNum}-07-01`, e: `${yearNum}-09-30` },
+      4: { s: `${yearNum}-10-01`, e: `${yearNum}-12-31` }
+    }
+    const range = termRanges[termNum]
+    let attendance = { total: 0, present: 0, absent: 0, late: 0, excused: 0, rate: 0 }
+    if (range) {
+      const { data: att } = await supabase.from('attendance').select('status')
+        .eq('learner_id', learnerId).gte('attend_date', range.s).lte('attend_date', range.e)
+      const recs = att || []
+      attendance.total = recs.length
+      attendance.present = recs.filter(r => r.status === 'present').length
+      attendance.absent = recs.filter(r => r.status === 'absent').length
+      attendance.late = recs.filter(r => r.status === 'late').length
+      attendance.excused = recs.filter(r => r.status === 'excused').length
+      attendance.rate = attendance.total > 0 ? Math.round(((attendance.present + attendance.late) / attendance.total) * 100) : 0
+    }
+
+    const results = (examResults || []).sort((a, b) => a.subject.localeCompare(b.subject))
+    const sch = learner.schools
+    const gb = sch?.grade_boundaries
+    const marks = results.map(r => r.mark)
+    const avg = marks.length > 0 ? Math.round(marks.reduce((a, b) => a + b, 0) / marks.length) : 0
+
+    const getGrade = (mark) => {
+      if (gb && Array.isArray(gb) && gb.length > 0) {
+        for (const b of gb) { if (mark >= b.min) return b.grade }
+        return 'F'
+      }
+      if (mark >= 80) return 'A'; if (mark >= 70) return 'B'; if (mark >= 60) return 'C'; if (mark >= 50) return 'D'; return 'F'
+    }
+
+    // Build PDF
+    const doc = new PDFDoc({ size: 'A4', margin: 40 })
+    res.setHeader('Content-Type', 'application/pdf')
+    res.setHeader('Content-Disposition', `inline; filename="report-card-${learner.first_name}-${learner.last_name}.pdf"`)
+    doc.pipe(res)
+
+    const W = doc.page.width - 80, navy = '#0f2044', darkGrey = '#64748b', lightGrey = '#f1f5f9'
+
+    // Header
+    doc.fillColor(navy).fontSize(18).font('Helvetica-Bold').text(sch?.name || 'School', 50, 50)
+    doc.fillColor(darkGrey).fontSize(9).font('Helvetica')
+       .text([sch?.address, sch?.phone, sch?.email].filter(Boolean).join('  ·  '), 50, 75)
+
+    // Title bar
+    doc.rect(40, 100, W, 36).fill(navy)
+    doc.fillColor('#fff').fontSize(20).font('Helvetica-Bold').text('REPORT CARD', 0, 107, { align: 'center', width: doc.page.width })
+
+    // Learner info
+    let y = 155
+    const field = (label, val, x, yy) => {
+      doc.fillColor(darkGrey).fontSize(8).font('Helvetica-Bold').text(label.toUpperCase(), x, yy)
+      doc.fillColor('#0f172a').fontSize(10).font('Helvetica').text(val || '—', x, yy + 11)
+    }
+    field('Name', `${learner.first_name} ${learner.last_name}`, 50, y)
+    field('Term / Year', `Term ${termNum} · ${yearNum}`, 300, y)
+    y += 35
+    field('Grade / Class', `${learner.classes?.grades?.name || ''} ${learner.classes?.name || ''}`, 50, y)
+    field('Reference', learner.reference_no, 300, y)
+
+    // Results table
+    y += 50
+    doc.fillColor(navy).fontSize(12).font('Helvetica-Bold').text('ACADEMIC RESULTS', 50, y)
+    y += 20
+    const cw = [W * 0.6, W * 0.2, W * 0.2]
+
+    doc.rect(50, y, cw[0], 18).fill(navy)
+    doc.rect(50 + cw[0], y, cw[1], 18).fill(navy)
+    doc.rect(50 + cw[0] + cw[1], y, cw[2], 18).fill(navy)
+    doc.fillColor('#fff').fontSize(9).font('Helvetica-Bold')
+    doc.text('Subject', 55, y + 4, { width: cw[0] - 10 })
+    doc.text('Mark (%)', 55 + cw[0], y + 4, { width: cw[1] - 10, align: 'center' })
+    doc.text('Grade', 55 + cw[0] + cw[1], y + 4, { width: cw[2] - 10, align: 'center' })
+    y += 18
+
+    results.forEach((r, i) => {
+      doc.rect(50, y, W, 18).fill(i % 2 === 0 ? '#fff' : lightGrey)
+      doc.fillColor('#0f172a').fontSize(9).font('Helvetica')
+      doc.text(r.subject, 55, y + 4, { width: cw[0] - 10 })
+      doc.text(String(r.mark), 55 + cw[0], y + 4, { width: cw[1] - 10, align: 'center' })
+      doc.text(getGrade(r.mark), 55 + cw[0] + cw[1], y + 4, { width: cw[2] - 10, align: 'center' })
+      y += 18
+    })
+
+    if (results.length > 0) {
+      doc.rect(50, y, W, 18).fill(navy)
+      doc.fillColor('#fff').fontSize(9).font('Helvetica-Bold')
+      doc.text('AVERAGE', 55, y + 4, { width: cw[0] - 10 })
+      doc.text(String(avg), 55 + cw[0], y + 4, { width: cw[1] - 10, align: 'center' })
+      doc.text(getGrade(avg), 55 + cw[0] + cw[1], y + 4, { width: cw[2] - 10, align: 'center' })
+    }
+
+    // Attendance
+    y += 40
+    doc.fillColor(navy).fontSize(11).font('Helvetica-Bold').text('ATTENDANCE', 50, y)
+    y += 18
+    doc.fillColor(darkGrey).fontSize(9).font('Helvetica')
+    doc.text(`Present: ${attendance.present}   Absent: ${attendance.absent}   Late: ${attendance.late}   Excused: ${attendance.excused}   Rate: ${attendance.rate}%`, 50, y)
+
+    // Footer
+    doc.fillColor(darkGrey).fontSize(7).font('Helvetica')
+       .text('Generated by Skolo', 0, doc.page.height - 30, { align: 'center', width: doc.page.width })
+
+    doc.end()
+  } catch (err) {
+    console.error('Parent report card error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// GET /parent-data/timetable/:learner_id — class timetable for parent's child
+router.get('/timetable/:learner_id', async (req, res) => {
+  try {
+    const { guardian_id, school_id } = req.user
+    const learnerId = req.params.learner_id
+
+    const isOwner = await validateLearnerOwnership(guardian_id, learnerId)
+    if (!isOwner) return res.status(403).json({ error: 'Not your child' })
+
+    // Get learner's class
+    const { data: learner } = await supabase
+      .from('learners')
+      .select('id, first_name, last_name, class_id, classes(id, name, grades(name))')
+      .eq('id', learnerId).single()
+
+    if (!learner?.class_id) return res.json({ learner, slots: [], periods: [] })
+
+    // Get teacher_classes for this class
+    const { data: tcs } = await supabase
+      .from('teacher_classes')
+      .select('id, subject, teachers(full_name)')
+      .eq('class_id', learner.class_id).eq('school_id', school_id)
+
+    const tcIds = (tcs || []).map(tc => tc.id)
+    let slots = []
+    if (tcIds.length > 0) {
+      const { data } = await supabase
+        .from('timetable')
+        .select('id, teacher_class_id, day_of_week, period_number, room')
+        .in('teacher_class_id', tcIds)
+        .order('day_of_week').order('period_number')
+
+      // Enrich slots with subject/teacher
+      const tcMap = {}
+      for (const tc of tcs) tcMap[tc.id] = tc
+      slots = (data || []).map(s => ({
+        ...s,
+        subject: tcMap[s.teacher_class_id]?.subject,
+        teacher: tcMap[s.teacher_class_id]?.teachers?.full_name
+      }))
+    }
+
+    // Get school period config
+    const { data: school } = await supabase
+      .from('schools').select('periods').eq('id', school_id).single()
+
+    res.json({ learner, slots, periods: school?.periods || [] })
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
+// PATCH /parent-data/profile — update parent's guardian info
+router.patch('/profile', async (req, res) => {
+  try {
+    const { guardian_id } = req.user
+    const { first_name, last_name, phone, email } = req.body
+
+    const updates = {}
+    if (first_name) updates.first_name = first_name.trim()
+    if (last_name) updates.last_name = last_name.trim()
+    if (phone !== undefined) updates.phone = phone.trim()
+    if (email !== undefined) updates.email = email.trim()
+
+    if (Object.keys(updates).length === 0) return res.status(400).json({ error: 'No fields to update' })
+
+    // Update guardian record
+    const { data: guardian, error } = await supabase
+      .from('guardians').update(updates).eq('id', guardian_id).select().single()
+
+    if (error) throw error
+
+    // Also update user record if name/email changed
+    const userUpdates = {}
+    if (updates.first_name || updates.last_name) {
+      const g = guardian
+      userUpdates.full_name = `${g.first_name} ${g.last_name}`
+    }
+    if (updates.email) userUpdates.email = updates.email
+
+    if (Object.keys(userUpdates).length > 0) {
+      await supabase.from('users').update(userUpdates).eq('id', req.user.id)
+    }
+
+    res.json({ guardian })
+  } catch (err) { res.status(500).json({ error: err.message }) }
+})
+
+// POST /parent-data/change-password — change parent's password
+router.post('/change-password', async (req, res) => {
+  try {
+    const { current_password, new_password } = req.body
+
+    if (!current_password || !new_password) return res.status(400).json({ error: 'Both passwords required' })
+    if (new_password.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' })
+
+    // Get current hash
+    const { data: user } = await supabase
+      .from('users').select('password_hash').eq('id', req.user.id).single()
+
+    if (!user) return res.status(404).json({ error: 'User not found' })
+
+    const valid = await bcrypt.compare(current_password, user.password_hash)
+    if (!valid) return res.status(400).json({ error: 'Current password is incorrect' })
+
+    const hash = await bcrypt.hash(new_password, 10)
+    await supabase.from('users').update({ password_hash: hash }).eq('id', req.user.id)
+
+    res.json({ success: true })
+  } catch (err) { res.status(500).json({ error: err.message }) }
 })
 
 module.exports = router

@@ -64,10 +64,12 @@ export default function Dashboard() {
       ))}
 
       {/* Quick links */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
-        <QuickLink to="/fees" icon="&#128176;" label="View Fees" />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 20 }}>
+        <QuickLink to="/fees" icon="&#128176;" label="Fees" />
         <QuickLink to="/attendance" icon="&#9745;" label="Attendance" />
+        <QuickLink to="/grades" icon="&#128202;" label="Grades" />
         <QuickLink to="/announcements" icon="&#128227;" label="News" />
+        <QuickLink to="/timetable" icon="&#128197;" label="Timetable" />
         <QuickLink to="/messages" icon="&#128172;" label="Messages" badge={data?.unread_messages} />
       </div>
 
