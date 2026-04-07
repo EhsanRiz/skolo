@@ -311,7 +311,7 @@ const LandingPage = () => {
       <nav className={`nav ${scrolled ? 'scrolled' : ''}`}>
         <div className="container">
           <a href="/" className="nav-logo">
-            <img src="/skolo-logo-navy.svg" alt="Skolo — One platform. Whole school." style={{ height:44, objectFit:'contain', borderRadius:8 }} />
+            <img src="/skolo-logo-navy.svg" alt="Skolo — One platform. Whole school." style={{ height:88, objectFit:'contain', borderRadius:10 }} />
           </a>
           <div className="nav-links">
             <a href="#features">Features</a>
