@@ -507,7 +507,7 @@ export default function Fees() {
                 title="Print / view receipt"
                 style={{ display:'inline-flex', alignItems:'center', justifyContent:'center',
                   width:26, height:26, border:'1px solid #bfdbfe', borderRadius:6,
-                  background:'#eff6ff', color:'#1d4ed8', cursor:'pointer', flexShrink:0 }}>
+                  background:'#eff6ff', color:'#0f2044', cursor:'pointer', flexShrink:0 }}>
                 <ReceiptIcon />
               </button>
             )}

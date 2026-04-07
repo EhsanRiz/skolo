@@ -36,7 +36,7 @@ const CSS = `
 .demo-dot {
   width: 8px;
   height: 8px;
-  background: #1d4ed8;
+  background: #0f2044;
   border-radius: 50%;
   display: inline-block;
 }
@@ -121,7 +121,7 @@ const CSS = `
 .demo-input:focus,
 .demo-textarea:focus,
 .demo-select:focus {
-  border-color: #1d4ed8;
+  border-color: #0f2044;
   box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
 }
 
@@ -174,7 +174,7 @@ const CSS = `
 }
 
 .demo-footer a {
-  color: #1d4ed8;
+  color: #0f2044;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.15s;

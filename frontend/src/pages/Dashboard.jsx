@@ -394,7 +394,7 @@ function TeacherDashboard() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     {isNow && <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#2563eb', animation: 'pulse 2s infinite', flexShrink: 0 }} />}
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: 13, color: isNow ? '#1d4ed8' : '#0f172a' }}>
+                      <div style={{ fontWeight: 600, fontSize: 13, color: isNow ? '#0f2044' : '#0f172a' }}>
                         {p.label}
                         <span style={{ fontWeight: 400, fontSize: 11, color: '#94a3b8', marginLeft: 8 }}>{p.start}–{p.end}</span>
                       </div>

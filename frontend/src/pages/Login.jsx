@@ -32,7 +32,7 @@ const CSS = `
 }
 .chalk { position:absolute; color:rgba(255,255,255,0.82); font-family:'Courier New',monospace; pointer-events:none; user-select:none; letter-spacing:1px; text-shadow:0 0 8px rgba(255,255,255,0.15); animation:chalkFade 9s ease-in-out infinite; }
 .li { width:100%; padding:11px 14px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:14px; outline:none; margin-bottom:16px; box-sizing:border-box; font-family:inherit; transition:border-color .15s,box-shadow .15s; }
-.li:focus { border-color:#1d4ed8; box-shadow:0 0 0 3px rgba(29,78,216,.12); }
+.li:focus { border-color:#0f2044; box-shadow:0 0 0 3px rgba(15,32,68,.12); }
 `
 
 export default function Login() {

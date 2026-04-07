@@ -16,7 +16,7 @@ const GRADE_SYMBOL = mark => {
   return 'F'
 }
 const GRADE_COLOR = sym => ({
-  A: '#15803d', B: '#1d4ed8', C: '#ca8a04', D: '#ea580c', F: '#dc2626', '—': '#94a3b8'
+  A: '#15803d', B: '#2563eb', C: '#ca8a04', D: '#ea580c', F: '#dc2626', '—': '#94a3b8'
 }[sym] || '#94a3b8')
 
 const DEFAULT_SUBJECTS = [

@@ -70,7 +70,7 @@ export default function Register() {
         <style>{CSS}</style>
         <div style={{
           minHeight: '100vh',
-          background: 'linear-gradient(160deg, #1a3a6b 0%, #1d4ed8 50%, #1e40af 100%)',
+          background: 'linear-gradient(160deg, #1a3a6b 0%, #0f2044 50%, #1e40af 100%)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px'
         }}>
           <div style={{
@@ -79,7 +79,7 @@ export default function Register() {
             boxShadow: '0 32px 80px rgba(0,0,0,0.25)',
             animation: 'fadeIn 0.5s ease both'
           }}>
-            <div style={{ fontSize: 28, fontWeight: 800, color: '#1d4ed8', letterSpacing: '-0.5px', marginBottom: 12 }}>Skolo</div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: '#0f2044', letterSpacing: '-0.5px', marginBottom: 12 }}>Skolo</div>
             <div style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', marginBottom: 8 }}>Registration is by invite only</div>
             <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, marginBottom: 24 }}>
               To register your school on Skolo, you need an invite from the platform admin. If you already have an account, you can sign in below.
@@ -100,7 +100,7 @@ export default function Register() {
         <style>{CSS}</style>
         <div style={{
           minHeight: '100vh',
-          background: 'linear-gradient(160deg, #1a3a6b 0%, #1d4ed8 50%, #1e40af 100%)',
+          background: 'linear-gradient(160deg, #1a3a6b 0%, #0f2044 50%, #1e40af 100%)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px'
         }}>
           <div style={{
@@ -109,7 +109,7 @@ export default function Register() {
             boxShadow: '0 32px 80px rgba(0,0,0,0.25)',
             animation: 'fadeIn 0.5s ease both'
           }}>
-            <div style={{ fontSize: 28, fontWeight: 800, color: '#1d4ed8', letterSpacing: '-0.5px', marginBottom: 12 }}>Skolo</div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: '#0f2044', letterSpacing: '-0.5px', marginBottom: 12 }}>Skolo</div>
             <div style={{ fontSize: 17, fontWeight: 700, color: '#dc2626', marginBottom: 8 }}>Invalid Invite Link</div>
             <div style={{ fontSize: 14, color: '#64748b', lineHeight: 1.6, marginBottom: 24 }}>
               {error || 'This invite link is not valid. It may have expired or already been used. Please contact the platform admin for a new invite.'}
@@ -126,7 +126,7 @@ export default function Register() {
   // Still validating
   if (validating) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #1a3a6b 0%, #1d4ed8 50%, #1e40af 100%)' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #1a3a6b 0%, #0f2044 50%, #1e40af 100%)' }}>
         <div style={{ textAlign: 'center', color: '#fff' }}>
           <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.5px' }}>Skolo</div>
           <div style={{ fontSize: 14, marginTop: 8, opacity: 0.7 }}>Verifying your invite...</div>
@@ -144,7 +144,7 @@ export default function Register() {
       <style>{CSS}</style>
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(160deg, #1a3a6b 0%, #1d4ed8 50%, #1e40af 100%)',
+        background: 'linear-gradient(160deg, #1a3a6b 0%, #0f2044 50%, #1e40af 100%)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px'
       }}>
         <div style={{
@@ -154,7 +154,7 @@ export default function Register() {
           animation: 'fadeIn 0.5s ease both'
         }}>
           <div style={{ marginBottom: 28 }}>
-            <div style={{ fontSize: 28, fontWeight: 800, color: '#1d4ed8', letterSpacing: '-0.5px' }}>Skolo</div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: '#0f2044', letterSpacing: '-0.5px' }}>Skolo</div>
             <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 3 }}>One platform. Whole school.</div>
           </div>
           <div style={{ fontSize: 19, fontWeight: 800, color: '#0f172a', marginBottom: 22 }}>Register your school</div>
@@ -215,7 +215,7 @@ export default function Register() {
 
           <div style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: '#94a3b8' }}>
             Already registered?{' '}
-            <Link to="/login" style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>Sign in</Link>
+            <Link to="/login" style={{ color: '#0f2044', fontWeight: 700, textDecoration: 'none' }}>Sign in</Link>
           </div>
 
           {/* 4DCS branding */}

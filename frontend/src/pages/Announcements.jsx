@@ -64,7 +64,7 @@ export default function Announcements() {
                 <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 10 }}>
                   {new Date(a.created_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
                   {' · '}{a.target === 'all' ? 'All parents' : a.target}
-                  {a.send_sms && <span style={{ marginLeft: 8, background: '#dbeafe', color: '#1d4ed8', padding: '1px 8px', borderRadius: 10, fontSize: 11, fontWeight: 600 }}>SMS</span>}
+                  {a.send_sms && <span style={{ marginLeft: 8, background: '#dbeafe', color: '#0f2044', padding: '1px 8px', borderRadius: 10, fontSize: 11, fontWeight: 600 }}>SMS</span>}
                 </div>
                 <div style={{ fontSize: 14, color: '#374151', lineHeight: 1.6 }}>{a.body}</div>
               </div>
@@ -92,7 +92,7 @@ export default function Announcements() {
                 <option value="class">Specific class</option>
               </select>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, padding: '12px', background: '#f8fafc', borderRadius: 9 }}>
-                <input type="checkbox" id="sms" name="send_sms" checked={form.send_sms} onChange={hf} style={{ width: 16, height: 16, accentColor: '#1d4ed8' }} />
+                <input type="checkbox" id="sms" name="send_sms" checked={form.send_sms} onChange={hf} style={{ width: 16, height: 16, accentColor: '#0f2044' }} />
                 <label htmlFor="sms" style={{ fontSize: 14, color: '#374151', cursor: 'pointer', fontWeight: 500 }}>
                   Also send as SMS to parents
                   <span style={{ display: 'block', fontSize: 12, color: '#94a3b8', fontWeight: 400 }}>Africa's Talking integration — activates in next build step</span>

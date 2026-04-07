@@ -609,7 +609,7 @@ export default function Settings() {
                     <tr key={u.id}>
                       <td style={{...t.td,fontWeight:600}}>{u.full_name}{isSelf&&<span style={{marginLeft:8,fontSize:11,color:'#94a3b8'}}>(you)</span>}</td>
                       <td style={t.td}>{u.email}</td>
-                      <td style={t.td}><span style={{background:'#dbeafe',color:'#1d4ed8',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>{u.role}</span></td>
+                      <td style={t.td}><span style={{background:'#dbeafe',color:'#0f2044',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>{u.role}</span></td>
                       <td style={t.td}>
                         {u.password_set === false
                           ? <span style={{background:'#fef9c3',color:'#a16207',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>⏳ Invite pending</span>
@@ -727,7 +727,7 @@ export default function Settings() {
                               ) : (
                                 <button disabled={inviting===g.id||!g.email}
                                   title={!g.email?'No email on file':''}
-                                  style={{...t.btn.ghost,padding:'5px 12px',fontSize:12,opacity:(!g.email)?.4:1,cursor:(!g.email)?'not-allowed':'pointer',border:'1px solid #1d4ed8',color:'#1d4ed8',fontWeight:600}}
+                                  style={{...t.btn.ghost,padding:'5px 12px',fontSize:12,opacity:(!g.email)?.4:1,cursor:(!g.email)?'not-allowed':'pointer',border:'1px solid #0f2044',color:'#0f2044',fontWeight:600}}
                                   onClick={async()=>{
                                     setInviting(g.id)
                                     try {
@@ -1252,7 +1252,7 @@ function TimetableTab({ school, refreshSchool, toast }) {
                                 const tc = s.teacher_classes
                                 return (
                                   <div key={s.id} style={{ background: '#eff6ff', borderRadius: 8, padding: '6px 8px', marginBottom: 4, position: 'relative' }}>
-                                    <div style={{ fontWeight: 600, fontSize: 12, color: '#1d4ed8' }}>
+                                    <div style={{ fontWeight: 600, fontSize: 12, color: '#0f2044' }}>
                                       {tc?.classes?.grades?.name} {tc?.classes?.name}
                                     </div>
                                     <div style={{ fontSize: 11, color: '#64748b' }}>

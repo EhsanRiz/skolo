@@ -3,7 +3,7 @@ import { IconTrash, t } from '../components/ui'
 import api from '../lib/api'
 
 const TYPE_COLORS = {
-  academic: { bg: '#dbeafe', color: '#1d4ed8', dot: '#2563eb' },
+  academic: { bg: '#dbeafe', color: '#0f2044', dot: '#2563eb' },
   sports:   { bg: '#dcfce7', color: '#15803d', dot: '#16a34a' },
   meeting:  { bg: '#fef9c3', color: '#a16207', dot: '#ca8a04' },
   holiday:  { bg: '#fce7f3', color: '#be185d', dot: '#db2777' },

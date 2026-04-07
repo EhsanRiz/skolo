@@ -15,7 +15,7 @@ const LandingPage = () => {
         --navy: #0f2044;
         --navy-light: #1a3160;
         --blue: #2563eb;
-        --blue-dark: #1d4ed8;
+        --blue-dark: #0f2044;
         --green: #16a34a;
         --amber: #f59e0b;
         --red: #dc2626;

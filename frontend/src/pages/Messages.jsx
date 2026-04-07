@@ -180,7 +180,7 @@ export default function Messages() {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
           <button onClick={() => setShowNew(false)} style={{
-            background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: '#1d4ed8', padding: 4
+            background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: '#0f2044', padding: 4
           }}>&larr;</button>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', margin: 0 }}>New message</h1>
         </div>
@@ -219,7 +219,7 @@ export default function Messages() {
                 <div style={{
                   width: 40, height: 40, borderRadius: '50%', background: '#eff6ff',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontWeight: 700, color: '#1d4ed8', fontSize: 15, flexShrink: 0
+                  fontWeight: 700, color: '#0f2044', fontSize: 15, flexShrink: 0
                 }}>
                   {p.full_name.charAt(0).toUpperCase()}
                 </div>
@@ -254,12 +254,12 @@ export default function Messages() {
           boxShadow: '0 1px 3px rgba(0,0,0,.04)', flexShrink: 0
         }}>
           <button onClick={() => { setActiveConv(null); loadConversations() }} style={{
-            background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: '#1d4ed8', padding: 4
+            background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: '#0f2044', padding: 4
           }}>&larr;</button>
           <div style={{
             width: 36, height: 36, borderRadius: '50%', background: '#eff6ff',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 700, color: '#1d4ed8', fontSize: 14, flexShrink: 0
+            fontWeight: 700, color: '#0f2044', fontSize: 14, flexShrink: 0
           }}>
             {getConvName(activeConv).charAt(0).toUpperCase()}
           </div>
@@ -268,7 +268,7 @@ export default function Messages() {
             <div style={{ fontSize: 12, color: '#64748b', textTransform: 'capitalize', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {getConvRole(activeConv)}
               {getConvLearnerInfo(activeConv) && (
-                <span style={{ color: '#1d4ed8', marginLeft: 6 }}>&middot; {getConvLearnerInfo(activeConv)}</span>
+                <span style={{ color: '#0f2044', marginLeft: 6 }}>&middot; {getConvLearnerInfo(activeConv)}</span>
               )}
             </div>
           </div>
@@ -319,7 +319,7 @@ export default function Messages() {
                   boxShadow: isMine ? 'none' : '0 1px 2px rgba(0,0,0,.04)'
                 }}>
                   {!isMine && msg.users?.full_name && (
-                    <div style={{ fontSize: 11, fontWeight: 600, color: '#1d4ed8', marginBottom: 2 }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: '#0f2044', marginBottom: 2 }}>
                       {msg.users.full_name}
                     </div>
                   )}
@@ -429,7 +429,7 @@ export default function Messages() {
               <div style={{
                 width: 44, height: 44, borderRadius: '50%', background: conv.unread_count > 0 ? '#0f2044' : '#eff6ff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontWeight: 700, color: conv.unread_count > 0 ? '#fff' : '#1d4ed8', fontSize: 16, flexShrink: 0,
+                fontWeight: 700, color: conv.unread_count > 0 ? '#fff' : '#0f2044', fontSize: 16, flexShrink: 0,
                 transition: 'all .15s'
               }}>
                 {getConvName(conv).charAt(0).toUpperCase()}
@@ -448,7 +448,7 @@ export default function Messages() {
                   </div>
                 </div>
                 {getConvLearnerInfo(conv) && (
-                  <div style={{ fontSize: 11, color: '#1d4ed8', marginTop: 1, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div style={{ fontSize: 11, color: '#0f2044', marginTop: 1, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {getConvLearnerInfo(conv)}
                   </div>
                 )}
