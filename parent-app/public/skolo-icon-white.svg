@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+  <rect width="160" height="160" rx="36" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+  <clipPath id="c"><rect width="160" height="160" rx="36"/></clipPath>
+  <rect y="120" width="160" height="40" fill="#2563eb" clip-path="url(#c)"/>
+  <rect width="160" height="120" fill="#0f2044" clip-path="url(#c)"/>
+  <text x="80" y="106" font-family="Georgia,serif" font-weight="700" font-size="104" fill="#ffffff" text-anchor="middle">S</text>
+</svg>

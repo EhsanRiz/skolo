@@ -159,16 +159,8 @@ export default function Layout() {
       {/* Brand */}
       <div style={{ padding: '20px 16px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-          {school?.logo_url ? (
-            <img src={school.logo_url} alt={school?.name}
-              style={{ height: 38, width: 38, objectFit: 'contain', flexShrink: 0, borderRadius: 6, background: 'rgba(255,255,255,0.08)', padding: 3 }} />
-          ) : (
-            <div style={{
-              width: 38, height: 38, background: '#1d4ed8', borderRadius: 8,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 14, fontWeight: 800, color: '#fff', flexShrink: 0
-            }}>{initials}</div>
-          )}
+          <img src={school?.logo_url || '/skolo-icon-white.svg'} alt={school?.name || 'Skolo'}
+            style={{ height: 38, width: 38, objectFit: 'contain', flexShrink: 0, borderRadius: 6 }} />
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {school?.name || 'Skolo'}
@@ -226,15 +218,8 @@ export default function Layout() {
           justifyContent: 'space-between', padding: '0 16px', flexShrink: 0
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {school?.logo_url ? (
-              <img src={school.logo_url} alt={school?.name} style={{ height: 30, maxWidth: 100, objectFit: 'contain' }} />
-            ) : (
-              <div style={{
-                width: 30, height: 30, background: '#1d4ed8', borderRadius: 7,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 12, fontWeight: 800, color: '#fff'
-              }}>{initials}</div>
-            )}
+            <img src={school?.logo_url || '/skolo-icon-white.svg'} alt={school?.name || 'Skolo'}
+              style={{ height: 30, width: 30, objectFit: 'contain', borderRadius: 6 }} />
             <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{school?.name || 'Skolo'}</div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>

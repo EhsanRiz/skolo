@@ -30,8 +30,8 @@ export default function Login() {
         background: '#fff', padding: '36px 20px 20px', textAlign: 'center',
         borderBottom: '1px solid #e2e8f0'
       }}>
-        <img src="/skolo-logo.svg" alt="Skolo" style={{
-          height: 80, objectFit: 'contain', margin: '0 auto 10px', display: 'block'
+        <img src="/skolo-logo-white.svg" alt="Skolo" style={{
+          height: 100, objectFit: 'contain', margin: '0 auto 10px', display: 'block'
         }} />
         <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, color: '#0f2044' }}>Parent Portal</h1>
         <p style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>Stay connected with your child's school</p>
