@@ -31,6 +31,35 @@ const TABS = [
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
+// ── Styled confirm dialog ─────────────────────────────────
+function ConfirmModal({ open, title, message, confirmLabel, danger, onConfirm, onCancel }) {
+  if (!open) return null
+  return (
+    <div style={{ position:'fixed', inset:0, zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center' }}
+      onClick={onCancel}>
+      <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.4)', backdropFilter:'blur(2px)' }} />
+      <div style={{
+        position:'relative', background:'#fff', borderRadius:16, padding:'28px 32px', maxWidth:400, width:'90%',
+        boxShadow:'0 20px 60px rgba(0,0,0,.2)', animation:'fadeUp .2s ease'
+      }} onClick={e => e.stopPropagation()}>
+        <div style={{ fontWeight:800, fontSize:17, color:'#0f172a', marginBottom:8 }}>{title || 'Confirm'}</div>
+        <div style={{ fontSize:14, color:'#64748b', lineHeight:1.6, marginBottom:24 }}>{message}</div>
+        <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
+          <button onClick={onCancel} style={{
+            padding:'9px 18px', borderRadius:8, border:'1.5px solid #e2e8f0', background:'#fff',
+            fontSize:13, fontWeight:600, cursor:'pointer', color:'#374151', fontFamily:'inherit'
+          }}>Cancel</button>
+          <button onClick={onConfirm} style={{
+            padding:'9px 18px', borderRadius:8, border:'none',
+            background: danger ? '#dc2626' : '#0f2044', color:'#fff',
+            fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:'inherit'
+          }}>{confirmLabel || 'Confirm'}</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Settings() {
   const { school, user: currentUser, refreshSchool } = useAuth()
   const toast = useToast()
@@ -72,6 +101,9 @@ export default function Settings() {
   const fileRef = useRef()
 
   const [saving, setSaving] = useState(false)
+  const [confirmModal, setConfirmModal] = useState({ open:false, title:'', message:'', confirmLabel:'', danger:false, onConfirm:()=>{} })
+  const showConfirm = (opts) => setConfirmModal({ open:true, ...opts })
+  const closeConfirm = () => setConfirmModal(c => ({ ...c, open:false }))
 
   const loadGrades   = () => api.get('/grades').then(r=>setGrades(r.data)).catch(()=>{})
   const loadFeePlans = () => api.get('/fee-plans').then(r=>setFeePlans(r.data)).catch(()=>{})
@@ -110,10 +142,16 @@ export default function Settings() {
     try { for(let i=0;i<toAdd.length;i++) await api.post('/grades',{name:toAdd[i],display_order:grades.length+i}); loadGrades(); toast.success(`${toAdd.length} grades added`) }
     catch{ toast.error('Failed') } finally{ setSaving(false) }
   }
-  const deleteGrade = async(id,name) => {
-    if(!confirm(`Delete grade "${name}"?`)) return
-    try{ await api.delete(`/grades/${id}`); loadGrades(); toast.success('Grade deleted') }
-    catch(err){ toast.error(err.response?.data?.error||'Failed') }
+  const deleteGrade = (id,name) => {
+    showConfirm({
+      title: 'Delete grade', message: `Are you sure you want to delete "${name}"? Any linked classes will also be removed.`,
+      confirmLabel: 'Delete', danger: true,
+      onConfirm: async () => {
+        closeConfirm()
+        try{ await api.delete(`/grades/${id}`); loadGrades(); toast.success('Grade deleted') }
+        catch(err){ toast.error(err.response?.data?.error||'Failed') }
+      }
+    })
   }
   const addClass = async gradeId => {
     const name=(newClasses[gradeId]||'').trim(); if(!name) return
@@ -140,10 +178,16 @@ export default function Settings() {
     try{ await api.patch(`/fee-plans/${id}`,{is_active:!is_active}); loadFeePlans() }
     catch{ toast.error('Failed') }
   }
-  const deletePlan = async id => {
-    if(!confirm('Delete this fee plan?')) return
-    try{ await api.delete(`/fee-plans/${id}`); loadFeePlans(); toast.success('Fee plan deleted') }
-    catch(err){ toast.error(err.response?.data?.error||'Failed') }
+  const deletePlan = (id) => {
+    showConfirm({
+      title: 'Delete fee plan', message: 'Are you sure you want to delete this fee plan? This cannot be undone.',
+      confirmLabel: 'Delete', danger: true,
+      onConfirm: async () => {
+        closeConfirm()
+        try{ await api.delete(`/fee-plans/${id}`); loadFeePlans(); toast.success('Fee plan deleted') }
+        catch(err){ toast.error(err.response?.data?.error||'Failed') }
+      }
+    })
   }
 
   // ── TEACHERS ─────────────────────────────────────────────────
@@ -167,10 +211,16 @@ export default function Settings() {
     setTcForm({ full_name:tc.full_name, email:tc.email||'', phone:tc.phone||'', subject:tc.subject||'' })
     setEditTeacher(tc); setShowTeacher(true)
   }
-  const deactivateTeacher = async id => {
-    if(!confirm('Deactivate this teacher?')) return
-    try{ await api.delete(`/teachers/${id}`); loadTeachers(); toast.success('Teacher deactivated') }
-    catch{ toast.error('Failed') }
+  const deactivateTeacher = (id) => {
+    showConfirm({
+      title: 'Deactivate teacher', message: 'Are you sure you want to deactivate this teacher? They will no longer appear in class assignments.',
+      confirmLabel: 'Deactivate', danger: true,
+      onConfirm: async () => {
+        closeConfirm()
+        try{ await api.delete(`/teachers/${id}`); loadTeachers(); toast.success('Teacher deactivated') }
+        catch{ toast.error('Failed') }
+      }
+    })
   }
 
   // Class assignment
@@ -260,13 +310,21 @@ export default function Settings() {
     } catch { toast.error('Failed to generate link') }
   }
 
-  const deleteUser = async (userId, name) => {
-    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return
-    try {
-      await api.delete(`/users/${userId}`)
-      loadUsers()
-      toast.success('Account deleted')
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
+  const deleteUser = (userId, name) => {
+    showConfirm({
+      title: 'Delete staff account',
+      message: `Delete "${name}"? This cannot be undone.`,
+      confirmLabel: 'Delete',
+      danger: true,
+      onConfirm: async () => {
+        closeConfirm()
+        try {
+          await api.delete(`/users/${userId}`)
+          loadUsers()
+          toast.success('Account deleted')
+        } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
+      }
+    })
   }
   const saveEdit = async e => {
     e.preventDefault(); setSaving(true)
@@ -1240,6 +1298,7 @@ function TimetableTab({ school, refreshSchool, toast }) {
           </div>
         </div>
       )}
+      <ConfirmModal {...confirmModal} onCancel={closeConfirm} />
     </div>
   )
 }
