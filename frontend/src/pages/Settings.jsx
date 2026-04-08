@@ -984,6 +984,8 @@ function TimetableTab({ school, refreshSchool, toast }) {
   const [tcs, setTcs]         = useState([])          // teacher_classes for dropdown
   const [saving, setSaving]   = useState(false)
   const [step, setStep]       = useState('periods')   // 'periods' | 'assign'
+  const [loadingTimetable, setLoadingTimetable] = useState(false)
+  const [timetableError, setTimetableError] = useState(null)
 
   // Load data
   useEffect(() => {
@@ -993,8 +995,19 @@ function TimetableTab({ school, refreshSchool, toast }) {
 
   useEffect(() => {
     if (step === 'assign') {
-      api.get('/timetable').then(r => setSlots(r.data || [])).catch(() => {})
-      api.get('/teacher-classes').then(r => setTcs(r.data || [])).catch(() => {})
+      setLoadingTimetable(true)
+      setTimetableError(null)
+      Promise.all([
+        api.get('/timetable'),
+        api.get('/teacher-classes')
+      ]).then(([timetableRes, tcRes]) => {
+        setSlots(timetableRes.data || [])
+        setTcs(tcRes.data || [])
+      }).catch(err => {
+        const msg = err.response?.data?.error || 'Failed to load timetable data'
+        setTimetableError(msg)
+        toast.error(msg)
+      }).finally(() => setLoadingTimetable(false))
     }
   }, [step])
 
@@ -1200,7 +1213,26 @@ function TimetableTab({ school, refreshSchool, toast }) {
       {/* ─ Step 2: Weekly grid ─ */}
       {step === 'assign' && (
         <div>
-          {teachablePeriods.length === 0 && (
+          {loadingTimetable && (
+            <div style={{ background: '#fff', borderRadius: 12, padding: 32, textAlign: 'center', border: '1px solid #e2e8f0' }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>⏳</div>
+              <div style={{ fontWeight: 600, fontSize: 14, color: '#374151' }}>Loading timetable...</div>
+            </div>
+          )}
+
+          {!loadingTimetable && timetableError && (
+            <div style={{ background: '#fef2f2', borderRadius: 12, padding: 32, textAlign: 'center', border: '1px solid #fecaca' }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>❌</div>
+              <div style={{ fontWeight: 600, fontSize: 14, color: '#991b1b', marginBottom: 4 }}>Failed to load timetable</div>
+              <div style={{ fontSize: 13, color: '#b91c1c', marginBottom: 16 }}>{timetableError}</div>
+              <button onClick={() => { setStep('periods'); setTimeout(() => setStep('assign'), 50) }}
+                style={{ padding: '8px 20px', background: '#0f2044', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                Retry
+              </button>
+            </div>
+          )}
+
+          {!loadingTimetable && !timetableError && teachablePeriods.length === 0 && (
             <div style={{ background: '#fff', borderRadius: 12, padding: 32, textAlign: 'center', border: '1.5px dashed #e2e8f0' }}>
               <div style={{ fontSize: 28, marginBottom: 8 }}>⚠️</div>
               <div style={{ fontWeight: 600, fontSize: 14, color: '#374151' }}>No teaching periods defined</div>
@@ -1208,7 +1240,7 @@ function TimetableTab({ school, refreshSchool, toast }) {
             </div>
           )}
 
-          {teachablePeriods.length > 0 && (
+          {!loadingTimetable && !timetableError && teachablePeriods.length > 0 && (
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', minWidth: 800, borderCollapse: 'collapse', background: '#fff', borderRadius: 12, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
                 <thead>
