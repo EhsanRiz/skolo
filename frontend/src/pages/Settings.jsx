@@ -947,6 +947,8 @@ export default function Settings() {
           </div>
         </div>
       )}
+
+      <ConfirmModal {...confirmModal} onCancel={closeConfirm} />
     </div>
   )
 }
@@ -1330,7 +1332,6 @@ function TimetableTab({ school, refreshSchool, toast }) {
           </div>
         </div>
       )}
-      <ConfirmModal {...confirmModal} onCancel={closeConfirm} />
     </div>
   )
 }
