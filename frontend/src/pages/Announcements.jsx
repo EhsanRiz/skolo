@@ -1,15 +1,81 @@
 import { useState, useEffect } from 'react'
+import { useAuth } from '../contexts/AuthContext'
 import { IconTrash, t } from '../components/ui'
+import { useToast } from '../contexts/ToastContext'
 import api from '../lib/api'
 
 const empty = { title: '', body: '', target: 'all', send_sms: false }
 
+const CSS = `
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.ann-bubble {
+  background: #fff; border-radius: 16px; padding: 20px 22px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  animation: fadeUp .3s ease both;
+  transition: box-shadow .15s, transform .15s;
+  cursor: pointer; position: relative;
+}
+.ann-bubble:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-1px); }
+.ann-bubble.expanded { cursor: default; }
+.ann-bubble.expanded:hover { transform: none; }
+.ann-body-collapsed {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.ann-body-expanded { }
+.ann-meta-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20; font-size: 11px; font-weight: 600;
+}
+`
+
+// Type/color mapping for announcement badges
+const TARGET_STYLE = {
+  all:   { bg: '#eff6ff', color: '#0f2044', label: 'All parents', icon: '📢' },
+  grade: { bg: '#faf5ff', color: '#7c3aed', label: 'Grade', icon: '🎓' },
+  class: { bg: '#fef3c7', color: '#a16207', label: 'Class', icon: '🏫' },
+}
+
+function ConfirmModal({ open, title, message, confirmLabel, danger, onConfirm, onCancel }) {
+  if (!open) return null
+  return (
+    <div style={{ position:'fixed', inset:0, zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center' }}
+      onClick={onCancel}>
+      <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.4)', backdropFilter:'blur(2px)' }} />
+      <div style={{
+        position:'relative', background:'#fff', borderRadius:16, padding:'28px 32px', maxWidth:400, width:'90%',
+        boxShadow:'0 20px 60px rgba(0,0,0,.2)'
+      }} onClick={e => e.stopPropagation()}>
+        <div style={{ fontWeight:800, fontSize:17, color:'#0f172a', marginBottom:8 }}>{title || 'Confirm'}</div>
+        <div style={{ fontSize:14, color:'#64748b', lineHeight:1.6, marginBottom:24 }}>{message}</div>
+        <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
+          <button onClick={onCancel} style={{
+            padding:'9px 18px', borderRadius:8, border:'1.5px solid #e2e8f0', background:'#fff',
+            fontSize:13, fontWeight:600, cursor:'pointer', color:'#374151', fontFamily:'inherit'
+          }}>Cancel</button>
+          <button onClick={onConfirm} style={{
+            padding:'9px 18px', borderRadius:8, border:'none',
+            background: danger ? '#dc2626' : '#0f2044', color:'#fff',
+            fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:'inherit'
+          }}>{confirmLabel || 'Confirm'}</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Announcements() {
+  const { user } = useAuth()
+  const toast = useToast()
   const [announcements, setAnnouncements] = useState([])
-  const [show,    setShow]    = useState(false)
-  const [form,    setForm]    = useState(empty)
-  const [saving,  setSaving]  = useState(false)
+  const [show, setShow] = useState(false)
+  const [form, setForm] = useState(empty)
+  const [saving, setSaving] = useState(false)
   const [lastResult, setLast] = useState(null)
+  const [expanded, setExpanded] = useState({}) // id → bool
+  const [confirmModal, setConfirmModal] = useState({ open: false })
+
+  const isAdmin = user?.role === 'admin' || user?.role === 'principal'
 
   const load = () => api.get('/announcements').then(r => setAnnouncements(r.data)).catch(() => {})
   useEffect(() => { load() }, [])
@@ -24,58 +90,136 @@ export default function Announcements() {
     try {
       const { data } = await api.post('/announcements', form)
       setLast(data); setShow(false); setForm(empty); load()
-    } catch (err) { alert(err.response?.data?.error || 'Failed') }
+      toast.success('Announcement sent!')
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
     finally { setSaving(false) }
   }
 
-  const remove = async id => {
-    if (!confirm('Delete this announcement?')) return
-    await api.delete(`/announcements/${id}`); load()
+  const remove = (id) => {
+    setConfirmModal({
+      open: true,
+      title: 'Delete announcement',
+      message: 'Are you sure? This cannot be undone.',
+      confirmLabel: 'Delete',
+      danger: true,
+      onConfirm: async () => {
+        setConfirmModal({ open: false })
+        try { await api.delete(`/announcements/${id}`); load(); toast.success('Deleted') }
+        catch { toast.error('Failed to delete') }
+      }
+    })
+  }
+
+  const toggleExpand = (id) => setExpanded(e => ({ ...e, [id]: !e[id] }))
+
+  const timeAgo = (dateStr) => {
+    const diff = Date.now() - new Date(dateStr).getTime()
+    const mins = Math.floor(diff / 60000)
+    if (mins < 60) return `${mins}m ago`
+    const hrs = Math.floor(mins / 60)
+    if (hrs < 24) return `${hrs}h ago`
+    const days = Math.floor(hrs / 24)
+    if (days < 7) return `${days}d ago`
+    return new Date(dateStr).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })
   }
 
   return (
     <div>
+      <style>{CSS}</style>
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>Announcements</h1>
           <p style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>Send messages and SMS blasts to parents</p>
         </div>
-        <button style={t.btn.primary} onClick={() => { setLast(null); setShow(true) }}>+ New announcement</button>
+        {isAdmin && (
+          <button style={t.btn.primary} onClick={() => { setLast(null); setShow(true) }}>+ New announcement</button>
+        )}
       </div>
 
       {lastResult && (
-        <div style={{ background: '#dcfce7', color: '#15803d', borderRadius: 10, padding: '12px 18px', marginBottom: 20, fontSize: 14, fontWeight: 500 }}>
-          ✓ Announcement sent{lastResult.sms_queued > 0 ? ` · ${lastResult.sms_queued} SMS messages queued` : ''}.
+        <div style={{ background: '#dcfce7', color: '#15803d', borderRadius: 12, padding: '12px 18px', marginBottom: 20, fontSize: 14, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 18 }}>✓</span>
+          Announcement sent{lastResult.sms_queued > 0 ? ` · ${lastResult.sms_queued} SMS messages queued` : ''}.
         </div>
       )}
 
       {announcements.length === 0 && (
-        <div style={{ background: '#fff', borderRadius: 14, padding: '48px', textAlign: 'center', color: '#94a3b8', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-          No announcements yet.
+        <div style={{ background: '#fff', borderRadius: 16, padding: '48px', textAlign: 'center', color: '#94a3b8', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>📢</div>
+          <div style={{ fontWeight: 600, fontSize: 15 }}>No announcements yet</div>
+          {isAdmin && <div style={{ fontSize: 13, marginTop: 6 }}>Create one to get started.</div>}
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {announcements.map(a => (
-          <div key={a.id} style={{ background: '#fff', borderRadius: 12, padding: '20px 22px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>{a.title}</div>
-                <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 10 }}>
-                  {new Date(a.created_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  {' · '}{a.target === 'all' ? 'All parents' : a.target}
-                  {a.send_sms && <span style={{ marginLeft: 8, background: '#dbeafe', color: '#0f2044', padding: '1px 8px', borderRadius: 10, fontSize: 11, fontWeight: 600 }}>SMS</span>}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {announcements.map((a, idx) => {
+          const isExpanded = !!expanded[a.id]
+          const isLong = (a.body || '').length > 150
+          const ts = TARGET_STYLE[a.target] || TARGET_STYLE.all
+
+          return (
+            <div key={a.id}
+              className={`ann-bubble${isExpanded ? ' expanded' : ''}`}
+              style={{ animationDelay: `${idx * 60}ms` }}
+              onClick={() => !isExpanded && isLong && toggleExpand(a.id)}>
+
+              {/* Header row */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: ts.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>
+                    {ts.icon}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{a.title}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 12, color: '#94a3b8' }}>{timeAgo(a.created_at)}</span>
+                      <span style={{ background: ts.bg, color: ts.color, padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
+                        {ts.label}
+                      </span>
+                      {a.send_sms && (
+                        <span style={{ background: '#dcfce7', color: '#16a34a', padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
+                          SMS ✓
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div style={{ fontSize: 14, color: '#374151', lineHeight: 1.6 }}>{a.body}</div>
+                {isAdmin && (
+                  <button onClick={(e) => { e.stopPropagation(); remove(a.id) }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#cbd5e1', padding: 6, borderRadius: 8, transition: 'color .15s', flexShrink: 0 }}
+                    onMouseEnter={e => e.target.style.color = '#ef4444'}
+                    onMouseLeave={e => e.target.style.color = '#cbd5e1'}>
+                    <IconTrash size={15} />
+                  </button>
+                )}
               </div>
-              <button onClick={() => remove(a.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#cbd5e1', marginLeft: 16, flexShrink: 0, display: 'flex', padding: 4 }}>
-                <IconTrash size={15} />
-              </button>
+
+              {/* Body */}
+              <div className={isExpanded || !isLong ? 'ann-body-expanded' : 'ann-body-collapsed'}
+                style={{ fontSize: 14, color: '#374151', lineHeight: 1.7, marginLeft: 46 }}>
+                {a.body}
+              </div>
+
+              {/* Expand/collapse hint */}
+              {isLong && (
+                <div
+                  onClick={(e) => { e.stopPropagation(); toggleExpand(a.id) }}
+                  style={{ marginLeft: 46, marginTop: 6, fontSize: 12, color: '#0f2044', fontWeight: 600, cursor: 'pointer' }}>
+                  {isExpanded ? 'Show less ↑' : 'Read more ↓'}
+                </div>
+              )}
+
+              {/* Date footer */}
+              <div style={{ marginLeft: 46, marginTop: 10, fontSize: 11, color: '#cbd5e1' }}>
+                {new Date(a.created_at).toLocaleDateString('en-ZA', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
+      {/* New announcement modal */}
       {show && (
         <div style={t.overlay} onClick={e => e.target === e.currentTarget && setShow(false)}>
           <div style={t.modal}>
@@ -106,6 +250,8 @@ export default function Announcements() {
           </div>
         </div>
       )}
+
+      <ConfirmModal {...confirmModal} onCancel={() => setConfirmModal({ open: false })} />
     </div>
   )
 }

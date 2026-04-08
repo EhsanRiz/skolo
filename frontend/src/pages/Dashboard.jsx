@@ -233,6 +233,11 @@ function TeacherDashboard() {
   const [events, setEvents]         = useState([])
   const [loading, setLoading]       = useState(true)
 
+  // Chart data
+  const [weekAttendance, setWeekAttendance] = useState([])
+  const [classPerformance, setClassPerformance] = useState([])
+  const [gradeDistribution, setGradeDistribution] = useState([])
+
   // Today's info
   const todayDow   = now.getDay()   // 0=Sun, 1=Mon...
   const todayNum   = todayDow >= 1 && todayDow <= 5 ? todayDow : 0  // 0 if weekend
@@ -252,6 +257,98 @@ function TeacherDashboard() {
       setLoading(false)
     })
   }, [])
+
+  // ── Load chart data (after initial load) ──────────────────
+  useEffect(() => {
+    if (!myClasses?.classes?.length) return
+
+    const classIds = myClasses.classes.map(c => c.class_id)
+    const dayLabels = ['Mon','Tue','Wed','Thu','Fri']
+
+    // 1. Attendance trend for this week
+    const monday = new Date(now)
+    monday.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1))
+    const weekDates = Array.from({ length: 5 }, (_, i) => {
+      const d = new Date(monday); d.setDate(monday.getDate() + i)
+      return d.toISOString().slice(0, 10)
+    })
+
+    Promise.all(
+      classIds.map(cid =>
+        Promise.all(weekDates.map(date =>
+          api.get(`/attendance/class/${cid}/register?date=${date}`)
+            .then(r => ({ date, records: r.data || [] }))
+            .catch(() => ({ date, records: [] }))
+        ))
+      )
+    ).then(classResults => {
+      const dayTotals = weekDates.map((date, di) => {
+        let present = 0, absent = 0, late = 0
+        classResults.forEach(classWeek => {
+          const day = classWeek[di]
+          day.records.forEach(r => {
+            if (r.status === 'present') present++
+            else if (r.status === 'absent') absent++
+            else if (r.status === 'late') late++
+          })
+        })
+        return { day: dayLabels[di], Present: present, Absent: absent, Late: late }
+      })
+      setWeekAttendance(dayTotals.filter(d => d.Present + d.Absent + d.Late > 0))
+    }).catch(() => {})
+
+    // 2. Class performance (avg marks per class, latest term)
+    const currentTerm = now.getMonth() < 3 ? 'T1' : now.getMonth() < 6 ? 'T2' : now.getMonth() < 9 ? 'T3' : 'T4'
+    Promise.all(
+      myClasses.classes.map(tc =>
+        api.get(`/exam-grades?class_id=${tc.class_id}&term=${currentTerm}`)
+          .then(r => {
+            const grades = r.data || []
+            const marks = grades.filter(g => g.mark != null).map(g => Number(g.mark))
+            const avg = marks.length ? Math.round(marks.reduce((s, m) => s + m, 0) / marks.length) : 0
+            return {
+              class: `${tc.classes?.grades?.name || ''} ${tc.classes?.name || ''}`.trim(),
+              avg,
+              count: marks.length
+            }
+          })
+          .catch(() => ({ class: tc.classes?.name || '?', avg: 0, count: 0 }))
+      )
+    ).then(results => {
+      setClassPerformance(results.filter(r => r.count > 0))
+    }).catch(() => {})
+
+    // 3. Grade distribution across all classes
+    const boundaries = school?.grade_boundaries || { A: 80, B: 70, C: 60, D: 50, F: 0 }
+    Promise.all(
+      classIds.map(cid =>
+        api.get(`/exam-grades?class_id=${cid}&term=${currentTerm}`)
+          .then(r => r.data || [])
+          .catch(() => [])
+      )
+    ).then(allResults => {
+      const dist = { A: 0, B: 0, C: 0, D: 0, F: 0 }
+      allResults.flat().forEach(g => {
+        const m = Number(g.mark)
+        if (isNaN(m)) return
+        if (m >= boundaries.A) dist.A++
+        else if (m >= boundaries.B) dist.B++
+        else if (m >= boundaries.C) dist.C++
+        else if (m >= boundaries.D) dist.D++
+        else dist.F++
+      })
+      const total = Object.values(dist).reduce((s, v) => s + v, 0)
+      if (total > 0) {
+        setGradeDistribution([
+          { name: 'A', value: dist.A, color: '#16a34a' },
+          { name: 'B', value: dist.B, color: '#2563eb' },
+          { name: 'C', value: dist.C, color: '#ca8a04' },
+          { name: 'D', value: dist.D, color: '#ea580c' },
+          { name: 'F', value: dist.F, color: '#dc2626' },
+        ].filter(d => d.value > 0))
+      }
+    }).catch(() => {})
+  }, [myClasses])
 
   // ── Today's schedule ──────────────────────────────────────
   const todaySlots = useMemo(() => {
@@ -368,48 +465,56 @@ function TeacherDashboard() {
             </div>
           )}
 
-          {/* Today's periods */}
+          {/* Today's periods — colour coded: done (green), now (blue), upcoming (white) */}
           {periods.length > 0 && todayNum > 0 && periods.map((p, i) => {
             const isNow     = !p.isBreak && currentTime >= p.start && currentTime <= p.end
             const isPast    = currentTime > p.end
+            const isFuture  = !isNow && !isPast
             const slot      = todaySlots.find(s => s.period_number === p.number)
             const tc        = slot?.teacher_classes
 
             if (p.isBreak) {
               return (
-                <div key={i} style={{ padding: '6px 10px', margin: '4px 0', textAlign: 'center', fontSize: 11, fontWeight: 600, color: '#a16207', background: '#fefce8', borderRadius: 6, opacity: isPast ? 0.5 : 1 }}>
-                  ☕ {p.label} ({p.start}–{p.end})
+                <div key={i} style={{ padding: '6px 10px', margin: '4px 0', textAlign: 'center', fontSize: 11, fontWeight: 600,
+                  color: isPast ? '#86efac' : '#a16207',
+                  background: isPast ? '#f0fdf4' : '#fefce8', borderRadius: 6 }}>
+                  {isPast ? '✓' : '☕'} {p.label} ({p.start}–{p.end})
                 </div>
               )
             }
 
+            // Colour scheme: done=green, now=blue, upcoming=neutral
+            const slotBg    = isPast ? '#f0fdf4' : isNow ? '#eff6ff' : slot ? '#fff' : '#fafafa'
+            const slotBorder = isPast ? '1.5px solid #bbf7d0' : isNow ? '1.5px solid #93c5fd' : '1.5px solid #f1f5f9'
+            const labelColor = isPast ? '#16a34a' : isNow ? '#0f2044' : '#0f172a'
+            const descColor  = isPast ? '#86efac' : isNow ? '#3b82f6' : '#64748b'
+
             return (
               <div key={i} className={`tt-slot${isNow ? ' tt-now' : ''}`}
-                style={{
-                  background: isNow ? '#eff6ff' : slot ? '#f8fafc' : '#fafafa',
-                  opacity: isPast ? 0.5 : 1,
-                  border: isNow ? '1.5px solid #93c5fd' : '1.5px solid transparent'
-                }}>
+                style={{ background: slotBg, border: slotBorder }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {isPast && <span style={{ fontSize: 12, color: '#16a34a', flexShrink: 0 }}>✓</span>}
                     {isNow && <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#2563eb', animation: 'pulse 2s infinite', flexShrink: 0 }} />}
+                    {isFuture && slot && <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#e2e8f0', flexShrink: 0 }} />}
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: 13, color: isNow ? '#0f2044' : '#0f172a' }}>
+                      <div style={{ fontWeight: 600, fontSize: 13, color: labelColor }}>
                         {p.label}
-                        <span style={{ fontWeight: 400, fontSize: 11, color: '#94a3b8', marginLeft: 8 }}>{p.start}–{p.end}</span>
+                        <span style={{ fontWeight: 400, fontSize: 11, color: isPast ? '#86efac' : '#94a3b8', marginLeft: 8 }}>{p.start}–{p.end}</span>
                       </div>
                       {slot ? (
-                        <div style={{ fontSize: 12, color: isNow ? '#3b82f6' : '#64748b', marginTop: 2 }}>
+                        <div style={{ fontSize: 12, color: descColor, marginTop: 2 }}>
                           {tc?.classes?.grades?.name} {tc?.classes?.name}
-                          {tc?.subject && <span style={{ color: '#94a3b8' }}> · {tc.subject}</span>}
-                          {slot.room && <span style={{ color: '#94a3b8' }}> · 📍 {slot.room}</span>}
+                          {tc?.subject && <span style={{ color: isPast ? '#a7f3d0' : '#94a3b8' }}> · {tc.subject}</span>}
+                          {slot.room && <span style={{ color: isPast ? '#a7f3d0' : '#94a3b8' }}> · 📍 {slot.room}</span>}
                         </div>
                       ) : (
-                        <div style={{ fontSize: 12, color: '#cbd5e1', marginTop: 2, fontStyle: 'italic' }}>Free period</div>
+                        <div style={{ fontSize: 12, color: isPast ? '#a7f3d0' : '#cbd5e1', marginTop: 2, fontStyle: 'italic' }}>Free period</div>
                       )}
                     </div>
                   </div>
                   {isNow && <span style={{ fontSize: 10, fontWeight: 700, background: '#2563eb', color: '#fff', padding: '2px 8px', borderRadius: 20 }}>NOW</span>}
+                  {isPast && slot && <span style={{ fontSize: 10, fontWeight: 600, color: '#16a34a', padding: '2px 8px' }}>Done</span>}
                 </div>
               </div>
             )
@@ -503,9 +608,88 @@ function TeacherDashboard() {
         </div>
       </div>
 
+      {/* ── Analytics charts ── */}
+      {(weekAttendance.length > 0 || classPerformance.length > 0 || gradeDistribution.length > 0) && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16, marginBottom: 16 }}>
+
+          {/* Attendance trend — bar chart */}
+          {weekAttendance.length > 0 && (
+            <div className="dash-card" style={{ animationDelay: '480ms' }}>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>This week's attendance</div>
+              <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 16 }}>Across all your classes</div>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={weekAttendance} barSize={18} barGap={2}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis dataKey="day" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis fontSize={11} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: 10, border: '1px solid #e2e8f0', fontSize: 12 }} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
+                  <Bar dataKey="Present" fill="#16a34a" radius={[4,4,0,0]} />
+                  <Bar dataKey="Late" fill="#ca8a04" radius={[4,4,0,0]} />
+                  <Bar dataKey="Absent" fill="#dc2626" radius={[4,4,0,0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Class performance — horizontal bar chart */}
+          {classPerformance.length > 0 && (
+            <div className="dash-card" style={{ animationDelay: '540ms' }}>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>Class average marks</div>
+              <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 16 }}>Current term</div>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={classPerformance} layout="vertical" barSize={20}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                  <XAxis type="number" domain={[0, 100]} fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis type="category" dataKey="class" fontSize={11} tickLine={false} axisLine={false} width={80} />
+                  <Tooltip
+                    contentStyle={{ borderRadius: 10, border: '1px solid #e2e8f0', fontSize: 12 }}
+                    formatter={(val) => [`${val}%`, 'Average']} />
+                  <Bar dataKey="avg" radius={[0,6,6,0]}>
+                    {classPerformance.map((entry, i) => (
+                      <Cell key={i} fill={entry.avg >= 70 ? '#16a34a' : entry.avg >= 50 ? '#ca8a04' : '#dc2626'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Grade distribution — pie chart */}
+          {gradeDistribution.length > 0 && (
+            <div className="dash-card" style={{ animationDelay: '600ms' }}>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>Grade distribution</div>
+              <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 16 }}>All subjects, current term</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <ResponsiveContainer width="55%" height={180}>
+                  <PieChart>
+                    <Pie data={gradeDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%"
+                      innerRadius={40} outerRadius={70} paddingAngle={3} strokeWidth={0}>
+                      {gradeDistribution.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ borderRadius: 10, border: '1px solid #e2e8f0', fontSize: 12 }} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div style={{ flex: 1 }}>
+                  {gradeDistribution.map(d => (
+                    <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <div style={{ width: 10, height: 10, borderRadius: 3, background: d.color, flexShrink: 0 }} />
+                      <span style={{ fontSize: 13, fontWeight: 600, color: '#374151', minWidth: 18 }}>{d.name}</span>
+                      <span style={{ fontSize: 12, color: '#94a3b8' }}>{d.value} learner{d.value !== 1 ? 's' : ''}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Upcoming events ── */}
       {events.length > 0 && (
-        <div className="dash-card" style={{ animationDelay: '420ms' }}>
+        <div className="dash-card" style={{ animationDelay: '660ms' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
             <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>Upcoming events</div>
             <Link to="/events" style={{ fontSize: 12, color: '#0f2044', fontWeight: 700, textDecoration: 'none' }}>View all →</Link>
@@ -528,7 +712,7 @@ function TeacherDashboard() {
       )}
 
       {/* ── Attendance alerts ── */}
-      <AttendanceAlertsCard delay="480ms" />
+      <AttendanceAlertsCard delay="720ms" />
 
       {/* ── Full week timetable (collapsed by default) ── */}
       {periods.length > 0 && timetable?.slots?.length > 0 && (
