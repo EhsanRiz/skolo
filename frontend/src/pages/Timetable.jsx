@@ -226,6 +226,203 @@ function DroppableCell({ day, period, cellSlots, isAdmin, viewMode, onDrop, onRe
 
 
 // ══════════════════════════════════════════════════════════════
+// TEACHER AVAILABILITY — compact overview of each teacher's week
+// ══════════════════════════════════════════════════════════════
+function TeacherAvailability({ classTcs, allSlots, periods, colorMap, selectedClassName }) {
+  const [expanded, setExpanded] = useState(true)
+
+  const teachablePeriods = periods.filter(p => !p.isBreak)
+
+  // Get unique teachers for this class
+  const teacherMap = {}
+  classTcs.forEach(tc => {
+    const tid = tc.teachers?.id
+    if (!tid) return
+    if (!teacherMap[tid]) teacherMap[tid] = { teacher: tc.teachers, tcIds: [] }
+    teacherMap[tid].tcIds.push(tc.id)
+  })
+  const teacherList = Object.values(teacherMap)
+
+  // Build lookup: teacher_id → { "day-period": slot_info }
+  const teacherSlots = {}
+  allSlots.forEach(s => {
+    const tid = s.teacher_classes?.teachers?.id
+    if (!tid) return
+    const key = `${s.day_of_week}-${s.period_number}`
+    if (!teacherSlots[tid]) teacherSlots[tid] = {}
+    teacherSlots[tid][key] = s
+  })
+
+  // Count stats
+  const totalCells = teachablePeriods.length * 5
+
+  return (
+    <div style={{ marginTop: 20 }}>
+      {/* Header — collapsible */}
+      <button
+        onClick={() => setExpanded(e => !e)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+          background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 12px',
+          textAlign: 'left'
+        }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+          style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform .2s' }}>
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+        <span style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>Teacher Availability</span>
+        <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500 }}>
+          — {teacherList.length} teacher{teacherList.length !== 1 ? 's' : ''} for {selectedClassName?.grade_name} {selectedClassName?.name}
+        </span>
+      </button>
+
+      {expanded && (
+        <div style={{ borderRadius: 14, border: '1px solid #e2e8f0', background: '#fff', overflow: 'hidden' }}>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', minWidth: 650, borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ background: '#f8fafc' }}>
+                  <th style={{
+                    padding: '10px 14px', fontSize: 11, fontWeight: 700, color: '#64748b',
+                    textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'left',
+                    width: 160, borderBottom: '1px solid #e2e8f0', borderRight: '1px solid #f1f5f9',
+                    position: 'sticky', left: 0, background: '#f8fafc', zIndex: 2
+                  }}>
+                    Teacher
+                  </th>
+                  {DAYS.map((day, di) => (
+                    teachablePeriods.map(p => (
+                      <th key={`${di}-${p.number}`} style={{
+                        padding: '6px 3px', fontSize: 9, fontWeight: 600, color: '#94a3b8',
+                        textAlign: 'center', borderBottom: '1px solid #e2e8f0',
+                        borderRight: '1px solid #f8fafc',
+                        minWidth: 52, lineHeight: 1.3
+                      }}>
+                        <div>{day.slice(0, 3)}</div>
+                        <div style={{ fontSize: 8, color: '#cbd5e1' }}>P{p.number}</div>
+                      </th>
+                    ))
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {teacherList.map(({ teacher }) => {
+                  const tSlots = teacherSlots[teacher.id] || {}
+                  const busyCount = Object.keys(tSlots).length
+                  const color = getColor(teacher.id, colorMap)
+                  const utilization = totalCells > 0 ? Math.round((busyCount / totalCells) * 100) : 0
+
+                  return (
+                    <tr key={teacher.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      {/* Teacher name cell */}
+                      <td style={{
+                        padding: '8px 14px', borderRight: '1px solid #f1f5f9',
+                        position: 'sticky', left: 0, background: '#fff', zIndex: 1
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div style={{
+                            width: 28, height: 28, borderRadius: 7,
+                            background: color.bg, border: `1.5px solid ${color.border}`,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontWeight: 800, fontSize: 11, color: color.text, flexShrink: 0
+                          }}>
+                            {teacher.full_name?.charAt(0) || '?'}
+                          </div>
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontWeight: 700, fontSize: 12, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {teacher.full_name}
+                            </div>
+                            <div style={{ fontSize: 10, color: '#94a3b8' }}>
+                              {busyCount}/{totalCells} slots · {utilization}%
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Day+period cells */}
+                      {DAYS.map((day, di) => (
+                        teachablePeriods.map(p => {
+                          const dayNum = di + 1
+                          const key = `${dayNum}-${p.number}`
+                          const slot = tSlots[key]
+                          const tc = slot?.teacher_classes
+                          const isThisClass = tc?.classes?.id === selectedClassName?.id
+
+                          if (slot) {
+                            return (
+                              <td key={`${di}-${p.number}`} style={{
+                                padding: '3px 2px', textAlign: 'center',
+                                borderRight: '1px solid #f8fafc',
+                                background: isThisClass ? color.bg : '#fef2f2'
+                              }}>
+                                <div title={`${tc?.subject || 'General'} — ${tc?.classes?.grades?.name || ''} ${tc?.classes?.name || ''}`}
+                                  style={{
+                                    fontSize: 9, fontWeight: 700, lineHeight: 1.3,
+                                    color: isThisClass ? color.text : '#dc2626',
+                                    padding: '2px 1px', borderRadius: 4,
+                                    cursor: 'default'
+                                  }}
+                                >
+                                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {tc?.subject?.slice(0, 6) || 'Gen'}
+                                  </div>
+                                  <div style={{ fontSize: 8, fontWeight: 500, color: isThisClass ? '#64748b' : '#f87171' }}>
+                                    {isThisClass ? '✓ here' : `${tc?.classes?.grades?.name || ''} ${tc?.classes?.name || ''}`}
+                                  </div>
+                                </div>
+                              </td>
+                            )
+                          }
+
+                          // Free slot
+                          return (
+                            <td key={`${di}-${p.number}`} style={{
+                              padding: '3px 2px', textAlign: 'center',
+                              borderRight: '1px solid #f8fafc'
+                            }}>
+                              <div style={{
+                                width: 8, height: 8, borderRadius: '50%',
+                                background: '#dcfce7', border: '1px solid #86efac',
+                                margin: '0 auto'
+                              }} title="Free" />
+                            </td>
+                          )
+                        })
+                      ))}
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Legend */}
+          <div style={{
+            padding: '8px 14px', borderTop: '1px solid #f1f5f9',
+            display: 'flex', gap: 16, fontSize: 11, color: '#64748b', background: '#fafbfc'
+          }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#dcfce7', border: '1px solid #86efac', display: 'inline-block' }} />
+              Free
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ width: 8, height: 8, borderRadius: 3, background: '#eff6ff', border: '1px solid #93c5fd', display: 'inline-block' }} />
+              Teaching this class
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span style={{ width: 8, height: 8, borderRadius: 3, background: '#fef2f2', border: '1px solid #fca5a5', display: 'inline-block' }} />
+              Busy elsewhere
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+
+// ══════════════════════════════════════════════════════════════
 // MAIN TIMETABLE PAGE
 // ══════════════════════════════════════════════════════════════
 export default function Timetable() {
@@ -652,6 +849,17 @@ export default function Timetable() {
           )}
         </div>
       </div>
+
+      {/* ══ TEACHER AVAILABILITY PANEL ══ */}
+      {isAdmin && view === 'class' && selectedClass && classTcs.length > 0 && (
+        <TeacherAvailability
+          classTcs={classTcs}
+          allSlots={allSlots}
+          periods={periods}
+          colorMap={colorMap}
+          selectedClassName={classes.find(c => c.id === selectedClass)}
+        />
+      )}
     </div>
   )
 }
