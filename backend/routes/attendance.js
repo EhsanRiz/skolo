@@ -80,11 +80,55 @@ router.get('/class/:class_id/register', async (req, res) => {
     const map = {}
     records.forEach(r => { map[r.learner_id] = { status: r.status, note: r.note } })
 
-    res.json(learners.map(l => ({
-      ...l,
-      status: map[l.id]?.status || null,
-      note:   map[l.id]?.note   || ''
-    })))
+    // Get register metadata — who last saved this register and when
+    let register_meta = null
+    if (records.length > 0) {
+      // Grab created_by + updated_at from any record for this class+date
+      const { data: metaRec } = await supabase
+        .from('attendance')
+        .select('created_by, updated_at')
+        .in('learner_id', ids)
+        .eq('date', date)
+        .eq('school_id', req.user.school_id)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (metaRec?.created_by) {
+        // Look up the user who saved it
+        const { data: savedBy } = await supabase
+          .from('users')
+          .select('id, email, role')
+          .eq('id', metaRec.created_by)
+          .maybeSingle()
+
+        // Try to get their name from teachers table
+        let savedByName = savedBy?.email || 'Unknown'
+        if (savedBy) {
+          const { data: teacher } = await supabase
+            .from('teachers')
+            .select('full_name')
+            .eq('user_id', savedBy.id)
+            .maybeSingle()
+          if (teacher?.full_name) savedByName = teacher.full_name
+        }
+
+        register_meta = {
+          saved_by: savedByName,
+          saved_by_role: savedBy?.role || 'unknown',
+          saved_at: metaRec.updated_at
+        }
+      }
+    }
+
+    res.json({
+      learners: learners.map(l => ({
+        ...l,
+        status: map[l.id]?.status || null,
+        note:   map[l.id]?.note   || ''
+      })),
+      register_meta
+    })
   } catch (err) { res.status(500).json({ error: err.message }) }
 })
 
@@ -111,6 +155,7 @@ router.post('/bulk', async (req, res) => {
       status:     r.status,
       note:       r.note || null,
       created_by: req.user.id,
+      marked_by_role: req.user.role,
       updated_at: new Date().toISOString()
     }))
 

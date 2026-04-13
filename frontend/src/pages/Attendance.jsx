@@ -22,8 +22,9 @@ export default function Attendance() {
   const { user } = useAuth()
   const { showToast } = useToast()
   const isTeacher   = user?.role === 'teacher'
+  const isAdmin     = user?.role === 'admin'
   const isPrincipal = user?.role === 'principal'
-  const readOnly    = isPrincipal
+  const canOverride = isAdmin || isPrincipal
 
   const [tab, setTab] = useState('register')
   const [classes, setClasses] = useState([])
@@ -87,7 +88,7 @@ export default function Attendance() {
 
       {/* Tab content */}
       {tab === 'register' && (
-        <RegisterTab classId={classId} className={className} readOnly={readOnly} showToast={showToast} />
+        <RegisterTab classId={classId} className={className} canOverride={canOverride} isTeacher={isTeacher} showToast={showToast} userRole={user?.role} />
       )}
       {tab === 'summary' && (
         <SummaryTab classId={classId} className={className} />
@@ -100,24 +101,33 @@ export default function Attendance() {
 }
 
 // ── Register Tab ──────────────────────────────────────────────
-function RegisterTab({ classId, readOnly, showToast }) {
+function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
   const [date,     setDate]     = useState(today())
   const [learners, setLearners] = useState([])
   const [marks,    setMarks]    = useState({})   // { learner_id: { status, note } }
   const [loading,  setLoading]  = useState(false)
   const [saving,   setSaving]   = useState(false)
   const [dirty,    setDirty]    = useState(false)
+  const [override, setOverride] = useState(false) // admin edit override
+  const [meta,     setMeta]     = useState(null)  // who last saved
+
+  // Teachers can always edit; admin/principal need override toggle
+  const readOnly = canOverride ? !override : false
 
   const load = useCallback(async () => {
     if (!classId) return
     setLoading(true)
     try {
       const { data } = await api.get(`/attendance/class/${classId}/register?date=${date}`)
-      setLearners(data)
+      // Backend now returns { learners, register_meta }
+      const list = data.learners || data
+      setLearners(list)
+      setMeta(data.register_meta || null)
       const m = {}
-      data.forEach(l => { m[l.id] = { status: l.status || 'present', note: l.note || '' } })
+      list.forEach(l => { m[l.id] = { status: l.status || 'present', note: l.note || '' } })
       setMarks(m)
       setDirty(false)
+      setOverride(false)
     } catch { showToast('Failed to load register', 'error') }
     finally { setLoading(false) }
   }, [classId, date])
@@ -160,7 +170,9 @@ function RegisterTab({ classId, readOnly, showToast }) {
       }))
       await api.post('/attendance/bulk', { class_id: classId, date, records })
       setDirty(false)
+      if (canOverride) setOverride(false) // lock editing after admin save
       showToast(`Register saved — ${records.length} learners`, 'success')
+      load() // reload to update submission metadata
     } catch { showToast('Failed to save register', 'error') }
     finally { setSaving(false) }
   }
@@ -194,6 +206,61 @@ function RegisterTab({ classId, readOnly, showToast }) {
           </div>
         )}
       </div>
+
+      {/* Admin/Principal read-only banner + override toggle */}
+      {canOverride && learners.length > 0 && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '12px 18px', borderRadius: 10, marginBottom: 14, flexWrap: 'wrap', gap: 10,
+          background: override ? '#fffbeb' : '#eff6ff',
+          border: `1px solid ${override ? '#fcd34d' : '#bfdbfe'}`
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 16 }}>{override ? '⚠️' : '👁️'}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: override ? '#92400e' : '#1e40af' }}>
+              {override
+                ? `Editing as ${userRole} — changes will be logged as an admin override`
+                : `Viewing as ${userRole} — attendance is managed by the class teacher`}
+            </span>
+          </div>
+          <button
+            onClick={() => setOverride(o => !o)}
+            style={{
+              padding: '6px 16px', borderRadius: 7, border: 'none', cursor: 'pointer',
+              fontWeight: 700, fontSize: 12, transition: 'all .15s',
+              background: override ? '#dc2626' : '#0f2044',
+              color: '#fff'
+            }}
+          >
+            {override ? '🔒 Lock editing' : '✏️ Edit override'}
+          </button>
+        </div>
+      )}
+
+      {/* Submission info — who last saved this register */}
+      {meta && canOverride && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px',
+          borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0',
+          marginBottom: 14, fontSize: 12, color: '#64748b'
+        }}>
+          <span style={{ fontWeight: 700, color: '#0f172a' }}>Last saved by:</span>
+          <span style={{ fontWeight: 600, color: meta.saved_by_role === 'teacher' ? '#16a34a' : '#d97706' }}>
+            {meta.saved_by}
+          </span>
+          <span style={{
+            padding: '1px 8px', borderRadius: 10, fontSize: 10, fontWeight: 700,
+            textTransform: 'uppercase', letterSpacing: '0.3px',
+            background: meta.saved_by_role === 'teacher' ? '#f0fdf4' : '#fffbeb',
+            color: meta.saved_by_role === 'teacher' ? '#16a34a' : '#d97706',
+            border: `1px solid ${meta.saved_by_role === 'teacher' ? '#86efac' : '#fcd34d'}`
+          }}>
+            {meta.saved_by_role}
+          </span>
+          <span>·</span>
+          <span>{new Date(meta.saved_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
+      )}
 
       {/* Stats */}
       {learners.length > 0 && (
@@ -272,8 +339,8 @@ function RegisterTab({ classId, readOnly, showToast }) {
       {!readOnly && learners.length > 0 && (
         <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
           <button onClick={save} disabled={saving}
-            style={{ padding: '10px 28px', background: dirty ? '#0f2044' : '#94a3b8', color: '#fff', border: 'none', borderRadius: 9, fontWeight: 700, fontSize: 14, cursor: saving ? 'not-allowed' : 'pointer', transition: 'background .2s' }}>
-            {saving ? 'Saving…' : dirty ? '💾 Save register' : 'Saved ✓'}
+            style={{ padding: '10px 28px', background: dirty ? (canOverride ? '#d97706' : '#0f2044') : '#94a3b8', color: '#fff', border: 'none', borderRadius: 9, fontWeight: 700, fontSize: 14, cursor: saving ? 'not-allowed' : 'pointer', transition: 'background .2s' }}>
+            {saving ? 'Saving…' : dirty ? (canOverride ? '⚠️ Save as admin override' : '💾 Save register') : 'Saved ✓'}
           </button>
         </div>
       )}
