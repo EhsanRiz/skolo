@@ -253,7 +253,6 @@ function TeacherAvailability({ classTcs, allSlots, periods, colorMap, selectedCl
     teacherSlots[tid][key] = s
   })
 
-  // Count stats
   const totalCells = teachablePeriods.length * 5
 
   return (
@@ -278,142 +277,157 @@ function TeacherAvailability({ classTcs, allSlots, periods, colorMap, selectedCl
       </button>
 
       {expanded && (
-        <div style={{ borderRadius: 14, border: '1px solid #e2e8f0', background: '#fff', overflow: 'hidden' }}>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', minWidth: 650, borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ background: '#f8fafc' }}>
-                  <th style={{
-                    padding: '10px 14px', fontSize: 11, fontWeight: 700, color: '#64748b',
-                    textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'left',
-                    width: 160, borderBottom: '1px solid #e2e8f0', borderRight: '1px solid #f1f5f9',
-                    position: 'sticky', left: 0, background: '#f8fafc', zIndex: 2
-                  }}>
-                    Teacher
-                  </th>
-                  {DAYS.map((day, di) => (
-                    teachablePeriods.map(p => (
-                      <th key={`${di}-${p.number}`} style={{
-                        padding: '6px 3px', fontSize: 9, fontWeight: 600, color: '#94a3b8',
-                        textAlign: 'center', borderBottom: '1px solid #e2e8f0',
-                        borderRight: '1px solid #f8fafc',
-                        minWidth: 52, lineHeight: 1.3
-                      }}>
-                        <div>{day.slice(0, 3)}</div>
-                        <div style={{ fontSize: 8, color: '#cbd5e1' }}>P{p.number}</div>
-                      </th>
-                    ))
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {teacherList.map(({ teacher }) => {
-                  const tSlots = teacherSlots[teacher.id] || {}
-                  const busyCount = Object.keys(tSlots).length
-                  const color = getColor(teacher.id, colorMap)
-                  const utilization = totalCells > 0 ? Math.round((busyCount / totalCells) * 100) : 0
-
-                  return (
-                    <tr key={teacher.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      {/* Teacher name cell */}
-                      <td style={{
-                        padding: '8px 14px', borderRight: '1px solid #f1f5f9',
-                        position: 'sticky', left: 0, background: '#fff', zIndex: 1
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <div style={{
-                            width: 28, height: 28, borderRadius: 7,
-                            background: color.bg, border: `1.5px solid ${color.border}`,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontWeight: 800, fontSize: 11, color: color.text, flexShrink: 0
-                          }}>
-                            {teacher.full_name?.charAt(0) || '?'}
-                          </div>
-                          <div style={{ minWidth: 0 }}>
-                            <div style={{ fontWeight: 700, fontSize: 12, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              {teacher.full_name}
-                            </div>
-                            <div style={{ fontSize: 10, color: '#94a3b8' }}>
-                              {busyCount}/{totalCells} slots · {utilization}%
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Day+period cells */}
-                      {DAYS.map((day, di) => (
-                        teachablePeriods.map(p => {
-                          const dayNum = di + 1
-                          const key = `${dayNum}-${p.number}`
-                          const slot = tSlots[key]
-                          const tc = slot?.teacher_classes
-                          const isThisClass = tc?.classes?.id === selectedClassName?.id
-
-                          if (slot) {
-                            return (
-                              <td key={`${di}-${p.number}`} style={{
-                                padding: '3px 2px', textAlign: 'center',
-                                borderRight: '1px solid #f8fafc',
-                                background: isThisClass ? color.bg : '#fef2f2'
-                              }}>
-                                <div title={`${tc?.subject || 'General'} — ${tc?.classes?.grades?.name || ''} ${tc?.classes?.name || ''}`}
-                                  style={{
-                                    fontSize: 9, fontWeight: 700, lineHeight: 1.3,
-                                    color: isThisClass ? color.text : '#dc2626',
-                                    padding: '2px 1px', borderRadius: 4,
-                                    cursor: 'default'
-                                  }}
-                                >
-                                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                    {tc?.subject?.slice(0, 6) || 'Gen'}
-                                  </div>
-                                  <div style={{ fontSize: 8, fontWeight: 500, color: isThisClass ? '#64748b' : '#f87171' }}>
-                                    {isThisClass ? '✓ here' : `${tc?.classes?.grades?.name || ''} ${tc?.classes?.name || ''}`}
-                                  </div>
-                                </div>
-                              </td>
-                            )
-                          }
-
-                          // Free slot
-                          return (
-                            <td key={`${di}-${p.number}`} style={{
-                              padding: '3px 2px', textAlign: 'center',
-                              borderRight: '1px solid #f8fafc'
-                            }}>
-                              <div style={{
-                                width: 8, height: 8, borderRadius: '50%',
-                                background: '#dcfce7', border: '1px solid #86efac',
-                                margin: '0 auto'
-                              }} title="Free" />
-                            </td>
-                          )
-                        })
-                      ))}
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-
+        <div>
           {/* Legend */}
           <div style={{
-            padding: '8px 14px', borderTop: '1px solid #f1f5f9',
-            display: 'flex', gap: 16, fontSize: 11, color: '#64748b', background: '#fafbfc'
+            display: 'flex', gap: 16, fontSize: 11, color: '#64748b', marginBottom: 12, paddingLeft: 4
           }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#dcfce7', border: '1px solid #86efac', display: 'inline-block' }} />
+            <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ width: 14, height: 14, borderRadius: 4, background: '#f0fdf4', border: '1.5px solid #86efac', display: 'inline-block' }} />
               Free
             </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ width: 8, height: 8, borderRadius: 3, background: '#eff6ff', border: '1px solid #93c5fd', display: 'inline-block' }} />
-              Teaching this class
+            <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ width: 14, height: 14, borderRadius: 4, background: '#eff6ff', border: '1.5px solid #93c5fd', display: 'inline-block' }} />
+              This class
             </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ width: 8, height: 8, borderRadius: 3, background: '#fef2f2', border: '1px solid #fca5a5', display: 'inline-block' }} />
+            <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ width: 14, height: 14, borderRadius: 4, background: '#fef2f2', border: '1.5px solid #fca5a5', display: 'inline-block' }} />
               Busy elsewhere
             </span>
+          </div>
+
+          {/* Teacher mini-grid cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
+            {teacherList.map(({ teacher }) => {
+              const tSlots = teacherSlots[teacher.id] || {}
+              const busyCount = Object.keys(tSlots).length
+              const color = getColor(teacher.id, colorMap)
+              const utilization = totalCells > 0 ? Math.round((busyCount / totalCells) * 100) : 0
+
+              return (
+                <div key={teacher.id} style={{
+                  background: '#fff', borderRadius: 12, border: '1px solid #e2e8f0',
+                  overflow: 'hidden'
+                }}>
+                  {/* Teacher header */}
+                  <div style={{
+                    padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10,
+                    borderBottom: '1px solid #f1f5f9', background: '#fafbfc'
+                  }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: 8,
+                      background: color.bg, border: `1.5px solid ${color.border}`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontWeight: 800, fontSize: 13, color: color.text, flexShrink: 0
+                    }}>
+                      {teacher.full_name?.charAt(0) || '?'}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: '#0f172a' }}>
+                        {teacher.full_name}
+                      </div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>
+                        {busyCount} of {totalCells} slots filled
+                      </div>
+                    </div>
+                    {/* Utilization bar */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div style={{ width: 48, height: 5, background: '#f1f5f9', borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{
+                          width: `${utilization}%`, height: '100%', borderRadius: 3,
+                          background: utilization > 80 ? '#dc2626' : utilization > 50 ? '#f59e0b' : '#16a34a',
+                          transition: 'width .3s'
+                        }} />
+                      </div>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#64748b' }}>{utilization}%</span>
+                    </div>
+                  </div>
+
+                  {/* Mini timetable grid */}
+                  <div style={{ padding: '8px 10px 10px' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr>
+                          <th style={{ width: 28 }} />
+                          {DAYS.map(d => (
+                            <th key={d} style={{
+                              padding: '3px 2px', fontSize: 10, fontWeight: 700,
+                              color: '#94a3b8', textAlign: 'center'
+                            }}>
+                              {d.slice(0, 3)}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {teachablePeriods.map(p => (
+                          <tr key={p.number}>
+                            <td style={{
+                              padding: '2px 4px 2px 0', fontSize: 9, fontWeight: 600,
+                              color: '#cbd5e1', textAlign: 'right', whiteSpace: 'nowrap'
+                            }}>
+                              P{p.number}
+                            </td>
+                            {DAYS.map((d, di) => {
+                              const dayNum = di + 1
+                              const key = `${dayNum}-${p.number}`
+                              const slot = tSlots[key]
+                              const tc = slot?.teacher_classes
+                              const isThisClass = tc?.classes?.id === selectedClassName?.id
+
+                              if (slot) {
+                                const subj = tc?.subject?.slice(0, 4) || 'Gen'
+                                const cls = `${tc?.classes?.grades?.name || ''} ${tc?.classes?.name || ''}`.trim()
+                                return (
+                                  <td key={d} style={{ padding: '2px 1px' }}>
+                                    <div
+                                      title={`${tc?.subject || 'General'} — ${cls}`}
+                                      style={{
+                                        background: isThisClass ? color.bg : '#fef2f2',
+                                        border: `1px solid ${isThisClass ? color.border : '#fca5a5'}`,
+                                        borderRadius: 5, padding: '3px 2px',
+                                        textAlign: 'center', cursor: 'default',
+                                        lineHeight: 1.2
+                                      }}
+                                    >
+                                      <div style={{
+                                        fontSize: 9, fontWeight: 700,
+                                        color: isThisClass ? color.text : '#dc2626',
+                                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
+                                      }}>
+                                        {subj}
+                                      </div>
+                                      {!isThisClass && (
+                                        <div style={{ fontSize: 7, color: '#f87171', fontWeight: 500 }}>
+                                          {cls.length > 8 ? cls.slice(0, 8) + '…' : cls}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </td>
+                                )
+                              }
+
+                              // Free
+                              return (
+                                <td key={d} style={{ padding: '2px 1px' }}>
+                                  <div style={{
+                                    background: '#f0fdf4', border: '1px solid #dcfce7',
+                                    borderRadius: 5, padding: '5px 2px',
+                                    textAlign: 'center'
+                                  }}>
+                                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#86efac', margin: '0 auto' }} />
+                                  </div>
+                                </td>
+                              )
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
