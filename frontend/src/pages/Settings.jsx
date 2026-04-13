@@ -1212,123 +1212,23 @@ function TimetableTab({ school, refreshSchool, toast }) {
         </div>
       )}
 
-      {/* ─ Step 2: Weekly grid ─ */}
+      {/* ─ Step 2: Go to Timetable Builder ─ */}
       {step === 'assign' && (
-        <div>
-          {loadingTimetable && (
-            <div style={{ background: '#fff', borderRadius: 12, padding: 32, textAlign: 'center', border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: 28, marginBottom: 8 }}>⏳</div>
-              <div style={{ fontWeight: 600, fontSize: 14, color: '#374151' }}>Loading timetable...</div>
+        <div style={{ maxWidth: 500 }}>
+          <div style={{ background: '#fff', borderRadius: 12, padding: 32, textAlign: 'center', border: '1.5px solid #e2e8f0' }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>📅</div>
+            <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a', marginBottom: 8 }}>
+              Timetable Builder
             </div>
-          )}
-
-          {!loadingTimetable && timetableError && (
-            <div style={{ background: '#fef2f2', borderRadius: 12, padding: 32, textAlign: 'center', border: '1px solid #fecaca' }}>
-              <div style={{ fontSize: 28, marginBottom: 8 }}>❌</div>
-              <div style={{ fontWeight: 600, fontSize: 14, color: '#991b1b', marginBottom: 4 }}>Failed to load timetable</div>
-              <div style={{ fontSize: 13, color: '#b91c1c', marginBottom: 16 }}>{timetableError}</div>
-              <button onClick={() => { setStep('periods'); setTimeout(() => setStep('assign'), 50) }}
-                style={{ padding: '8px 20px', background: '#0f2044', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
-                Retry
-              </button>
+            <div style={{ fontSize: 14, color: '#64748b', marginBottom: 20, lineHeight: 1.6 }}>
+              The interactive timetable builder has moved to its own page. Select a class, click any slot, and assign teachers — with automatic conflict detection.
             </div>
-          )}
-
-          {!loadingTimetable && !timetableError && teachablePeriods.length === 0 && (
-            <div style={{ background: '#fff', borderRadius: 12, padding: 32, textAlign: 'center', border: '1.5px dashed #e2e8f0' }}>
-              <div style={{ fontSize: 28, marginBottom: 8 }}>⚠️</div>
-              <div style={{ fontWeight: 600, fontSize: 14, color: '#374151' }}>No teaching periods defined</div>
-              <div style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>Go back to step 1 and add your school's periods first.</div>
-            </div>
-          )}
-
-          {!loadingTimetable && !timetableError && teachablePeriods.length > 0 && (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', minWidth: 800, borderCollapse: 'collapse', background: '#fff', borderRadius: 12, overflow: 'hidden', border: '1px solid #e2e8f0' }}>
-                <thead>
-                  <tr style={{ background: '#f8fafc' }}>
-                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', textAlign: 'left', width: 110, borderBottom: '1px solid #e2e8f0', borderRight: '1px solid #f1f5f9' }}>
-                      Period
-                    </th>
-                    {DAYS.map((d, di) => (
-                      <th key={d} style={{ padding: '10px 8px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', textAlign: 'center', borderBottom: '1px solid #e2e8f0', borderRight: di < 4 ? '1px solid #f1f5f9' : 'none' }}>
-                        {d}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {periods.map((p, pi) => {
-                    if (p.isBreak) {
-                      return (
-                        <tr key={pi} style={{ background: '#fefce8' }}>
-                          <td colSpan={6} style={{ padding: '8px 12px', fontSize: 12, fontWeight: 600, color: '#a16207', textAlign: 'center', borderBottom: '1px solid #f1f5f9' }}>
-                            ☕ {p.label} ({p.start}–{p.end})
-                          </td>
-                        </tr>
-                      )
-                    }
-
-                    return (
-                      <tr key={pi} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                        <td style={{ padding: '10px 12px', borderRight: '1px solid #f1f5f9', verticalAlign: 'top' }}>
-                          <div style={{ fontWeight: 600, fontSize: 13, color: '#0f172a' }}>{p.label}</div>
-                          <div style={{ fontSize: 11, color: '#94a3b8' }}>{p.start}–{p.end}</div>
-                        </td>
-                        {DAYS.map((d, dayIdx) => {
-                          const dayNum = dayIdx + 1
-                          const key = `${dayNum}-${p.number}`
-                          const cellSlots = slotMap[key] || []
-
-                          return (
-                            <td key={d} style={{ padding: '6px', verticalAlign: 'top', borderRight: dayIdx < 4 ? '1px solid #f1f5f9' : 'none', minWidth: 130 }}>
-                              {cellSlots.map(s => {
-                                const tc = s.teacher_classes
-                                return (
-                                  <div key={s.id} style={{ background: '#eff6ff', borderRadius: 8, padding: '6px 8px', marginBottom: 4, position: 'relative' }}>
-                                    <div style={{ fontWeight: 600, fontSize: 12, color: '#0f2044' }}>
-                                      {tc?.classes?.grades?.name} {tc?.classes?.name}
-                                    </div>
-                                    <div style={{ fontSize: 11, color: '#64748b' }}>
-                                      {tc?.teachers?.full_name}{tc?.subject ? ` · ${tc.subject}` : ''}
-                                    </div>
-                                    {s.room && <div style={{ fontSize: 10, color: '#94a3b8' }}>📍 {s.room}</div>}
-                                    <button onClick={() => removeSlot(s.id)}
-                                      style={{ position: 'absolute', top: 2, right: 4, background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: 12, padding: 2 }}
-                                      title="Remove">✕</button>
-                                  </div>
-                                )
-                              })}
-                              {/* Add slot dropdown */}
-                              <select
-                                value=""
-                                onChange={e => assignSlot(dayNum, p.number, e.target.value)}
-                                style={{ width: '100%', padding: '5px 6px', border: '1.5px dashed #e2e8f0', borderRadius: 8, fontSize: 11, color: '#94a3b8', cursor: 'pointer', background: '#fafafa', outline: 'none' }}
-                              >
-                                <option value="">+ assign…</option>
-                                {tcOptions.map(tc => (
-                                  <option key={tc.id} value={tc.id}>{tc.label}</option>
-                                ))}
-                              </select>
-                            </td>
-                          )
-                        })}
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {tcOptions.length === 0 && teachablePeriods.length > 0 && (
-            <div style={{ marginTop: 16, padding: '12px 16px', background: '#fef3c7', border: '1px solid #fde68a', borderRadius: 10, fontSize: 13, color: '#a16207' }}>
-              ⚠️ No teacher-class assignments found. Assign teachers to classes first in the Teachers tab.
-            </div>
-          )}
-
-          <div style={{ marginTop: 16, padding: '12px 16px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: 10, fontSize: 13, color: '#15803d' }}>
-            💡 Teachers will see this timetable on their dashboard. Select a teacher-class from the dropdown to fill each slot.
+            <a href="/timetable" style={{
+              display: 'inline-block', padding: '10px 28px', background: '#0f2044', color: '#fff',
+              borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: 'none', transition: 'background .15s'
+            }}>
+              Open Timetable Builder →
+            </a>
           </div>
         </div>
       )}

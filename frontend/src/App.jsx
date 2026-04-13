@@ -24,6 +24,7 @@ import SuperAdminLogin from './pages/SuperAdminLogin'
 import LandingPage from './pages/LandingPage'
 import RequestDemo from './pages/RequestDemo'
 import Messages from './pages/Messages'
+import Timetable from './pages/Timetable'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -77,6 +78,7 @@ export default function App() {
             <Route path="my-classes"    element={<MyClasses />} />
             <Route path="exam-grades"   element={<ExamGrades />} />
             <Route path="attendance"    element={<Attendance />} />
+            <Route path="timetable"    element={<Timetable />} />
             <Route path="fees"          element={<Fees />} />
             <Route path="events"        element={<Events />} />
             <Route path="announcements" element={<Announcements />} />
