@@ -709,12 +709,76 @@ export default function Fees() {
           </div>
         )}
 
-        {/* GRADE GROUPS */}
+        {/* GRADE GROUPS — full detail for admin/bursar, summary cards for principal */}
         {!search && !loading && (
           <>
             {processed.groups && Object.keys(processed.groups).length > 0
-              ? Object.entries(processed.groups).map(([gname, rows]) => (
-                  <GradeGroup key={gname} gname={gname} rows={rows} />
+              ? (isReadOnly ? (
+                  /* ── Principal summary view: per-grade cards ── */
+                  <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))', gap:12 }}>
+                    {Object.entries(processed.groups).map(([gname, rows]) => {
+                      const gradeOwed   = rows.reduce((s,r)=>s+Number(r.amount_due),0)
+                      const gradePaid   = rows.reduce((s,r)=>s+Number(r.amount_paid),0)
+                      const gradeBalance= gradeOwed - gradePaid
+                      const overdueCount= rows.filter(r=>r.status==='overdue').length
+                      const paidCount   = rows.filter(r=>r.status==='paid').length
+                      const totalCount  = rows.length
+                      const collPct     = gradeOwed > 0 ? Math.round(gradePaid/gradeOwed*100) : 0
+                      const allPaid     = paidCount === totalCount
+                      const hasOverdue  = overdueCount > 0
+
+                      return (
+                        <div key={gname} style={{
+                          background:'#fff', borderRadius:12, padding:'18px 20px',
+                          border: `1.5px solid ${hasOverdue ? '#fca5a5' : allPaid ? '#86efac' : '#e2e8f0'}`,
+                          boxShadow:'0 1px 3px rgba(0,0,0,.04)'
+                        }}>
+                          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
+                            <div style={{ fontWeight:800, fontSize:15, color:'#0f172a' }}>{gname}</div>
+                            {allPaid && <span style={{ fontSize:11, fontWeight:700, color:'#16a34a', background:'#f0fdf4', padding:'2px 8px', borderRadius:10 }}>All paid</span>}
+                            {hasOverdue && <span style={{ fontSize:11, fontWeight:700, color:'#dc2626', background:'#fee2e2', padding:'2px 8px', borderRadius:10 }}>{overdueCount} overdue</span>}
+                          </div>
+
+                          {/* Collection progress bar */}
+                          <div style={{ marginBottom:12 }}>
+                            <div style={{ display:'flex', justifyContent:'space-between', fontSize:11, fontWeight:600, color:'#64748b', marginBottom:4 }}>
+                              <span>Collection rate</span>
+                              <span style={{ color: collPct>=80?'#16a34a':collPct>=50?'#d97706':'#dc2626', fontWeight:800 }}>{collPct}%</span>
+                            </div>
+                            <div style={{ height:8, background:'#f1f5f9', borderRadius:4, overflow:'hidden' }}>
+                              <div style={{ height:'100%', width:`${collPct}%`, borderRadius:4, transition:'width .3s',
+                                background: collPct>=80?'#16a34a':collPct>=50?'#d97706':'#dc2626' }} />
+                            </div>
+                          </div>
+
+                          {/* Stats grid */}
+                          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+                            <div style={{ background:'#f8fafc', borderRadius:8, padding:'8px 10px' }}>
+                              <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.4px' }}>Due</div>
+                              <div style={{ fontSize:15, fontWeight:800, color:'#0f172a' }}>{sym}{gradeOwed.toLocaleString()}</div>
+                            </div>
+                            <div style={{ background:'#f0fdf4', borderRadius:8, padding:'8px 10px' }}>
+                              <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.4px' }}>Collected</div>
+                              <div style={{ fontSize:15, fontWeight:800, color:'#16a34a' }}>{sym}{gradePaid.toLocaleString()}</div>
+                            </div>
+                            <div style={{ background: gradeBalance>0?'#fff5f5':'#f0fdf4', borderRadius:8, padding:'8px 10px' }}>
+                              <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.4px' }}>Outstanding</div>
+                              <div style={{ fontSize:15, fontWeight:800, color: gradeBalance>0?'#dc2626':'#16a34a' }}>{sym}{gradeBalance.toLocaleString()}</div>
+                            </div>
+                            <div style={{ background:'#f8fafc', borderRadius:8, padding:'8px 10px' }}>
+                              <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.4px' }}>Learners</div>
+                              <div style={{ fontSize:15, fontWeight:800, color:'#0f172a' }}>{paidCount}<span style={{ fontSize:11, color:'#94a3b8', fontWeight:600 }}>/{totalCount} paid</span></div>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  /* ── Admin/bursar: detailed per-learner rows ── */
+                  Object.entries(processed.groups).map(([gname, rows]) => (
+                    <GradeGroup key={gname} gname={gname} rows={rows} />
+                  ))
                 ))
               : (
                 <div style={{ background:'#fff', borderRadius:12, padding:56, textAlign:'center', color:'#94a3b8', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>

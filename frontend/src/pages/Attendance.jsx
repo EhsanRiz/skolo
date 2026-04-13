@@ -296,10 +296,22 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
                 const status = marks[l.id]?.status || 'present'
                 const note   = marks[l.id]?.note   || ''
                 const s = STATUS_MAP[status]
+                const editedByOther = l.marked_by_role && l.marked_by_role !== 'teacher'
                 return (
-                  <tr key={l.id} style={{ borderBottom: i < learners.length - 1 ? '1px solid #f1f5f9' : 'none', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
+                  <tr key={l.id} style={{ borderBottom: i < learners.length - 1 ? '1px solid #f1f5f9' : 'none', background: editedByOther ? '#fffbeb' : (i % 2 === 0 ? '#fff' : '#fafafa') }}>
                     <td style={{ ...td, color: '#94a3b8', width: 40 }}>{i + 1}</td>
-                    <td style={{ ...td, fontWeight: 600, color: '#0f172a', textAlign: 'left' }}>{l.last_name}, {l.first_name}</td>
+                    <td style={{ ...td, fontWeight: 600, color: '#0f172a', textAlign: 'left' }}>
+                      {l.last_name}, {l.first_name}
+                      {editedByOther && (
+                        <span style={{
+                          display: 'inline-block', marginLeft: 6, padding: '1px 6px', borderRadius: 8,
+                          fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px',
+                          background: '#fffbeb', color: '#d97706', border: '1px solid #fcd34d'
+                        }}>
+                          edited by {l.marked_by_role}
+                        </span>
+                      )}
+                    </td>
                     <td style={{ ...td, color: '#94a3b8', fontSize: 12, textAlign: 'left' }}>{l.reference_no || '—'}</td>
                     <td style={{ ...td, width: 220 }}>
                       <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>

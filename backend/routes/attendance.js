@@ -70,7 +70,7 @@ router.get('/class/:class_id/register', async (req, res) => {
 
     const { data: records, error: rErr } = await supabase
       .from('attendance')
-      .select('learner_id, status, note')
+      .select('learner_id, status, note, created_by, marked_by_role, updated_at')
       .in('learner_id', ids)
       .eq('date', date)
       .eq('school_id', req.user.school_id)
@@ -78,7 +78,7 @@ router.get('/class/:class_id/register', async (req, res) => {
     if (rErr) throw rErr
 
     const map = {}
-    records.forEach(r => { map[r.learner_id] = { status: r.status, note: r.note } })
+    records.forEach(r => { map[r.learner_id] = { status: r.status, note: r.note, created_by: r.created_by, marked_by_role: r.marked_by_role, updated_at: r.updated_at } })
 
     // Get register metadata — who last saved this register and when
     let register_meta = null
@@ -125,7 +125,9 @@ router.get('/class/:class_id/register', async (req, res) => {
       learners: learners.map(l => ({
         ...l,
         status: map[l.id]?.status || null,
-        note:   map[l.id]?.note   || ''
+        note:   map[l.id]?.note   || '',
+        marked_by_role: map[l.id]?.marked_by_role || null,
+        updated_at: map[l.id]?.updated_at || null
       })),
       register_meta
     })

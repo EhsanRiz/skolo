@@ -731,7 +731,7 @@ function PremiumGate({ tab, learnerId }) {
 export default function LearnerProfile() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { school } = useAuth()
+  const { school, user } = useAuth()
   const sym = school?.countries?.currency_symbol || 'R'
 
   const [learner, setLearner] = useState(null)

@@ -101,6 +101,8 @@ export default function Learners() {
   const [learners, setLearners] = useState([])
   const [grades,   setGrades]   = useState([])
   const [search,   setSearch]   = useState('')
+  const [gradeFilter, setGradeFilter] = useState('')
+  const [classFilter, setClassFilter] = useState('')
   const [modal,    setModal]    = useState(null)
   const [selected, setSelected] = useState(null)
   const [form,     setForm]     = useState(emptyL)
@@ -120,9 +122,24 @@ export default function Learners() {
   }
   useEffect(() => { load() }, [])
 
-  const filtered = learners.filter(l =>
-    `${l.first_name} ${l.last_name}`.toLowerCase().includes(search.toLowerCase())
-  )
+  // Derive which grade a learner belongs to
+  const gradeForLearner = l => {
+    for (const g of grades) {
+      if ((g.classes || []).some(c => c.id === l.class_id)) return g.id
+      if (g.id === l.class_id) return g.id
+    }
+    return null
+  }
+
+  // Classes available for the selected grade filter
+  const filteredClasses = gradeFilter ? (grades.find(g => g.id === gradeFilter)?.classes || []) : []
+
+  const filtered = learners.filter(l => {
+    if (search && !`${l.first_name} ${l.last_name}`.toLowerCase().includes(search.toLowerCase())) return false
+    if (gradeFilter && gradeForLearner(l) !== gradeFilter) return false
+    if (classFilter && l.class_id !== classFilter) return false
+    return true
+  })
 
   const hf = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }))
   const hg = e => setGuardian(g => ({ ...g, [e.target.name]: e.target.value }))
@@ -260,10 +277,43 @@ export default function Learners() {
         )}
       </div>
 
-      {/* Search */}
+      {/* Search + Filters */}
       <div style={{ background: '#fff', borderRadius: 12, padding: '12px 16px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
         <input style={{ ...t.input, marginBottom: 0, background: '#f8fafc' }}
           placeholder="Search by name…" value={search} onChange={e => setSearch(e.target.value)} />
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+          <select
+            value={gradeFilter}
+            onChange={e => { setGradeFilter(e.target.value); setClassFilter('') }}
+            style={{ padding: '7px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, outline: 'none', background: gradeFilter ? '#eff6ff' : '#fff', color: gradeFilter ? '#1d4ed8' : '#374151', fontWeight: gradeFilter ? 600 : 400, minWidth: 140 }}
+          >
+            <option value="">All grades</option>
+            {grades.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+          </select>
+
+          {filteredClasses.length > 0 && (
+            <select
+              value={classFilter}
+              onChange={e => setClassFilter(e.target.value)}
+              style={{ padding: '7px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, outline: 'none', background: classFilter ? '#eff6ff' : '#fff', color: classFilter ? '#1d4ed8' : '#374151', fontWeight: classFilter ? 600 : 400, minWidth: 120 }}
+            >
+              <option value="">All classes</option>
+              {filteredClasses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          )}
+
+          {(gradeFilter || classFilter) && (
+            <button onClick={() => { setGradeFilter(''); setClassFilter('') }}
+              style={{ padding: '6px 12px', border: '1px solid #e2e8f0', borderRadius: 7, background: '#fff', color: '#94a3b8', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+              Clear filters
+            </button>
+          )}
+
+          <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 600, marginLeft: 'auto' }}>
+            {filtered.length} learner{filtered.length !== 1 ? 's' : ''}
+          </span>
+        </div>
       </div>
 
       {/* Table */}
