@@ -721,7 +721,13 @@ function PremiumGate({ tab, learnerId }) {
         </div>
       </div>
       <div style={{ marginTop:28, fontSize:13, color:'#9ca3af' }}>
-        Contact <strong style={{color:'#003049'}}>4D Climate Solutions</strong> to upgrade your school's plan.
+        Contact{' '}
+        <a href="https://innovaearth.com" target="_blank" rel="noopener noreferrer"
+           style={{color:'#003049', fontWeight:700, textDecoration:'none'}}>InnovaEarth</a>
+        {' '}or{' '}
+        <a href="https://4dcs.co.za" target="_blank" rel="noopener noreferrer"
+           style={{color:'#003049', fontWeight:700, textDecoration:'none'}}>4D Climate Solutions</a>
+        {' '}to upgrade your school's plan.
       </div>
     </div>
   )

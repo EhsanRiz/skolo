@@ -68,6 +68,13 @@ The token system lives at `frontend/src/components/ui.jsx` (the `t` object). Mos
 
 ## Recent Sessions
 
+### 8 May 2026 — Visual polish sweep (post-palette audit)
+
+- **Landing page palette consistency:** swept three off-palette tints (`#fef3c7` → `#fef4d6` amber tint, `#d97706` → `#b8870a` amber dark, `#f0f5fa` → `#e6eff5` Sky Blue tint); decorative purple → Sky Blue on the Audience "Education organisations" globe icon and the Challenges "Real-time visibility" stat. Skolo AI plan tier and Exam grades feature icon keep their purple (justified per palette spec — tier semantic and subject/grades semantic).
+- **Sidebar active state → Sky Blue:** `Layout.jsx` `.nav-link.active` background changed from translucent white to `#669bbc` per the Modern Academic mockup spec; notification panel's "general" item bg also fixed to `#e6eff5`.
+- **LearnerProfile upgrade CTA:** premium-gate copy now reads "Contact **InnovaEarth** or **4D Climate Solutions** to upgrade…" — both linkable, matches footer attribution.
+- **Parent dashboard Outstanding stat:** color changed from danger red `#dc2626` to amber dark `#b8870a` so an outstanding balance reads as "attention-needed" (amber) rather than "error" (red), matching the hero mockup on the landing page.
+
 ### 8 May 2026 — Modern Academic palette migration (3 commits)
 
 - `0288ea9` — token system rebuilt around semantic roles (`primary`, `accent`, `attention`, `success`, `danger`); 1,482 hardcoded hex codes swept across 42 files; embedded JPEG 4DCS logos removed from Login/Register; footer attribution everywhere updated to "Developed by [InnovaEarth](https://innovaearth.com) in collaboration with [4D Climate Solutions](https://4dcs.co.za)" with both names clickable
@@ -275,10 +282,10 @@ If a deploy doesn't fire automatically, click **"Create deployment"** on Cloudfl
 - [ ] Consider replacing `#7c3aed` purple (waived/SuperAdmin/unread) with a Modern-Academic-aligned alternative
 
 ### Visual polish (post-palette)
-- [ ] Review remaining landing-page sections (Pain Points, Features, Audience, Pricing, Challenges, FAQ) — confirm they flow with the new lighter theme
-- [ ] Check `LearnerProfile.jsx` "Contact 4D Climate Solutions to upgrade" body copy — should this reference InnovaEarth too?
-- [ ] Audit `Layout.jsx` sidebar against the mockup spec — confirm Sky Blue active state and Navy text levels are right
-- [ ] Spot-check parent app dashboard against the mockup — Pay Now button should be Amber
+- [x] Review remaining landing-page sections (Pain Points, Features, Audience, Pricing, Challenges, FAQ) — confirm they flow with the new lighter theme *(8 May)*
+- [x] Check `LearnerProfile.jsx` "Contact 4D Climate Solutions to upgrade" body copy — now references both InnovaEarth and 4DCS *(8 May)*
+- [x] Audit `Layout.jsx` sidebar against the mockup spec — Sky Blue active state applied *(8 May)*
+- [x] Spot-check parent app dashboard against the mockup — Outstanding stat now amber *(8 May)*
 
 ### Phase 2
 - [ ] Supabase Realtime for messaging (replace 5s polling)

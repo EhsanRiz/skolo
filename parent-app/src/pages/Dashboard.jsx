@@ -85,7 +85,7 @@ export default function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 24 }}>
         <StatCard label="OUTSTANDING" value={`${currency}${totalBalance.toFixed(0)}`}
           sub={totalBalance > 0 ? `${currency}${totalPaid.toFixed(0)} paid` : 'All paid up'}
-          color={totalBalance > 0 ? '#dc2626' : '#16a34a'} delay={0}
+          color={totalBalance > 0 ? '#b8870a' : '#16a34a'} delay={0}
           onClick={() => navigate('/fees')} />
         <StatCard label="ATTENDANCE" value={avgAttendance != null ? `${avgAttendance}%` : '—'}
           sub={`${new Date().toLocaleString('en-ZA', { month: 'long' })} school-wide`}

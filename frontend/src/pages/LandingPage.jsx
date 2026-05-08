@@ -51,7 +51,7 @@ const LandingPage = () => {
       .section-label {
         display: inline-block; font-size: 12px; font-weight: 700;
         letter-spacing: 1.5px; text-transform: uppercase;
-        color: var(--blue); background: #f0f5fa; padding: 5px 14px;
+        color: var(--blue); background: #e6eff5; padding: 5px 14px;
         border-radius: 20px; margin-bottom: 16px;
       }
       .section-title {
@@ -190,7 +190,7 @@ const LandingPage = () => {
       }
       .pain-icon svg { width: 20px; height: 20px; stroke-width: 1.8; }
       .pain-icon.red    { background: #fee2e2; color: #dc2626; }
-      .pain-icon.amber  { background: #fef3c7; color: #d97706; }
+      .pain-icon.amber  { background: #fef4d6; color: #b8870a; }
       .pain-icon.slate  { background: #e5e7eb; color: #4b5563; }
       .pain-title { font-size: 16px; font-weight: 800; color: #1f2937; }
       .pain-desc { font-size: 14px; color: var(--slate); line-height: 1.7; }
@@ -203,7 +203,7 @@ const LandingPage = () => {
         background: var(--light); border-radius: 14px;
         border: 1.5px solid #e5e7eb; transition: all .25s;
       }
-      .feature-card:hover { border-color: var(--blue); background: #f0f5fa; }
+      .feature-card:hover { border-color: var(--blue); background: #e6eff5; }
       .feature-icon {
         width: 48px; height: 48px; border-radius: 12px;
         display: flex; align-items: center; justify-content: center;
@@ -212,7 +212,7 @@ const LandingPage = () => {
       .feature-icon.blue   { background: #e6eff5; }
       .feature-icon.green  { background: #dcfce7; }
       .feature-icon.purple { background: #ede9fe; }
-      .feature-icon.amber  { background: #fef3c7; }
+      .feature-icon.amber  { background: #fef4d6; }
       .feature-icon.rose   { background: #ffe4e6; }
       .feature-icon.cyan   { background: #cffafe; }
       .feature-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
@@ -554,7 +554,7 @@ const LandingPage = () => {
               { icon: 'blue', title: 'Fee management', desc: 'Track who owes what, record payments instantly, auto-generate monthly fee entries, and see collection rates by grade \u2014 in real time.', svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#003049" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> },
               { icon: 'green', title: 'Daily attendance', desc: 'Teachers mark registers on their phone in under a minute. Principals see school-wide rates and get alerts for learners falling behind.', svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> },
               { icon: 'purple', title: 'Exam grades & report cards', desc: 'Enter marks by subject and term. Averages calculate automatically. Download PDF report cards for each learner with one click.', svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> },
-              { icon: 'amber', title: 'Timetable & calendar', desc: 'Build your school timetable in minutes. Teachers see their daily schedule with live indicators. Never double-book a class.', svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+              { icon: 'amber', title: 'Timetable & calendar', desc: 'Build your school timetable in minutes. Teachers see their daily schedule with live indicators. Never double-book a class.', svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b8870a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
               { icon: 'rose', title: 'Messaging & SMS', desc: 'Built-in messaging between staff and parents. Post announcements to specific grades. Optionally blast via SMS \u2014 no more lost circulars.', svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e11d48" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> },
               { icon: 'cyan', title: 'Parent portal', desc: 'Give parents a secure portal to view fees, attendance, grades, and message teachers. No app download needed \u2014 works on any phone.', svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0891b2" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
             ].map((f, i) => (
@@ -624,7 +624,7 @@ const LandingPage = () => {
             </div>
             <div className="audience-card animate delay-1">
               <h3 style={{ display:'flex', alignItems:'center', gap:'10px' }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#669bbc" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                 Education organisations
               </h3>
               <p style={{ fontSize:'14px', color:'var(--slate)', marginBottom:'18px' }}>Government departments, NGOs, and school groups that need visibility across multiple institutions.</p>
@@ -666,7 +666,7 @@ const LandingPage = () => {
               </div>
             </div>
             <div className="challenge-card animate delay-2">
-              <div className="challenge-stat" style={{ color:'var(--purple)' }}>0</div>
+              <div className="challenge-stat" style={{ color:'#669bbc' }}>0</div>
               <div>
                 <div className="challenge-title">Real-time visibility for principals</div>
                 <div className="challenge-desc">School leaders rely on end-of-term paper reports. There&rsquo;s no way to see today&rsquo;s attendance, this week&rsquo;s fee collection, or which learners are falling behind &mdash; until someone compiles it manually.</div>

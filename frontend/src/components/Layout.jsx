@@ -45,7 +45,7 @@ const CSS = `
   border-radius: 8px; margin: 2px 0; transition: all 0.15s;
 }
 .nav-link:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9); }
-.nav-link.active { background: rgba(255,255,255,0.15); color: #fff; font-weight: 600; }
+.nav-link.active { background: #669bbc; color: #fff; font-weight: 600; }
 .nav-link svg { opacity: 0.6; flex-shrink: 0; }
 .nav-link.active svg { opacity: 1; }
 
@@ -184,7 +184,7 @@ function NotificationBell({ user, school_id }) {
             {/* Unread messages first */}
             {msgNotifs.map(n => (
               <div key={n.id} onClick={() => { setOpen(false); navigate(n.link) }}
-                style={{ padding:'12px 16px', cursor:'pointer', background:'#f0f5fa', borderBottom:'1px solid #fafafa', transition:'background .1s' }}>
+                style={{ padding:'12px 16px', cursor:'pointer', background:'#e6eff5', borderBottom:'1px solid #fafafa', transition:'background .1s' }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:8 }}>
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ fontWeight:700, fontSize:13, color:'#1f2937', marginBottom:2 }}>
