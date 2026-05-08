@@ -15,7 +15,7 @@ const DEFAULT_BOUNDARIES = [
   { grade: 'F', min: 0  },
 ]
 
-const GRADE_COLORS = ['#16a34a','#2563eb','#d97706','#ea580c','#dc2626','#7c3aed','#0891b2','#be185d']
+const GRADE_COLORS = ['#16a34a','#003049','#d97706','#ea580c','#dc2626','#7c3aed','#0891b2','#be185d']
 
 function letterGrade(mark, boundaries) {
   if (mark === null || mark === undefined || mark === '') return '—'
@@ -32,7 +32,7 @@ function gradeColor(grade, boundaries) {
   const scale = (boundaries && boundaries.length ? boundaries : DEFAULT_BOUNDARIES)
     .slice().sort((a, b) => b.min - a.min)
   const idx = scale.findIndex(b => b.grade === grade)
-  if (idx === -1) return '#94a3b8'
+  if (idx === -1) return '#9ca3af'
   return GRADE_COLORS[idx % GRADE_COLORS.length]
 }
 
@@ -147,14 +147,14 @@ export default function ExamGrades() {
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 22, fontWeight: 800, color: '#0f172a' }}>Exam Grades</div>
-        <div style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>
+        <div style={{ fontSize: 22, fontWeight: 800, color: '#1f2937' }}>Exam Grades</div>
+        <div style={{ fontSize: 14, color: '#6b7280', marginTop: 2 }}>
           {readOnly ? 'View grades by class, subject and term' : 'Enter marks per subject, term and year'}
         </div>
       </div>
 
       {/* Toolbar */}
-      <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e2e8f0', padding: '18px 20px', marginBottom: 20, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-end' }}>
+      <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e5e7eb', padding: '18px 20px', marginBottom: 20, display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-end' }}>
 
         {/* Class selector */}
         <div style={{ flex: '1 1 180px' }}>
@@ -192,8 +192,8 @@ export default function ExamGrades() {
             {TERMS.map(t => (
               <button key={t} onClick={() => setTerm(t)} style={{
                 padding: '7px 14px', borderRadius: 8, border: '1.5px solid',
-                borderColor: term === t ? '#0f2044' : '#e2e8f0',
-                background: term === t ? '#0f2044' : '#fff',
+                borderColor: term === t ? '#003049' : '#e5e7eb',
+                background: term === t ? '#003049' : '#fff',
                 color: term === t ? '#fff' : '#374151',
                 fontWeight: 600, fontSize: 13, cursor: 'pointer'
               }}>T{t}</button>
@@ -212,7 +212,7 @@ export default function ExamGrades() {
         {/* Save */}
         {!readOnly && (
           <button onClick={handleSave} disabled={saving || !selected || !subject.trim() || !learners.length}
-            style={{ padding: '9px 22px', background: dirty ? '#0f2044' : '#94a3b8', color: '#fff', border: 'none', borderRadius: 9, fontWeight: 700, fontSize: 14, cursor: saving || !dirty ? 'not-allowed' : 'pointer', alignSelf: 'flex-end', whiteSpace: 'nowrap', transition: 'background .2s' }}>
+            style={{ padding: '9px 22px', background: dirty ? '#003049' : '#9ca3af', color: '#fff', border: 'none', borderRadius: 9, fontWeight: 700, fontSize: 14, cursor: saving || !dirty ? 'not-allowed' : 'pointer', alignSelf: 'flex-end', whiteSpace: 'nowrap', transition: 'background .2s' }}>
             {saving ? 'Saving…' : dirty ? '💾 Save grades' : 'Saved ✓'}
           </button>
         )}
@@ -227,36 +227,36 @@ export default function ExamGrades() {
             { label: 'Unmarked', val: learners.length - filledCount },
             { label: 'Class avg', val: filledCount ? `${avg}%` : '—' },
           ].map(s => (
-            <div key={s.label} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 10, padding: '10px 18px', flex: '1 1 100px', textAlign: 'center' }}>
-              <div style={{ fontSize: 20, fontWeight: 800, color: '#0f172a' }}>{s.val}</div>
-              <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px' }}>{s.label}</div>
+            <div key={s.label} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 10, padding: '10px 18px', flex: '1 1 100px', textAlign: 'center' }}>
+              <div style={{ fontSize: 20, fontWeight: 800, color: '#1f2937' }}>{s.val}</div>
+              <div style={{ fontSize: 11, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.4px' }}>{s.label}</div>
             </div>
           ))}
         </div>
       )}
 
       {/* Grid */}
-      <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+      <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e5e7eb', overflow: 'hidden' }}>
         {loadingGrid ? (
-          <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>Loading learners…</div>
+          <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Loading learners…</div>
         ) : !selected ? (
-          <div style={{ padding: 48, textAlign: 'center', color: '#94a3b8' }}>
+          <div style={{ padding: 48, textAlign: 'center', color: '#9ca3af' }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>📋</div>
             <div style={{ fontWeight: 600 }}>Select a class to get started</div>
           </div>
         ) : !subject.trim() ? (
-          <div style={{ padding: 48, textAlign: 'center', color: '#94a3b8' }}>
+          <div style={{ padding: 48, textAlign: 'center', color: '#9ca3af' }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>📝</div>
             <div style={{ fontWeight: 600 }}>Enter a subject name above</div>
           </div>
         ) : learners.length === 0 ? (
-          <div style={{ padding: 48, textAlign: 'center', color: '#94a3b8' }}>
+          <div style={{ padding: 48, textAlign: 'center', color: '#9ca3af' }}>
             <div style={{ fontWeight: 600 }}>No active learners in this class</div>
           </div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+              <tr style={{ background: '#fafafa', borderBottom: '1px solid #e5e7eb' }}>
                 <th style={th}>#</th>
                 <th style={{ ...th, textAlign: 'left' }}>Learner</th>
                 <th style={th}>Ref</th>
@@ -272,13 +272,13 @@ export default function ExamGrades() {
                   ? grade === [...boundaries].sort((a,b) => a.min - b.min)[0]?.grade
                   : grade === 'F'
                 return (
-                  <tr key={l.id} style={{ borderBottom: '1px solid #f1f5f9', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
-                    <td style={{ ...td, color: '#94a3b8', width: 40 }}>{i + 1}</td>
-                    <td style={{ ...td, fontWeight: 600, color: '#0f172a' }}>{l.last_name}, {l.first_name}</td>
-                    <td style={{ ...td, color: '#94a3b8', fontSize: 12 }}>{l.reference_no || '—'}</td>
+                  <tr key={l.id} style={{ borderBottom: '1px solid #f7f7f7', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
+                    <td style={{ ...td, color: '#9ca3af', width: 40 }}>{i + 1}</td>
+                    <td style={{ ...td, fontWeight: 600, color: '#1f2937' }}>{l.last_name}, {l.first_name}</td>
+                    <td style={{ ...td, color: '#9ca3af', fontSize: 12 }}>{l.reference_no || '—'}</td>
                     <td style={{ ...td, width: 120 }}>
                       {readOnly ? (
-                        <span style={{ fontWeight: 700, color: '#0f172a' }}>{mark !== '' && mark !== null && mark !== undefined ? `${mark}%` : '—'}</span>
+                        <span style={{ fontWeight: 700, color: '#1f2937' }}>{mark !== '' && mark !== null && mark !== undefined ? `${mark}%` : '—'}</span>
                       ) : (
                         <input
                           type="number"
@@ -288,7 +288,7 @@ export default function ExamGrades() {
                           placeholder="—"
                           style={{
                             width: 70, padding: '5px 8px', borderRadius: 7,
-                            border: `1.5px solid ${isF && mark !== '' && mark !== undefined ? '#fca5a5' : '#e2e8f0'}`,
+                            border: `1.5px solid ${isF && mark !== '' && mark !== undefined ? '#fca5a5' : '#e5e7eb'}`,
                             fontSize: 14, fontWeight: 600, textAlign: 'center', outline: 'none',
                             background: isF && mark !== '' && mark !== undefined ? '#fff5f5' : '#fff'
                           }}
@@ -313,9 +313,9 @@ export default function ExamGrades() {
 
       {/* Bottom save bar — sticky when dirty */}
       {dirty && !readOnly && (
-        <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', background: '#0f2044', color: '#fff', padding: '12px 28px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.25)', zIndex: 100 }}>
+        <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', background: '#003049', color: '#fff', padding: '12px 28px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.25)', zIndex: 100 }}>
           <span style={{ fontWeight: 600, fontSize: 14 }}>You have unsaved changes</span>
-          <button onClick={handleSave} disabled={saving} style={{ background: '#fff', color: '#0f2044', border: 'none', borderRadius: 8, padding: '7px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+          <button onClick={handleSave} disabled={saving} style={{ background: '#fff', color: '#003049', border: 'none', borderRadius: 8, padding: '7px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
             {saving ? 'Saving…' : 'Save now'}
           </button>
         </div>
@@ -324,7 +324,7 @@ export default function ExamGrades() {
   )
 }
 
-const lbl = { display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.4px' }
-const sel = { padding: '8px 12px', border: '1.5px solid #e2e8f0', borderRadius: 9, fontSize: 14, outline: 'none', width: '100%', background: '#fff', boxSizing: 'border-box' }
-const th  = { padding: '11px 14px', fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.4px', textAlign: 'center' }
+const lbl = { display: 'block', fontSize: 12, fontWeight: 600, color: '#6b7280', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.4px' }
+const sel = { padding: '8px 12px', border: '1.5px solid #e5e7eb', borderRadius: 9, fontSize: 14, outline: 'none', width: '100%', background: '#fff', boxSizing: 'border-box' }
+const th  = { padding: '11px 14px', fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.4px', textAlign: 'center' }
 const td  = { padding: '10px 14px', fontSize: 14, textAlign: 'center' }

@@ -28,13 +28,13 @@ export default function Login() {
       {/* Header */}
       <div style={{
         background: '#fff', padding: '36px 20px 20px', textAlign: 'center',
-        borderBottom: '1px solid #e2e8f0'
+        borderBottom: '1px solid #e5e7eb'
       }}>
         <img src="/skolo-logo-white.svg" alt="Skolo" style={{
           height: 100, objectFit: 'contain', margin: '0 auto 10px', display: 'block'
         }} />
-        <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, color: '#0f2044' }}>Parent Portal</h1>
-        <p style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>Stay connected with your child's school</p>
+        <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0, color: '#003049' }}>Parent Portal</h1>
+        <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>Stay connected with your child's school</p>
       </div>
 
       {/* Form */}
@@ -65,20 +65,23 @@ export default function Login() {
         </form>
 
         <div style={{ textAlign: 'center', marginTop: 16 }}>
-          <Link to="/forgot-password" style={{ color: '#1d4ed8', fontSize: 13, textDecoration: 'none' }}>
+          <Link to="/forgot-password" style={{ color: '#003049', fontSize: 13, textDecoration: 'none' }}>
             Forgot password?
           </Link>
         </div>
 
         {/* Install prompt */}
         <div style={{
-          marginTop: 32, padding: 16, background: '#f0f4ff', borderRadius: 10,
-          textAlign: 'center', fontSize: 13, color: '#334155'
+          marginTop: 32, padding: 16, background: '#e6eff5', borderRadius: 10,
+          textAlign: 'center', fontSize: 13, color: '#374151'
         }}>
-          <strong style={{ color: '#1d4ed8' }}>Add to Home Screen</strong>
+          <strong style={{ color: '#003049' }}>Add to Home Screen</strong>
           <p style={{ marginTop: 4, lineHeight: 1.4 }}>
             For the best experience, tap the share button in your browser and select "Add to Home Screen".
           </p>
+        </div>
+        <div style={{ textAlign:'center', padding:'16px 20px 24px', fontSize:11, color:'#9ca3af', lineHeight:1.6 }}>
+          Developed by <a href="https://innovaearth.com" target="_blank" rel="noopener noreferrer" style={{ color:'#003049', fontWeight:600, textDecoration:'none' }}>InnovaEarth</a> in collaboration with <a href="https://4dcs.co.za" target="_blank" rel="noopener noreferrer" style={{ color:'#003049', fontWeight:600, textDecoration:'none' }}>4D Climate Solutions</a>
         </div>
       </div>
     </div>
@@ -86,17 +89,17 @@ export default function Login() {
 }
 
 const labelStyle = {
-  display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 6
+  display: 'block', fontSize: 13, fontWeight: 500, color: '#374151', marginBottom: 6
 }
 
 const inputStyle = {
-  width: '100%', padding: '11px 14px', borderRadius: 9, border: '1px solid #e2e8f0',
+  width: '100%', padding: '11px 14px', borderRadius: 9, border: '1px solid #e5e7eb',
   fontSize: 15, outline: 'none', background: '#fff',
   transition: 'border-color 0.15s'
 }
 
 const btnStyle = {
   width: '100%', padding: '12px', borderRadius: 9, border: 'none',
-  background: '#1d4ed8', color: '#fff', fontSize: 15, fontWeight: 600,
+  background: '#003049', color: '#fff', fontSize: 15, fontWeight: 600,
   cursor: 'pointer'
 }

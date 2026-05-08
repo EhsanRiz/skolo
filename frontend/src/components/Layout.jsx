@@ -160,7 +160,7 @@ function NotificationBell({ user, school_id }) {
   return (
     <div ref={ref} style={{ position:'relative' }}>
       <button onClick={() => { setOpen(o => !o); if (unread > 0) markAllRead() }}
-        style={{ position:'relative', background:'none', border:'none', cursor:'pointer', color:'#64748b', padding:6, display:'flex', alignItems:'center', borderRadius:8, transition:'background .15s' }}>
+        style={{ position:'relative', background:'none', border:'none', cursor:'pointer', color:'#6b7280', padding:6, display:'flex', alignItems:'center', borderRadius:8, transition:'background .15s' }}>
         <BellIcon />
         {unread > 0 && (
           <span style={{ position:'absolute', top:2, right:2, width:16, height:16, background:'#dc2626', borderRadius:20, fontSize:9, fontWeight:800, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', border:'2px solid #fff' }}>
@@ -170,50 +170,50 @@ function NotificationBell({ user, school_id }) {
       </button>
 
       {open && (
-        <div style={{ position:'absolute', right:0, top:'calc(100% + 8px)', width:340, background:'#fff', borderRadius:14, boxShadow:'0 8px 32px rgba(0,0,0,.18)', zIndex:300, overflow:'hidden', border:'1px solid #e2e8f0' }}>
-          <div style={{ padding:'14px 16px 10px', display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:'1px solid #f1f5f9' }}>
-            <div style={{ fontWeight:700, fontSize:14, color:'#0f172a' }}>Notifications</div>
+        <div style={{ position:'absolute', right:0, top:'calc(100% + 8px)', width:340, background:'#fff', borderRadius:14, boxShadow:'0 8px 32px rgba(0,0,0,.18)', zIndex:300, overflow:'hidden', border:'1px solid #e5e7eb' }}>
+          <div style={{ padding:'14px 16px 10px', display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:'1px solid #f7f7f7' }}>
+            <div style={{ fontWeight:700, fontSize:14, color:'#1f2937' }}>Notifications</div>
             {notifs.some(n => !n.is_read) && (
-              <button onClick={markAllRead} style={{ fontSize:11, color:'#64748b', background:'none', border:'none', cursor:'pointer', fontWeight:600 }}>Mark all read</button>
+              <button onClick={markAllRead} style={{ fontSize:11, color:'#6b7280', background:'none', border:'none', cursor:'pointer', fontWeight:600 }}>Mark all read</button>
             )}
           </div>
           <div style={{ maxHeight:360, overflowY:'auto' }}>
             {notifs.length === 0 && msgNotifs.length === 0 && (
-              <div style={{ padding:'32px 16px', textAlign:'center', color:'#94a3b8', fontSize:13 }}>No notifications yet.</div>
+              <div style={{ padding:'32px 16px', textAlign:'center', color:'#9ca3af', fontSize:13 }}>No notifications yet.</div>
             )}
             {/* Unread messages first */}
             {msgNotifs.map(n => (
               <div key={n.id} onClick={() => { setOpen(false); navigate(n.link) }}
-                style={{ padding:'12px 16px', cursor:'pointer', background:'#eff6ff', borderBottom:'1px solid #f8fafc', transition:'background .1s' }}>
+                style={{ padding:'12px 16px', cursor:'pointer', background:'#f0f5fa', borderBottom:'1px solid #fafafa', transition:'background .1s' }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:8 }}>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontWeight:700, fontSize:13, color:'#0f172a', marginBottom:2 }}>
+                    <div style={{ fontWeight:700, fontSize:13, color:'#1f2937', marginBottom:2 }}>
                       <span style={{ marginRight:6 }}>💬</span>{n.title}
                     </div>
-                    {n.body && <div style={{ fontSize:12, color:'#64748b', lineHeight:1.5, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{n.body}</div>}
+                    {n.body && <div style={{ fontSize:12, color:'#6b7280', lineHeight:1.5, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{n.body}</div>}
                   </div>
-                  <div style={{ fontSize:10, color:'#94a3b8', flexShrink:0, marginTop:2 }}>{timeAgo(n.created_at)}</div>
+                  <div style={{ fontSize:10, color:'#9ca3af', flexShrink:0, marginTop:2 }}>{timeAgo(n.created_at)}</div>
                 </div>
               </div>
             ))}
             {/* Regular notifications */}
             {notifs.map(n => (
               <div key={n.id} onClick={() => handleClick(n)}
-                style={{ padding:'12px 16px', cursor:'pointer', background: n.is_read ? '#fff' : '#faf5ff', borderBottom:'1px solid #f8fafc', transition:'background .1s' }}>
+                style={{ padding:'12px 16px', cursor:'pointer', background: n.is_read ? '#fff' : '#faf5ff', borderBottom:'1px solid #fafafa', transition:'background .1s' }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:8 }}>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontWeight: n.is_read ? 500 : 700, fontSize:13, color:'#0f172a', marginBottom:2 }}>{n.title}</div>
-                    {n.body && <div style={{ fontSize:12, color:'#64748b', lineHeight:1.5, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{n.body}</div>}
+                    <div style={{ fontWeight: n.is_read ? 500 : 700, fontSize:13, color:'#1f2937', marginBottom:2 }}>{n.title}</div>
+                    {n.body && <div style={{ fontSize:12, color:'#6b7280', lineHeight:1.5, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{n.body}</div>}
                   </div>
-                  <div style={{ fontSize:10, color:'#94a3b8', flexShrink:0, marginTop:2 }}>{timeAgo(n.created_at)}</div>
+                  <div style={{ fontSize:10, color:'#9ca3af', flexShrink:0, marginTop:2 }}>{timeAgo(n.created_at)}</div>
                 </div>
                 {!n.is_read && <div style={{ width:6, height:6, background:'#7c3aed', borderRadius:'50%', marginTop:4 }} />}
               </div>
             ))}
           </div>
-          <div style={{ padding:'10px 16px', borderTop:'1px solid #f1f5f9', textAlign:'center' }}>
+          <div style={{ padding:'10px 16px', borderTop:'1px solid #f7f7f7', textAlign:'center' }}>
             <button onClick={() => { navigate('/messages'); setOpen(false) }}
-              style={{ fontSize:12, color:'#1d4ed8', fontWeight:700, background:'none', border:'none', cursor:'pointer' }}>
+              style={{ fontSize:12, color:'#003049', fontWeight:700, background:'none', border:'none', cursor:'pointer' }}>
               View all messages →
             </button>
           </div>
@@ -315,11 +315,11 @@ export default function Layout() {
   return (
     <>
       <style>{CSS}</style>
-      <div style={{ display:'flex', minHeight:'100vh', background:'#f1f5f9' }}>
+      <div style={{ display:'flex', minHeight:'100vh', background:'#f7f7f7' }}>
 
         {/* ── DESKTOP SIDEBAR ── */}
         <aside className="desktop-sidebar" style={{
-          width:232, background:'#0f2044', flexDirection:'column',
+          width:232, background:'#003049', flexDirection:'column',
           flexShrink:0, position:'sticky', top:0, height:'100vh'
         }}>
           <SidebarContent />
@@ -328,7 +328,7 @@ export default function Layout() {
         {/* ── MOBILE TOPBAR ── */}
         <div className="mobile-topbar" style={{
           display:'none', position:'fixed', top:0, left:0, right:0, zIndex:200,
-          background:'#0f2044', height:56, alignItems:'center',
+          background:'#003049', height:56, alignItems:'center',
           justifyContent:'space-between', padding:'0 16px', flexShrink:0
         }}>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
@@ -348,7 +348,7 @@ export default function Layout() {
             onClick={() => setMenuOpen(false)}>
             <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)', backdropFilter:'blur(2px)' }} />
             <div style={{ position:'absolute', top:0, left:0, bottom:0, width:260,
-              background:'#0f2044', display:'flex', flexDirection:'column' }}
+              background:'#003049', display:'flex', flexDirection:'column' }}
               onClick={e => e.stopPropagation()}>
               <SidebarContent />
             </div>
@@ -360,18 +360,18 @@ export default function Layout() {
 
           {/* Desktop topbar */}
           <header className="desktop-topbar" style={{
-            background:'#fff', borderBottom:'1px solid #e2e8f0',
+            background:'#fff', borderBottom:'1px solid #e5e7eb',
             padding:'0 32px', height:60,
             display:'flex', alignItems:'center', justifyContent:'space-between',
             flexShrink:0
           }}>
-            <div style={{ fontWeight:700, fontSize:15, color:'#0f172a' }}>
+            <div style={{ fontWeight:700, fontSize:15, color:'#1f2937' }}>
               {school?.name || '—'}
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:10 }}>
               <NotificationBell user={user} />
-              <div style={{ fontSize:12, fontWeight:600, color:'#64748b',
-                background:'#f1f5f9', padding:'5px 12px', borderRadius:20 }}>
+              <div style={{ fontSize:12, fontWeight:600, color:'#6b7280',
+                background:'#f7f7f7', padding:'5px 12px', borderRadius:20 }}>
                 {sym} {code} · {user?.role}
               </div>
             </div>
@@ -386,7 +386,7 @@ export default function Layout() {
         {/* ── MOBILE BOTTOM NAV ── */}
         <div className="mobile-bottom" style={{
           display:'none', position:'fixed', bottom:0, left:0, right:0,
-          background:'#0f2044', padding:'6px 8px env(safe-area-inset-bottom, 10px)',
+          background:'#003049', padding:'6px 8px env(safe-area-inset-bottom, 10px)',
           zIndex:150, justifyContent:'space-around', alignItems:'center',
           boxShadow:'0 -2px 12px rgba(0,0,0,0.2)',
           overflowX:'auto', WebkitOverflowScrolling:'touch'

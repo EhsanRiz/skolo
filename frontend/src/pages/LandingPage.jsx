@@ -12,16 +12,16 @@ const LandingPage = () => {
       *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
       :root {
-        --navy: #0f2044;
+        --navy: #003049;
         --navy-light: #1a3160;
-        --blue: #2563eb;
-        --blue-dark: #0f2044;
+        --blue: #003049;
+        --blue-dark: #003049;
         --green: #16a34a;
-        --amber: #f59e0b;
+        --amber: #f7c548;
         --red: #dc2626;
         --purple: #7c3aed;
-        --slate: #64748b;
-        --light: #f8fafc;
+        --slate: #6b7280;
+        --light: #fafafa;
         --white: #ffffff;
       }
 
@@ -29,7 +29,7 @@ const LandingPage = () => {
 
       body {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        color: #0f172a; line-height: 1.6; -webkit-font-smoothing: antialiased;
+        color: #1f2937; line-height: 1.6; -webkit-font-smoothing: antialiased;
       }
 
       /* ── UTILITY ─────────────────────────────────── */
@@ -41,7 +41,7 @@ const LandingPage = () => {
         cursor: pointer; transition: all .2s; font-family: inherit;
       }
       .btn-primary { background: var(--blue); color: #fff; }
-      .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,.35); }
+      .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,48,73,.35); }
       .btn-outline { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,.3); }
       .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,.08); }
       .btn-green { background: var(--green); color: #fff; }
@@ -49,7 +49,7 @@ const LandingPage = () => {
       .section-label {
         display: inline-block; font-size: 12px; font-weight: 700;
         letter-spacing: 1.5px; text-transform: uppercase;
-        color: var(--blue); background: #eff6ff; padding: 5px 14px;
+        color: var(--blue); background: #f0f5fa; padding: 5px 14px;
         border-radius: 20px; margin-bottom: 16px;
       }
       .section-title {
@@ -101,7 +101,7 @@ const LandingPage = () => {
       }
       .hero::before {
         content: ''; position: absolute; inset: 0;
-        background: radial-gradient(ellipse at 80% 20%, rgba(37,99,235,.15) 0%, transparent 60%),
+        background: radial-gradient(ellipse at 80% 20%, rgba(0,48,73,.15) 0%, transparent 60%),
                     radial-gradient(ellipse at 20% 80%, rgba(22,163,74,.08) 0%, transparent 50%);
       }
       .hero .container {
@@ -113,7 +113,7 @@ const LandingPage = () => {
         font-size: clamp(36px, 5vw, 56px); font-weight: 900;
         letter-spacing: -1px; line-height: 1.08; margin-bottom: 20px;
       }
-      .hero-text h1 span { color: #60a5fa; }
+      .hero-text h1 span { color: #669bbc; }
       .hero-text p { font-size: 18px; color: rgba(255,255,255,.65); line-height: 1.7; margin-bottom: 32px; max-width: 480px; }
       .hero-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
       .hero-visual { display: flex; justify-content: center; align-items: center; }
@@ -126,7 +126,7 @@ const LandingPage = () => {
       .mockup-bar { display: flex; gap: 6px; margin-bottom: 18px; }
       .mockup-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.15); }
       .mockup-dot:first-child { background: #ef4444; }
-      .mockup-dot:nth-child(2) { background: #f59e0b; }
+      .mockup-dot:nth-child(2) { background: #f7c548; }
       .mockup-dot:nth-child(3) { background: #22c55e; }
       .mockup-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
       .mockup-stat {
@@ -136,13 +136,13 @@ const LandingPage = () => {
       .mockup-stat-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.35); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
       .mockup-stat-value { font-size: 24px; font-weight: 900; color: #fff; }
       .mockup-stat-value.green { color: #4ade80; }
-      .mockup-stat-value.blue  { color: #60a5fa; }
-      .mockup-stat-value.amber { color: #fbbf24; }
+      .mockup-stat-value.blue  { color: #669bbc; }
+      .mockup-stat-value.amber { color: #f7c548; }
       .mockup-chart { display: flex; align-items: flex-end; gap: 8px; height: 80px; padding-top: 8px; }
       .mockup-bar-item { flex: 1; border-radius: 5px 5px 0 0; min-height: 12px; }
 
       /* ── SOCIAL PROOF STRIP ──────────────────────── */
-      .proof-strip { padding: 48px 0; background: #fff; border-bottom: 1px solid #f1f5f9; }
+      .proof-strip { padding: 48px 0; background: #fff; border-bottom: 1px solid #f7f7f7; }
       .proof-grid {
         display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; align-items: center;
       }
@@ -155,10 +155,10 @@ const LandingPage = () => {
       .pain-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
       .pain-card {
         background: #fff; border-radius: 14px; padding: 28px;
-        box-shadow: 0 1px 3px rgba(0,0,0,.05); border: 1.5px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0,0,0,.05); border: 1.5px solid #e5e7eb;
         transition: all .25s;
       }
-      .pain-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,.08); border-color: #cbd5e1; }
+      .pain-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,.08); border-color: #d1d5db; }
       .pain-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
       .pain-icon {
         width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
@@ -167,8 +167,8 @@ const LandingPage = () => {
       .pain-icon svg { width: 20px; height: 20px; stroke-width: 1.8; }
       .pain-icon.red    { background: #fee2e2; color: #dc2626; }
       .pain-icon.amber  { background: #fef3c7; color: #d97706; }
-      .pain-icon.slate  { background: #e2e8f0; color: #475569; }
-      .pain-title { font-size: 16px; font-weight: 800; color: #0f172a; }
+      .pain-icon.slate  { background: #e5e7eb; color: #4b5563; }
+      .pain-title { font-size: 16px; font-weight: 800; color: #1f2937; }
       .pain-desc { font-size: 14px; color: var(--slate); line-height: 1.7; }
 
       /* ── FEATURES ────────────────────────────────── */
@@ -177,15 +177,15 @@ const LandingPage = () => {
       .feature-card {
         display: flex; gap: 18px; padding: 24px;
         background: var(--light); border-radius: 14px;
-        border: 1.5px solid #e2e8f0; transition: all .25s;
+        border: 1.5px solid #e5e7eb; transition: all .25s;
       }
-      .feature-card:hover { border-color: var(--blue); background: #eff6ff; }
+      .feature-card:hover { border-color: var(--blue); background: #f0f5fa; }
       .feature-icon {
         width: 48px; height: 48px; border-radius: 12px;
         display: flex; align-items: center; justify-content: center;
         font-size: 22px; flex-shrink: 0;
       }
-      .feature-icon.blue   { background: #dbeafe; }
+      .feature-icon.blue   { background: #e6eff5; }
       .feature-icon.green  { background: #dcfce7; }
       .feature-icon.purple { background: #ede9fe; }
       .feature-icon.amber  { background: #fef3c7; }
@@ -199,7 +199,7 @@ const LandingPage = () => {
       .audience-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
       .audience-card {
         background: #fff; border-radius: 16px; padding: 36px;
-        box-shadow: 0 1px 3px rgba(0,0,0,.05); border: 1.5px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0,0,0,.05); border: 1.5px solid #e5e7eb;
       }
       .audience-card h3 { font-size: 20px; font-weight: 800; margin-bottom: 16px; }
       .audience-list { list-style: none; }
@@ -214,17 +214,17 @@ const LandingPage = () => {
       .pricing-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 48px; max-width: 1040px; margin-left: auto; margin-right: auto; }
       .pricing-card {
         background: #fff; border-radius: 16px; padding: 32px 24px;
-        border: 2px solid #e2e8f0; text-align: center; transition: all .25s;
+        border: 2px solid #e5e7eb; text-align: center; transition: all .25s;
       }
       .pricing-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,.08); }
-      .pricing-card.featured { border-color: var(--blue); box-shadow: 0 8px 30px rgba(37,99,235,.12); position: relative; }
+      .pricing-card.featured { border-color: var(--blue); box-shadow: 0 8px 30px rgba(0,48,73,.12); position: relative; }
       .pricing-badge {
         position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
         background: var(--blue); color: #fff; font-size: 11px; font-weight: 700;
         padding: 4px 14px; border-radius: 20px; letter-spacing: .5px; white-space: nowrap;
       }
       .pricing-name { font-size: 14px; font-weight: 700; color: var(--slate); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
-      .pricing-price { font-size: 36px; font-weight: 900; color: #0f172a; margin-bottom: 4px; }
+      .pricing-price { font-size: 36px; font-weight: 900; color: #1f2937; margin-bottom: 4px; }
       .pricing-period { font-size: 13px; color: var(--slate); margin-bottom: 20px; }
       .pricing-features { list-style: none; text-align: left; margin-bottom: 24px; }
       .pricing-features li { padding: 6px 0; font-size: 14px; color: #374151; display: flex; gap: 8px; align-items: flex-start; }
@@ -249,27 +249,27 @@ const LandingPage = () => {
       .challenges-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 48px; }
       .challenge-card {
         background: #fff; border-radius: 16px; padding: 32px;
-        border: 1.5px solid #e2e8f0; transition: all .25s;
+        border: 1.5px solid #e5e7eb; transition: all .25s;
         display: flex; gap: 18px;
       }
-      .challenge-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.06); border-color: #cbd5e1; }
+      .challenge-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.06); border-color: #d1d5db; }
       .challenge-stat {
         font-size: 32px; font-weight: 900; letter-spacing: -1px;
         flex-shrink: 0; width: 72px; text-align: center; line-height: 1.1;
       }
-      .challenge-title { font-size: 15px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+      .challenge-title { font-size: 15px; font-weight: 800; color: #1f2937; margin-bottom: 6px; }
       .challenge-desc { font-size: 14px; color: var(--slate); line-height: 1.6; }
       .challenge-fix { font-size: 13px; font-weight: 700; color: var(--blue); margin-top: 10px; display: flex; align-items: center; gap: 4px; }
 
       /* ── FAQ ──────────────────────────────────────── */
       .faq { padding: 100px 0; }
       .faq-list { max-width: 720px; margin: 48px auto 0; }
-      .faq-item { border-bottom: 1px solid #e2e8f0; }
+      .faq-item { border-bottom: 1px solid #e5e7eb; }
       .faq-q {
         display: flex; justify-content: space-between; align-items: center;
         padding: 20px 0; cursor: pointer; background: none; border: none;
         width: 100%; text-align: left; font-size: 16px; font-weight: 700;
-        color: #0f172a; font-family: inherit; transition: color .15s;
+        color: #1f2937; font-family: inherit; transition: color .15s;
       }
       .faq-q:hover { color: var(--blue); }
       .faq-q svg { flex-shrink: 0; transition: transform .2s; color: var(--slate); }
@@ -434,7 +434,7 @@ const LandingPage = () => {
               <div style={{ fontSize:'10px', fontWeight:'700', color:'rgba(255,255,255,.3)', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'10px' }}>Monthly collection</div>
               <div className="mockup-chart">
                 {[45,55,65,50,75,90].map((h,i) => (
-                  <div key={i} className="mockup-bar-item" style={{ height:`${h}%`, background:`rgba(37,99,235,${0.3+i*0.1})` }}></div>
+                  <div key={i} className="mockup-bar-item" style={{ height:`${h}%`, background:`rgba(0,48,73,${0.3+i*0.1})` }}></div>
                 ))}
               </div>
             </div>
@@ -498,7 +498,7 @@ const LandingPage = () => {
           </div>
           <div className="features-grid">
             {[
-              { icon: 'blue', title: 'Fee management', desc: 'Track who owes what, record payments instantly, auto-generate monthly fee entries, and see collection rates by grade \u2014 in real time.', svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> },
+              { icon: 'blue', title: 'Fee management', desc: 'Track who owes what, record payments instantly, auto-generate monthly fee entries, and see collection rates by grade \u2014 in real time.', svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#003049" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> },
               { icon: 'green', title: 'Daily attendance', desc: 'Teachers mark registers on their phone in under a minute. Principals see school-wide rates and get alerts for learners falling behind.', svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> },
               { icon: 'purple', title: 'Exam grades & report cards', desc: 'Enter marks by subject and term. Averages calculate automatically. Download PDF report cards for each learner with one click.', svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> },
               { icon: 'amber', title: 'Timetable & calendar', desc: 'Build your school timetable in minutes. Teachers see their daily schedule with live indicators. Never double-book a class.', svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
@@ -515,8 +515,8 @@ const LandingPage = () => {
       </section>
 
       {/* ═══════ AI ═══════ */}
-      <section style={{ padding:'100px 0', background:'linear-gradient(135deg,#0f2044 0%,#162d5a 100%)', color:'#fff', position:'relative', overflow:'hidden' }}>
-        <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 70% 30%,rgba(124,58,237,.15) 0%,transparent 60%),radial-gradient(ellipse at 30% 70%,rgba(37,99,235,.1) 0%,transparent 50%)' }}></div>
+      <section style={{ padding:'100px 0', background:'linear-gradient(135deg,#003049 0%,#162d5a 100%)', color:'#fff', position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 70% 30%,rgba(124,58,237,.15) 0%,transparent 60%),radial-gradient(ellipse at 30% 70%,rgba(0,48,73,.1) 0%,transparent 50%)' }}></div>
         <div className="container" style={{ position:'relative', zIndex:1 }}>
           <div style={{ textAlign:'center' }}>
             <span className="section-label" style={{ background:'rgba(124,58,237,.2)', color:'#c4b5fd' }}>AI-powered</span>
@@ -526,7 +526,7 @@ const LandingPage = () => {
           <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:'20px', marginTop:'48px' }}>
             {[
               { title: 'Early warning alerts', desc: 'AI spots learners at risk of dropping out based on attendance patterns, fee arrears, and grade trends \u2014 before it\u2019s too late.', color: '#c4b5fd', bg: 'rgba(124,58,237,.2)', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/></svg> },
-              { title: 'Smart reports', desc: 'Ask questions in plain English: \u201CWhich grade has the lowest attendance this term?\u201D \u2014 no spreadsheets, no formulas.', color: '#93c5fd', bg: 'rgba(37,99,235,.2)', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> },
+              { title: 'Smart reports', desc: 'Ask questions in plain English: \u201CWhich grade has the lowest attendance this term?\u201D \u2014 no spreadsheets, no formulas.', color: '#c6dae7', bg: 'rgba(0,48,73,.2)', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c6dae7" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> },
               { title: 'Automated parent comms', desc: 'AI drafts personalised fee reminders, absence follow-ups, and term-end summaries \u2014 saving hours each week.', color: '#86efac', bg: 'rgba(22,163,74,.2)', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#86efac" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> },
             ].map((item, i) => (
               <div key={i} className={`animate delay-${i+1}`} style={{ background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.08)', borderRadius:'14px', padding:'28px' }}>
@@ -557,7 +557,7 @@ const LandingPage = () => {
           <div className="audience-grid">
             <div className="audience-card animate">
               <h3 style={{ display:'flex', alignItems:'center', gap:'10px' }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#003049" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                 School leaders
               </h3>
               <p style={{ fontSize:'14px', color:'var(--slate)', marginBottom:'18px' }}>Principals, bursars, and admin staff who want to spend less time on paperwork and more time on teaching.</p>
@@ -748,7 +748,7 @@ const LandingPage = () => {
           <div className="footer-inner">
             <div className="footer-brand">
               <img src="/skolo-icon-white.svg" alt="Skolo" style={{ height:28, width:28, borderRadius:6 }} />
-              <p>&copy; 2026 <a href="https://4dcs.co.za">4D Climate Solutions</a> &middot; Built in Lesotho, for Southern Africa.</p>
+              <p>&copy; 2026 Skolo &middot; Developed by <a href="https://innovaearth.com" target="_blank" rel="noopener noreferrer">InnovaEarth</a> in collaboration with <a href="https://4dcs.co.za" target="_blank" rel="noopener noreferrer">4D Climate Solutions</a> &middot; Built in Lesotho, for Southern Africa.</p>
             </div>
             <div className="footer-links">
               <Link to="/login">Sign in</Link>

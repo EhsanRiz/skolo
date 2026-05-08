@@ -16,8 +16,8 @@ const GRADE_SYMBOL = mark => {
   return 'F'
 }
 const GRADE_COLOR = sym => ({
-  A: '#15803d', B: '#2563eb', C: '#ca8a04', D: '#ea580c', F: '#dc2626', '—': '#94a3b8'
-}[sym] || '#94a3b8')
+  A: '#15803d', B: '#003049', C: '#ca8a04', D: '#ea580c', F: '#dc2626', '—': '#9ca3af'
+}[sym] || '#9ca3af')
 
 const DEFAULT_SUBJECTS = [
   'Mathematics', 'English', 'Sesotho', 'Science', 'Social Studies',
@@ -26,15 +26,15 @@ const DEFAULT_SUBJECTS = [
 
 const CSS = `
 .tab-btn { padding:10px 18px; border:none; cursor:pointer; font-weight:600; font-size:13px;
-  background:none; color:#64748b; border-bottom:2px solid transparent; transition:all .15s; }
-.tab-btn:hover { color:#0f172a; }
-.tab-btn.active { color:#0f2044; border-bottom-color:#0f2044; }
-.mark-input { width:60px; padding:5px 8px; border:1.5px solid #e2e8f0; border-radius:7px;
+  background:none; color:#6b7280; border-bottom:2px solid transparent; transition:all .15s; }
+.tab-btn:hover { color:#1f2937; }
+.tab-btn.active { color:#003049; border-bottom-color:#003049; }
+.mark-input { width:60px; padding:5px 8px; border:1.5px solid #e5e7eb; border-radius:7px;
   font-size:13px; font-weight:600; text-align:center; outline:none; transition:border-color .15s; }
-.mark-input:focus { border-color:#0f2044; }
-.back-btn { display:inline-flex; align-items:center; gap:6px; color:#64748b; font-size:13px;
+.mark-input:focus { border-color:#003049; }
+.back-btn { display:inline-flex; align-items:center; gap:6px; color:#6b7280; font-size:13px;
   font-weight:600; text-decoration:none; margin-bottom:20px; }
-.back-btn:hover { color:#0f172a; }
+.back-btn:hover { color:#1f2937; }
 `
 
 // ── Sub-components ────────────────────────────────────────────
@@ -88,23 +88,23 @@ function ReportCardButton({ learnerId, learnerName }) {
       {open && (
         <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 8, background: '#fff', borderRadius: 12,
           padding: '18px 20px', boxShadow: '0 12px 40px rgba(0,0,0,.2)', zIndex: 100, width: 240 }}>
-          <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', marginBottom: 14 }}>Download report card</div>
+          <div style={{ fontWeight: 700, fontSize: 14, color: '#1f2937', marginBottom: 14 }}>Download report card</div>
 
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 5 }}>Term</label>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#6b7280', marginBottom: 5 }}>Term</label>
           <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
             {[1, 2, 3, 4].map(t => (
               <button key={t} onClick={() => setTerm(t)}
-                style={{ flex: 1, padding: '7px 0', border: term === t ? '2px solid #0f2044' : '1.5px solid #e2e8f0',
-                  borderRadius: 7, background: term === t ? '#0f2044' : '#fff', color: term === t ? '#fff' : '#374151',
+                style={{ flex: 1, padding: '7px 0', border: term === t ? '2px solid #003049' : '1.5px solid #e5e7eb',
+                  borderRadius: 7, background: term === t ? '#003049' : '#fff', color: term === t ? '#fff' : '#374151',
                   fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                 T{t}
               </button>
             ))}
           </div>
 
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 5 }}>Year</label>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#6b7280', marginBottom: 5 }}>Year</label>
           <select value={year} onChange={e => setYear(Number(e.target.value))}
-            style={{ width: '100%', padding: '8px 10px', border: '1.5px solid #e2e8f0', borderRadius: 7, fontSize: 13,
+            style={{ width: '100%', padding: '8px 10px', border: '1.5px solid #e5e7eb', borderRadius: 7, fontSize: 13,
               outline: 'none', background: '#fff', marginBottom: 14 }}>
             {[new Date().getFullYear(), new Date().getFullYear() - 1].map(y => (
               <option key={y} value={y}>{y}</option>
@@ -112,7 +112,7 @@ function ReportCardButton({ learnerId, learnerName }) {
           </select>
 
           <button onClick={download} disabled={generating}
-            style={{ width: '100%', padding: '10px', background: '#0f2044', color: '#fff', border: 'none',
+            style={{ width: '100%', padding: '10px', background: '#003049', color: '#fff', border: 'none',
               borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: generating ? 0.7 : 1 }}>
             {generating ? 'Generating…' : 'Download PDF'}
           </button>
@@ -150,8 +150,8 @@ function OverviewTab({ learner, school }) {
 
   const Field = ({ label, value }) => (
     <div>
-      <div style={{ fontSize:11, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.6px', marginBottom:3 }}>{label}</div>
-      <div style={{ fontSize:14, fontWeight:500, color:'#0f172a' }}>{value || '—'}</div>
+      <div style={{ fontSize:11, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.6px', marginBottom:3 }}>{label}</div>
+      <div style={{ fontSize:14, fontWeight:500, color:'#1f2937' }}>{value || '—'}</div>
     </div>
   )
 
@@ -159,7 +159,7 @@ function OverviewTab({ learner, school }) {
     <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:20 }}>
       {/* Learner details */}
       <div style={{ background:'#fff', borderRadius:12, padding:'20px 24px', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>
-        <div style={{ fontWeight:700, fontSize:15, marginBottom:18, color:'#0f172a' }}>Learner details</div>
+        <div style={{ fontWeight:700, fontSize:15, marginBottom:18, color:'#1f2937' }}>Learner details</div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:16 }}>
           <Field label="Reference No."    value={learner.reference_no} />
           <Field label="Grade / Class"    value={grade} />
@@ -171,10 +171,10 @@ function OverviewTab({ learner, school }) {
       </div>
 
       {/* Medical */}
-      <div style={{ gridColumn:'1/-1', background:'#fff', borderRadius:12, padding:'20px 24px', boxShadow:'0 1px 3px rgba(0,0,0,.06)', borderLeft:'3px solid #e2e8f0' }}>
+      <div style={{ gridColumn:'1/-1', background:'#fff', borderRadius:12, padding:'20px 24px', boxShadow:'0 1px 3px rgba(0,0,0,.06)', borderLeft:'3px solid #e5e7eb' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
-          <div style={{ fontWeight:700, fontSize:15, color:'#0f172a' }}>Medical information</div>
-          <span style={{ fontSize:11, color:'#94a3b8', fontStyle:'italic' }}>Optional · shared only with consent</span>
+          <div style={{ fontWeight:700, fontSize:15, color:'#1f2937' }}>Medical information</div>
+          <span style={{ fontSize:11, color:'#9ca3af', fontStyle:'italic' }}>Optional · shared only with consent</span>
         </div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:16 }}>
           <Field label="Medical condition" value={learner.medical_condition} />
@@ -182,13 +182,13 @@ function OverviewTab({ learner, school }) {
           <Field label="Doctor phone"      value={learner.doctor_phone} />
         </div>
         {!learner.medical_condition && !learner.doctor_name && (
-          <div style={{ fontSize:12, color:'#94a3b8', marginTop:6 }}>No medical information on file. Edit the learner record to add.</div>
+          <div style={{ fontSize:12, color:'#9ca3af', marginTop:6 }}>No medical information on file. Edit the learner record to add.</div>
         )}
       </div>
 
       {/* Guardian */}
       <div style={{ background:'#fff', borderRadius:12, padding:'20px 24px', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>
-        <div style={{ fontWeight:700, fontSize:15, marginBottom:18, color:'#0f172a' }}>Parent / Guardian</div>
+        <div style={{ fontWeight:700, fontSize:15, marginBottom:18, color:'#1f2937' }}>Parent / Guardian</div>
         {guardian ? (
           <>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:16, marginBottom:16 }}>
@@ -198,27 +198,27 @@ function OverviewTab({ learner, school }) {
               <Field label="Email"        value={guardian.email} />
             </div>
             {/* Portal link */}
-            <div style={{ borderTop:'1px solid #f1f5f9', paddingTop:14 }}>
+            <div style={{ borderTop:'1px solid #f7f7f7', paddingTop:14 }}>
               <div style={{ fontSize:12, fontWeight:600, color:'#374151', marginBottom:8 }}>Parent portal link</div>
               {portalUrl ? (
                 <div style={{ display:'flex', gap:8 }}>
                   <input value={portalUrl} readOnly
-                    style={{ flex:1, padding:'7px 10px', border:'1px solid #e2e8f0', borderRadius:7, fontSize:11, background:'#f8fafc', color:'#374151', outline:'none' }} />
+                    style={{ flex:1, padding:'7px 10px', border:'1px solid #e5e7eb', borderRadius:7, fontSize:11, background:'#fafafa', color:'#374151', outline:'none' }} />
                   <button onClick={() => { navigator.clipboard.writeText(portalUrl); toast.success('Copied!') }}
-                    style={{ padding:'7px 14px', background:'#0f2044', color:'#fff', border:'none', borderRadius:7, fontSize:12, fontWeight:600, cursor:'pointer', flexShrink:0 }}>
+                    style={{ padding:'7px 14px', background:'#003049', color:'#fff', border:'none', borderRadius:7, fontSize:12, fontWeight:600, cursor:'pointer', flexShrink:0 }}>
                     Copy
                   </button>
                 </div>
               ) : (
                 <button onClick={generatePortal} disabled={generatingLink}
-                  style={{ padding:'8px 14px', background:'#f1f5f9', color:'#374151', border:'none', borderRadius:7, fontSize:12, fontWeight:600, cursor:'pointer' }}>
+                  style={{ padding:'8px 14px', background:'#f7f7f7', color:'#374151', border:'none', borderRadius:7, fontSize:12, fontWeight:600, cursor:'pointer' }}>
                   🔗 {generatingLink ? 'Generating…' : 'Generate portal link'}
                 </button>
               )}
             </div>
           </>
         ) : (
-          <div style={{ color:'#94a3b8', fontSize:14 }}>No guardian linked.</div>
+          <div style={{ color:'#9ca3af', fontSize:14 }}>No guardian linked.</div>
         )}
       </div>
     </div>
@@ -240,7 +240,7 @@ function FeesTab({ learnerId, sym, isReadOnly }) {
     { value:'snapscan', label:'SnapScan' }, { value:'other', label:'Other' },
   ]
 
-  const STATUS_C = { paid:['#dcfce7','#15803d'], partial:['#fef9c3','#a16207'], overdue:['#fee2e2','#dc2626'], pending:['#f1f5f9','#64748b'] }
+  const STATUS_C = { paid:['#dcfce7','#15803d'], partial:['#fef4d6','#b8870a'], overdue:['#fee2e2','#dc2626'], pending:['#f7f7f7','#6b7280'] }
 
   const [catchingUp, setCatchingUp] = useState(false)
 
@@ -294,10 +294,10 @@ function FeesTab({ learnerId, sym, isReadOnly }) {
         <div style={{ background:'#fffbeb', border:'1px solid #fcd34d', borderRadius:10, padding:'12px 16px', marginBottom:16, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <div>
             <div style={{ fontWeight:700, fontSize:13, color:'#92400e' }}>⚠ No fees generated for {currentMonthLabel}</div>
-            <div style={{ fontSize:12, color:'#a16207', marginTop:2 }}>This learner has no fee entries for the current month.</div>
+            <div style={{ fontSize:12, color:'#b8870a', marginTop:2 }}>This learner has no fee entries for the current month.</div>
           </div>
           <button onClick={catchUp} disabled={catchingUp}
-            style={{ padding:'7px 14px', background:'#0f2044', color:'#fff', border:'none', borderRadius:8, fontSize:12, fontWeight:700, cursor:'pointer', flexShrink:0 }}>
+            style={{ padding:'7px 14px', background:'#003049', color:'#fff', border:'none', borderRadius:8, fontSize:12, fontWeight:700, cursor:'pointer', flexShrink:0 }}>
             {catchingUp ? 'Generating…' : '⚡ Generate now'}
           </button>
         </div>
@@ -306,23 +306,23 @@ function FeesTab({ learnerId, sym, isReadOnly }) {
       {/* Summary */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(150px, 1fr))', gap:12, marginBottom:20 }}>
         {[
-          { label:'Total due',    value:`${sym}${totalDue.toLocaleString()}`,             color:'#0f172a' },
+          { label:'Total due',    value:`${sym}${totalDue.toLocaleString()}`,             color:'#1f2937' },
           { label:'Paid',         value:`${sym}${totalPaid.toLocaleString()}`,            color:'#16a34a' },
           { label:'Outstanding',  value:`${sym}${(totalDue-totalPaid).toLocaleString()}`, color: totalDue>totalPaid?'#dc2626':'#16a34a' },
         ].map(c=>(
           <div key={c.label} style={{ background:'#fff', borderRadius:10, padding:'14px 18px', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>
-            <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.6px', marginBottom:4 }}>{c.label}</div>
+            <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.6px', marginBottom:4 }}>{c.label}</div>
             <div style={{ fontSize:22, fontWeight:800, color:c.color }}>{c.value}</div>
           </div>
         ))}
       </div>
 
       <div style={{ background:'#fff', borderRadius:12, boxShadow:'0 1px 3px rgba(0,0,0,.06)', overflow:'hidden' }}>
-        {loading ? <div style={{ padding:40, textAlign:'center', color:'#94a3b8' }}>Loading…</div> : (
+        {loading ? <div style={{ padding:40, textAlign:'center', color:'#9ca3af' }}>Loading…</div> : (
           <table style={{ width:'100%', borderCollapse:'collapse' }}>
             <thead><tr>
               {['Description','Due date','Due','Paid','Balance','Status',''].map(h=>
-                <th key={h} style={{ textAlign:'left', padding:'10px 14px', fontSize:10, fontWeight:700, color:'#94a3b8', background:'#f8fafc', textTransform:'uppercase', letterSpacing:'0.6px' }}>{h}</th>
+                <th key={h} style={{ textAlign:'left', padding:'10px 14px', fontSize:10, fontWeight:700, color:'#9ca3af', background:'#fafafa', textTransform:'uppercase', letterSpacing:'0.6px' }}>{h}</th>
               )}
             </tr></thead>
             <tbody>
@@ -332,18 +332,18 @@ function FeesTab({ learnerId, sym, isReadOnly }) {
                 return (
                   <tr key={e.id}>
                     <td style={{ padding:'11px 14px', fontSize:13, fontWeight:500 }}>{e.description}</td>
-                    <td style={{ padding:'11px 14px', fontSize:12, color:'#64748b' }}>{new Date(e.due_date).toLocaleDateString('en-ZA')}</td>
+                    <td style={{ padding:'11px 14px', fontSize:12, color:'#6b7280' }}>{new Date(e.due_date).toLocaleDateString('en-ZA')}</td>
                     <td style={{ padding:'11px 14px', fontSize:13 }}>{sym}{Number(e.amount_due).toLocaleString()}</td>
                     <td style={{ padding:'11px 14px', fontSize:13, color:'#16a34a', fontWeight:600 }}>{sym}{Number(e.amount_paid).toLocaleString()}</td>
                     <td style={{ padding:'11px 14px', fontSize:13, fontWeight:700, color:bal>0?'#dc2626':'#16a34a' }}>{sym}{bal.toLocaleString()}</td>
                     <td style={{ padding:'11px 14px' }}><span style={{ background:bg, color:col, padding:'2px 9px', borderRadius:20, fontSize:11, fontWeight:700 }}>{e.status}</span></td>
                     <td style={{ padding:'11px 14px' }}>
-                      {e.status!=='paid' && !isReadOnly && <button onClick={()=>openPay(e)} style={{ padding:'5px 12px', background:'#0f2044', color:'#fff', border:'none', borderRadius:7, fontSize:12, fontWeight:700, cursor:'pointer' }}>Pay</button>}
+                      {e.status!=='paid' && !isReadOnly && <button onClick={()=>openPay(e)} style={{ padding:'5px 12px', background:'#003049', color:'#fff', border:'none', borderRadius:7, fontSize:12, fontWeight:700, cursor:'pointer' }}>Pay</button>}
                     </td>
                   </tr>
                 )
               })}
-              {!entries.length && <tr><td colSpan={7} style={{ padding:40, textAlign:'center', color:'#94a3b8', fontSize:13 }}>No fee entries for {year}.</td></tr>}
+              {!entries.length && <tr><td colSpan={7} style={{ padding:40, textAlign:'center', color:'#9ca3af', fontSize:13 }}>No fee entries for {year}.</td></tr>}
             </tbody>
           </table>
         )}
@@ -351,23 +351,23 @@ function FeesTab({ learnerId, sym, isReadOnly }) {
 
       {/* Pay modal */}
       {payEntry && (
-        <div style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:200, backdropFilter:'blur(2px)' }}
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,48,73,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:200, backdropFilter:'blur(2px)' }}
           onClick={e=>e.target===e.currentTarget&&setPayEntry(null)}>
           <div style={{ background:'#fff', borderRadius:16, padding:'28px', width:'100%', maxWidth:380, boxShadow:'0 24px 60px rgba(0,0,0,0.2)' }}>
             <h3 style={{ fontWeight:800, marginBottom:6 }}>Record payment</h3>
-            <div style={{ fontSize:13, color:'#64748b', marginBottom:16 }}>{payEntry.description}</div>
+            <div style={{ fontSize:13, color:'#6b7280', marginBottom:16 }}>{payEntry.description}</div>
             <form onSubmit={recordPay}>
               <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:5 }}>Amount ({sym}) *</label>
-              <input style={{ width:'100%', padding:'9px 12px', border:'1.5px solid #e2e8f0', borderRadius:8, fontSize:14, outline:'none', marginBottom:12 }}
+              <input style={{ width:'100%', padding:'9px 12px', border:'1.5px solid #e5e7eb', borderRadius:8, fontSize:14, outline:'none', marginBottom:12 }}
                 type="number" step="0.01" value={payForm.amount} onChange={e=>setPayForm(f=>({...f,amount:e.target.value}))} required />
               <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:5 }}>Method</label>
-              <select style={{ width:'100%', padding:'9px 12px', border:'1.5px solid #e2e8f0', borderRadius:8, fontSize:14, outline:'none', marginBottom:12, background:'#fff' }}
+              <select style={{ width:'100%', padding:'9px 12px', border:'1.5px solid #e5e7eb', borderRadius:8, fontSize:14, outline:'none', marginBottom:12, background:'#fff' }}
                 value={payForm.payment_method} onChange={e=>setPayForm(f=>({...f,payment_method:e.target.value}))}>
                 {METHODS.map(m=><option key={m.value} value={m.value}>{m.label}</option>)}
               </select>
               <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
-                <button type="button" onClick={()=>setPayEntry(null)} style={{ padding:'8px 16px', background:'#f1f5f9', border:'none', borderRadius:8, fontWeight:600, cursor:'pointer' }}>Cancel</button>
-                <button type="submit" disabled={paying} style={{ padding:'8px 16px', background:'#0f2044', color:'#fff', border:'none', borderRadius:8, fontWeight:600, cursor:'pointer' }}>{paying?'Saving…':'Record'}</button>
+                <button type="button" onClick={()=>setPayEntry(null)} style={{ padding:'8px 16px', background:'#f7f7f7', border:'none', borderRadius:8, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+                <button type="submit" disabled={paying} style={{ padding:'8px 16px', background:'#003049', color:'#fff', border:'none', borderRadius:8, fontWeight:600, cursor:'pointer' }}>{paying?'Saving…':'Record'}</button>
               </div>
             </form>
           </div>
@@ -445,9 +445,9 @@ function ExamGradesTab({ learnerId }) {
   return (
     <div>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
-        <div style={{ fontSize:14, color:'#64748b' }}>Academic Year {year}</div>
+        <div style={{ fontSize:14, color:'#6b7280' }}>Academic Year {year}</div>
         <button onClick={()=>setShowAdd(s=>!s)}
-          style={{ padding:'7px 14px', background:'#0f2044', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>
+          style={{ padding:'7px 14px', background:'#003049', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>
           + Add subject
         </button>
       </div>
@@ -457,16 +457,16 @@ function ExamGradesTab({ learnerId }) {
           <input value={newSubject} onChange={e=>setNewSubject(e.target.value)}
             onKeyDown={e=>e.key==='Enter'&&addSubject()}
             placeholder="Subject name e.g. Physical Science"
-            style={{ flex:1, padding:'9px 12px', border:'1.5px solid #e2e8f0', borderRadius:8, fontSize:13, outline:'none' }} />
-          <button onClick={addSubject} style={{ padding:'9px 16px', background:'#0f2044', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>Add</button>
-          <button onClick={()=>setShowAdd(false)} style={{ padding:'9px 16px', background:'#f1f5f9', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+            style={{ flex:1, padding:'9px 12px', border:'1.5px solid #e5e7eb', borderRadius:8, fontSize:13, outline:'none' }} />
+          <button onClick={addSubject} style={{ padding:'9px 16px', background:'#003049', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>Add</button>
+          <button onClick={()=>setShowAdd(false)} style={{ padding:'9px 16px', background:'#f7f7f7', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>Cancel</button>
         </div>
       )}
 
       <div style={{ background:'#fff', borderRadius:12, boxShadow:'0 1px 3px rgba(0,0,0,.06)', overflow:'hidden' }}>
         <table style={{ width:'100%', borderCollapse:'collapse' }}>
           <thead>
-            <tr style={{ background:'#0f2044' }}>
+            <tr style={{ background:'#003049' }}>
               <th style={{ textAlign:'left', padding:'12px 16px', fontSize:12, fontWeight:700, color:'rgba(255,255,255,0.7)', width:'30%' }}>Subject</th>
               {TERMS.map(t=>(
                 <th key={t} style={{ textAlign:'center', padding:'12px 8px', fontSize:12, fontWeight:700, color:'rgba(255,255,255,0.7)' }}>
@@ -482,8 +482,8 @@ function ExamGradesTab({ learnerId }) {
               const avg = getAvg(subject)
               const avgSym = GRADE_SYMBOL(avg)
               return (
-                <tr key={subject} style={{ borderTop:'1px solid #f1f5f9', background: si%2===0?'#fff':'#fafafa' }}>
-                  <td style={{ padding:'10px 16px', fontSize:13, fontWeight:600, color:'#0f172a' }}>{subject}</td>
+                <tr key={subject} style={{ borderTop:'1px solid #f7f7f7', background: si%2===0?'#fff':'#fafafa' }}>
+                  <td style={{ padding:'10px 16px', fontSize:13, fontWeight:600, color:'#1f2937' }}>{subject}</td>
                   {TERMS.map(term => {
                     const mark  = getMark(subject, term)
                     const sym_  = GRADE_SYMBOL(mark)
@@ -507,21 +507,21 @@ function ExamGradesTab({ learnerId }) {
                   <td style={{ padding:'8px', textAlign:'center' }}>
                     {avg !== null ? (
                       <div style={{ display:'inline-flex', alignItems:'center', gap:4 }}>
-                        <span style={{ fontSize:13, fontWeight:700, color:'#0f172a' }}>{avg}%</span>
+                        <span style={{ fontSize:13, fontWeight:700, color:'#1f2937' }}>{avg}%</span>
                         <span style={{ fontSize:13, fontWeight:800, color:GRADE_COLOR(avgSym) }}>{avgSym}</span>
                       </div>
-                    ) : <span style={{ color:'#94a3b8', fontSize:12 }}>—</span>}
+                    ) : <span style={{ color:'#9ca3af', fontSize:12 }}>—</span>}
                   </td>
                   <td style={{ padding:'8px', textAlign:'center' }}>
                     <button onClick={()=>removeSubject(subject)}
-                      style={{ background:'none', border:'none', cursor:'pointer', color:'#cbd5e1', fontSize:14, padding:2 }}>✕</button>
+                      style={{ background:'none', border:'none', cursor:'pointer', color:'#d1d5db', fontSize:14, padding:2 }}>✕</button>
                   </td>
                 </tr>
               )
             })}
 
             {/* Term averages footer */}
-            <tr style={{ background:'#0f2044', borderTop:'2px solid #1e3a6b' }}>
+            <tr style={{ background:'#003049', borderTop:'2px solid #1e3a6b' }}>
               <td style={{ padding:'10px 16px', fontSize:12, fontWeight:700, color:'rgba(255,255,255,0.7)' }}>TERM AVERAGE</td>
               {TERMS.map(t=>{
                 const avg = getTermAvg(t)
@@ -539,13 +539,13 @@ function ExamGradesTab({ learnerId }) {
           </tbody>
         </table>
         {subjects.length === 0 && (
-          <div style={{ padding:40, textAlign:'center', color:'#94a3b8', fontSize:13 }}>
+          <div style={{ padding:40, textAlign:'center', color:'#9ca3af', fontSize:13 }}>
             No subjects yet. Click "+ Add subject" to get started.
           </div>
         )}
       </div>
 
-      <div style={{ marginTop:12, fontSize:12, color:'#94a3b8' }}>
+      <div style={{ marginTop:12, fontSize:12, color:'#9ca3af' }}>
         A ≥ 80% · B ≥ 70% · C ≥ 60% · D ≥ 50% · F &lt; 50% · Click a mark and press Tab/click away to save
       </div>
     </div>
@@ -579,14 +579,14 @@ function AwardsTab({ learnerId }) {
   return (
     <div>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
-        <div style={{ fontSize:14, color:'#64748b' }}>{awards.length} award{awards.length!==1?'s':''}</div>
-        <button onClick={()=>setShow(true)} style={{ padding:'7px 14px', background:'#0f2044', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>
+        <div style={{ fontSize:14, color:'#6b7280' }}>{awards.length} award{awards.length!==1?'s':''}</div>
+        <button onClick={()=>setShow(true)} style={{ padding:'7px 14px', background:'#003049', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>
           + Add award
         </button>
       </div>
 
       {awards.length === 0 && !show && (
-        <div style={{ background:'#fff', borderRadius:12, padding:48, textAlign:'center', color:'#94a3b8', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>
+        <div style={{ background:'#fff', borderRadius:12, padding:48, textAlign:'center', color:'#9ca3af', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>
           <div style={{ fontSize:32, marginBottom:10 }}>🏆</div>
           <div style={{ fontWeight:600, marginBottom:4, color:'#374151' }}>No awards yet</div>
           <div style={{ fontSize:13 }}>Add merit badges, achievements and recognitions here.</div>
@@ -596,33 +596,33 @@ function AwardsTab({ learnerId }) {
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(260px, 1fr))', gap:12 }}>
         {awards.map(a => (
           <div key={a.id} style={{ background:'#fff', borderRadius:12, padding:'16px 18px', boxShadow:'0 1px 3px rgba(0,0,0,.06)', position:'relative' }}>
-            <button onClick={()=>del(a.id)} style={{ position:'absolute', top:12, right:12, background:'none', border:'none', cursor:'pointer', color:'#cbd5e1', fontSize:14 }}>✕</button>
+            <button onClick={()=>del(a.id)} style={{ position:'absolute', top:12, right:12, background:'none', border:'none', cursor:'pointer', color:'#d1d5db', fontSize:14 }}>✕</button>
             <div style={{ fontSize:26, marginBottom:8 }}>🏆</div>
-            <div style={{ fontWeight:700, fontSize:14, color:'#0f172a', marginBottom:4, paddingRight:20 }}>{a.title}</div>
-            {a.description && <div style={{ fontSize:13, color:'#64748b', marginBottom:8, lineHeight:1.5 }}>{a.description}</div>}
-            {a.award_date && <div style={{ fontSize:11, color:'#94a3b8', fontWeight:600 }}>{new Date(a.award_date).toLocaleDateString('en-ZA', { day:'numeric', month:'long', year:'numeric' })}</div>}
+            <div style={{ fontWeight:700, fontSize:14, color:'#1f2937', marginBottom:4, paddingRight:20 }}>{a.title}</div>
+            {a.description && <div style={{ fontSize:13, color:'#6b7280', marginBottom:8, lineHeight:1.5 }}>{a.description}</div>}
+            {a.award_date && <div style={{ fontSize:11, color:'#9ca3af', fontWeight:600 }}>{new Date(a.award_date).toLocaleDateString('en-ZA', { day:'numeric', month:'long', year:'numeric' })}</div>}
           </div>
         ))}
       </div>
 
       {show && (
-        <div style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:200, backdropFilter:'blur(2px)' }}
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,48,73,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:200, backdropFilter:'blur(2px)' }}
           onClick={e=>e.target===e.currentTarget&&setShow(false)}>
           <div style={{ background:'#fff', borderRadius:16, padding:'28px', width:'100%', maxWidth:420, boxShadow:'0 24px 60px rgba(0,0,0,0.2)' }}>
             <h3 style={{ fontWeight:800, marginBottom:20 }}>Add award</h3>
             <form onSubmit={save}>
               <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:5 }}>Title *</label>
-              <input style={{ width:'100%', padding:'9px 12px', border:'1.5px solid #e2e8f0', borderRadius:8, fontSize:14, outline:'none', marginBottom:12 }}
+              <input style={{ width:'100%', padding:'9px 12px', border:'1.5px solid #e5e7eb', borderRadius:8, fontSize:14, outline:'none', marginBottom:12 }}
                 value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} required placeholder="e.g. Academic Excellence Award" />
               <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:5 }}>Description</label>
-              <textarea style={{ width:'100%', padding:'9px 12px', border:'1.5px solid #e2e8f0', borderRadius:8, fontSize:14, outline:'none', marginBottom:12, resize:'vertical', minHeight:70 }}
+              <textarea style={{ width:'100%', padding:'9px 12px', border:'1.5px solid #e5e7eb', borderRadius:8, fontSize:14, outline:'none', marginBottom:12, resize:'vertical', minHeight:70 }}
                 value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} placeholder="What was this award for?" />
               <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:5 }}>Date</label>
-              <input type="date" style={{ width:'100%', padding:'9px 12px', border:'1.5px solid #e2e8f0', borderRadius:8, fontSize:14, outline:'none', marginBottom:16 }}
+              <input type="date" style={{ width:'100%', padding:'9px 12px', border:'1.5px solid #e5e7eb', borderRadius:8, fontSize:14, outline:'none', marginBottom:16 }}
                 value={form.award_date} onChange={e=>setForm(f=>({...f,award_date:e.target.value}))} />
               <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
-                <button type="button" onClick={()=>setShow(false)} style={{ padding:'8px 16px', background:'#f1f5f9', border:'none', borderRadius:8, fontWeight:600, cursor:'pointer' }}>Cancel</button>
-                <button type="submit" disabled={saving} style={{ padding:'8px 16px', background:'#0f2044', color:'#fff', border:'none', borderRadius:8, fontWeight:600, cursor:'pointer' }}>{saving?'Saving…':'Add award'}</button>
+                <button type="button" onClick={()=>setShow(false)} style={{ padding:'8px 16px', background:'#f7f7f7', border:'none', borderRadius:8, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+                <button type="submit" disabled={saving} style={{ padding:'8px 16px', background:'#003049', color:'#fff', border:'none', borderRadius:8, fontWeight:600, cursor:'pointer' }}>{saving?'Saving…':'Add award'}</button>
               </div>
             </form>
           </div>
@@ -662,10 +662,10 @@ function NotesTab({ learnerId }) {
         <form onSubmit={save}>
           <textarea value={text} onChange={e=>setText(e.target.value)}
             placeholder="Add a note about this learner — visible to all staff…"
-            style={{ width:'100%', padding:'10px 12px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', resize:'vertical', minHeight:80, marginBottom:10, fontFamily:'inherit' }} />
+            style={{ width:'100%', padding:'10px 12px', border:'1.5px solid #e5e7eb', borderRadius:9, fontSize:14, outline:'none', resize:'vertical', minHeight:80, marginBottom:10, fontFamily:'inherit' }} />
           <div style={{ display:'flex', justifyContent:'flex-end' }}>
             <button type="submit" disabled={saving||!text.trim()}
-              style={{ padding:'8px 18px', background:'#0f2044', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', opacity:text.trim()?1:0.5 }}>
+              style={{ padding:'8px 18px', background:'#003049', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', opacity:text.trim()?1:0.5 }}>
               {saving?'Saving…':'Save note'}
             </button>
           </div>
@@ -673,7 +673,7 @@ function NotesTab({ learnerId }) {
       </div>
 
       {notes.length === 0 && (
-        <div style={{ background:'#fff', borderRadius:12, padding:40, textAlign:'center', color:'#94a3b8', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>
+        <div style={{ background:'#fff', borderRadius:12, padding:40, textAlign:'center', color:'#9ca3af', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>
           No notes yet.
         </div>
       )}
@@ -682,13 +682,13 @@ function NotesTab({ learnerId }) {
         {notes.map(n => (
           <div key={n.id} style={{ background:'#fff', borderRadius:12, padding:'16px 18px', boxShadow:'0 1px 3px rgba(0,0,0,.06)', display:'flex', gap:12 }}>
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:11, color:'#94a3b8', marginBottom:6 }}>
+              <div style={{ fontSize:11, color:'#9ca3af', marginBottom:6 }}>
                 <strong style={{ color:'#374151' }}>{n.users?.full_name || 'Staff'}</strong>
                 {' · '}{new Date(n.created_at).toLocaleDateString('en-ZA', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })}
               </div>
-              <div style={{ fontSize:14, color:'#0f172a', lineHeight:1.6, whiteSpace:'pre-wrap' }}>{n.note}</div>
+              <div style={{ fontSize:14, color:'#1f2937', lineHeight:1.6, whiteSpace:'pre-wrap' }}>{n.note}</div>
             </div>
-            <button onClick={()=>del(n.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'#cbd5e1', fontSize:14, alignSelf:'flex-start', flexShrink:0, padding:2 }}>✕</button>
+            <button onClick={()=>del(n.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'#d1d5db', fontSize:14, alignSelf:'flex-start', flexShrink:0, padding:2 }}>✕</button>
           </div>
         ))}
       </div>
@@ -701,27 +701,27 @@ function PremiumGate({ tab, learnerId }) {
   const labels = { grades:'Exam Grades', awards:'Awards', notes:'Notes' }
   return (
     <div style={{ background:'#fff', borderRadius:14, padding:'56px 40px', textAlign:'center',
-      boxShadow:'0 1px 3px rgba(0,0,0,.06)', border:'1.5px dashed #e2e8f0' }}>
+      boxShadow:'0 1px 3px rgba(0,0,0,.06)', border:'1.5px dashed #e5e7eb' }}>
       <div style={{ fontSize:40, marginBottom:16 }}>🔒</div>
-      <div style={{ fontSize:18, fontWeight:800, color:'#0f172a', marginBottom:8 }}>
+      <div style={{ fontSize:18, fontWeight:800, color:'#1f2937', marginBottom:8 }}>
         {labels[tab]} is a Pro feature
       </div>
-      <div style={{ fontSize:14, color:'#64748b', maxWidth:380, margin:'0 auto 24px', lineHeight:1.7 }}>
+      <div style={{ fontSize:14, color:'#6b7280', maxWidth:380, margin:'0 auto 24px', lineHeight:1.7 }}>
         Upgrade to Skolo Pro to unlock exam result tracking, awards management and staff notes for all your learners.
       </div>
       <div style={{ display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap' }}>
-        <div style={{ background:'#f8fafc', borderRadius:10, padding:'12px 20px', fontSize:13, color:'#374151' }}>
+        <div style={{ background:'#fafafa', borderRadius:10, padding:'12px 20px', fontSize:13, color:'#374151' }}>
           📊 Exam grades grid (subjects × terms)
         </div>
-        <div style={{ background:'#f8fafc', borderRadius:10, padding:'12px 20px', fontSize:13, color:'#374151' }}>
+        <div style={{ background:'#fafafa', borderRadius:10, padding:'12px 20px', fontSize:13, color:'#374151' }}>
           🏆 Awards and achievements
         </div>
-        <div style={{ background:'#f8fafc', borderRadius:10, padding:'12px 20px', fontSize:13, color:'#374151' }}>
+        <div style={{ background:'#fafafa', borderRadius:10, padding:'12px 20px', fontSize:13, color:'#374151' }}>
           📝 Staff notes and observations
         </div>
       </div>
-      <div style={{ marginTop:28, fontSize:13, color:'#94a3b8' }}>
-        Contact <strong style={{color:'#0f2044'}}>4D Climate Solutions</strong> to upgrade your school's plan.
+      <div style={{ marginTop:28, fontSize:13, color:'#9ca3af' }}>
+        Contact <strong style={{color:'#003049'}}>4D Climate Solutions</strong> to upgrade your school's plan.
       </div>
     </div>
   )
@@ -744,11 +744,11 @@ export default function LearnerProfile() {
       .catch(() => { setLoading(false) })
   }, [id])
 
-  if (loading) return <div style={{ padding:48, textAlign:'center', color:'#64748b' }}>Loading…</div>
+  if (loading) return <div style={{ padding:48, textAlign:'center', color:'#6b7280' }}>Loading…</div>
   if (!learner) return (
-    <div style={{ padding:48, textAlign:'center', color:'#64748b' }}>
+    <div style={{ padding:48, textAlign:'center', color:'#6b7280' }}>
       <div>Learner not found.</div>
-      <Link to="/learners" style={{ color:'#0f2044', fontWeight:600 }}>← Back to learners</Link>
+      <Link to="/learners" style={{ color:'#003049', fontWeight:600 }}>← Back to learners</Link>
     </div>
   )
 
@@ -773,7 +773,7 @@ export default function LearnerProfile() {
         </Link>
 
         {/* Profile header */}
-        <div style={{ background:'#0f2044', borderRadius:14, padding:'24px 28px', marginBottom:24, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+        <div style={{ background:'#003049', borderRadius:14, padding:'24px 28px', marginBottom:24, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <div style={{ display:'flex', alignItems:'center', gap:16 }}>
             <div style={{ width:52, height:52, background:'rgba(255,255,255,0.15)', borderRadius:12,
               display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, fontWeight:800, color:'#fff' }}>
@@ -794,14 +794,14 @@ export default function LearnerProfile() {
         </div>
 
         {/* Tabs */}
-        <div style={{ borderBottom:'2px solid #e2e8f0', marginBottom:24, display:'flex', gap:0 }}>
+        <div style={{ borderBottom:'2px solid #e5e7eb', marginBottom:24, display:'flex', gap:0 }}>
           {TABS.map(tb => (
             <button key={tb.key}
               className={`tab-btn${tab===tb.key?' active':''}`}
               onClick={() => setTab(tb.key)}
               style={{ display:'flex', alignItems:'center', gap:5 }}>
               {tb.label}
-              {tb.premium && <span style={{ fontSize:10, background:'#fef9c3', color:'#a16207', padding:'1px 6px', borderRadius:10, fontWeight:700, letterSpacing:'0.3px' }}>PRO</span>}
+              {tb.premium && <span style={{ fontSize:10, background:'#fef4d6', color:'#b8870a', padding:'1px 6px', borderRadius:10, fontWeight:700, letterSpacing:'0.3px' }}>PRO</span>}
             </button>
           ))}
         </div>

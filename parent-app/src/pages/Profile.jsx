@@ -69,15 +69,15 @@ export default function Profile() {
     setPwSaving(false)
   }
 
-  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>Loading...</div>
+  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#6b7280' }}>Loading...</div>
 
   return (
     <div style={{ maxWidth: 500, margin: '0 auto' }}>
-      <h1 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', margin: '0 0 20px' }}>Profile & Settings</h1>
+      <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1f2937', margin: '0 0 20px' }}>Profile & Settings</h1>
 
       {/* Personal Information */}
       <div style={cardStyle}>
-        <div style={{ fontWeight: 600, fontSize: 15, color: '#0f172a', marginBottom: 16 }}>Personal Information</div>
+        <div style={{ fontWeight: 600, fontSize: 15, color: '#1f2937', marginBottom: 16 }}>Personal Information</div>
 
         {msg && (
           <div style={{
@@ -108,7 +108,7 @@ export default function Profile() {
           </div>
           <button type="submit" disabled={saving} style={{
             width: '100%', padding: '10px', borderRadius: 8, border: 'none',
-            background: '#1d4ed8', color: '#fff', fontWeight: 600, fontSize: 14,
+            background: '#003049', color: '#fff', fontWeight: 600, fontSize: 14,
             cursor: 'pointer', opacity: saving ? 0.6 : 1
           }}>
             {saving ? 'Saving...' : 'Save Changes'}
@@ -118,7 +118,7 @@ export default function Profile() {
 
       {/* Change Password */}
       <div style={cardStyle}>
-        <div style={{ fontWeight: 600, fontSize: 15, color: '#0f172a', marginBottom: 16 }}>Change Password</div>
+        <div style={{ fontWeight: 600, fontSize: 15, color: '#1f2937', marginBottom: 16 }}>Change Password</div>
 
         {pwMsg && (
           <div style={{
@@ -143,7 +143,7 @@ export default function Profile() {
           </div>
           <button type="submit" disabled={pwSaving} style={{
             width: '100%', padding: '10px', borderRadius: 8,
-            border: '1.5px solid #0f2044', background: '#fff', color: '#0f2044',
+            border: '1.5px solid #003049', background: '#fff', color: '#003049',
             fontWeight: 600, fontSize: 14, cursor: 'pointer', opacity: pwSaving ? 0.6 : 1
           }}>
             {pwSaving ? 'Updating...' : 'Update Password'}
@@ -152,7 +152,7 @@ export default function Profile() {
       </div>
 
       {/* Account info */}
-      <div style={{ textAlign: 'center', padding: '20px 0', color: '#94a3b8', fontSize: 12 }}>
+      <div style={{ textAlign: 'center', padding: '20px 0', color: '#9ca3af', fontSize: 12 }}>
         Signed in as {user?.email}
       </div>
     </div>
@@ -161,15 +161,15 @@ export default function Profile() {
 
 const cardStyle = {
   background: '#fff', borderRadius: 12, padding: 16,
-  border: '1px solid #e2e8f0', marginBottom: 12
+  border: '1px solid #e5e7eb', marginBottom: 12
 }
 
 const labelStyle = {
-  display: 'block', fontSize: 12, fontWeight: 500, color: '#64748b', marginBottom: 4
+  display: 'block', fontSize: 12, fontWeight: 500, color: '#6b7280', marginBottom: 4
 }
 
 const inputStyle = {
   width: '100%', padding: '10px 12px', borderRadius: 8,
-  border: '1px solid #e2e8f0', fontSize: 14, outline: 'none',
+  border: '1px solid #e5e7eb', fontSize: 14, outline: 'none',
   boxSizing: 'border-box'
 }

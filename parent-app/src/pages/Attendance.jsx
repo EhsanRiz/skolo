@@ -25,15 +25,15 @@ export default function Attendance() {
   const statusColor = {
     present: { bg: '#dcfce7', color: '#16a34a', icon: '✓' },
     absent: { bg: '#fee2e2', color: '#dc2626', icon: '✗' },
-    late: { bg: '#fef9c3', color: '#a16207', icon: 'L' },
+    late: { bg: '#fef4d6', color: '#b8870a', icon: 'L' },
     excused: { bg: '#ede9fe', color: '#7c3aed', icon: 'E' }
   }
 
-  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>Loading attendance...</div>
+  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#6b7280' }}>Loading attendance...</div>
 
   return (
     <div style={{ maxWidth: 600, margin: '0 auto' }}>
-      <h1 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', margin: '0 0 16px' }}>Attendance</h1>
+      <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1f2937', margin: '0 0 16px' }}>Attendance</h1>
 
       {/* Month/year picker */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
@@ -53,18 +53,18 @@ export default function Attendance() {
           <div key={child.id} style={cardStyle}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <div>
-                <div style={{ fontWeight: 600, fontSize: 15, color: '#0f172a' }}>
+                <div style={{ fontWeight: 600, fontSize: 15, color: '#1f2937' }}>
                   {child.first_name} {child.last_name}
                 </div>
-                <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>
                   {child.classes?.grades?.name} {child.classes?.name}
                 </div>
               </div>
               {/* Attendance percentage circle */}
               <div style={{
                 width: 52, height: 52, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: pct >= 90 ? '#dcfce7' : pct >= 75 ? '#fef9c3' : '#fee2e2',
-                color: pct >= 90 ? '#16a34a' : pct >= 75 ? '#a16207' : '#dc2626',
+                background: pct >= 90 ? '#dcfce7' : pct >= 75 ? '#fef4d6' : '#fee2e2',
+                color: pct >= 90 ? '#16a34a' : pct >= 75 ? '#b8870a' : '#dc2626',
                 fontWeight: 700, fontSize: 14
               }}>
                 {pct}%
@@ -104,7 +104,7 @@ export default function Attendance() {
                 })}
               </div>
             ) : (
-              <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: 13, padding: 12 }}>
+              <div style={{ textAlign: 'center', color: '#9ca3af', fontSize: 13, padding: 12 }}>
                 No attendance records for {MONTHS[month - 1]} {year}
               </div>
             )}
@@ -112,7 +112,7 @@ export default function Attendance() {
             {/* Legend */}
             <div style={{ display: 'flex', gap: 12, marginTop: 10, justifyContent: 'center' }}>
               {Object.entries(statusColor).map(([key, val]) => (
-                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 10, color: '#64748b' }}>
+                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 10, color: '#6b7280' }}>
                   <span style={{ width: 10, height: 10, borderRadius: 3, background: val.bg, border: `1px solid ${val.color}` }} />
                   <span style={{ textTransform: 'capitalize' }}>{key}</span>
                 </div>
@@ -123,7 +123,7 @@ export default function Attendance() {
       })}
 
       {(!data?.learners || data.learners.length === 0) && (
-        <div style={{ textAlign: 'center', color: '#94a3b8', padding: 40, fontSize: 14 }}>
+        <div style={{ textAlign: 'center', color: '#9ca3af', padding: 40, fontSize: 14 }}>
           No learners linked to your account
         </div>
       )}
@@ -132,11 +132,11 @@ export default function Attendance() {
 }
 
 const selectStyle = {
-  padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0',
-  fontSize: 14, color: '#334155', background: '#fff', flex: 1
+  padding: '8px 12px', borderRadius: 8, border: '1px solid #e5e7eb',
+  fontSize: 14, color: '#374151', background: '#fff', flex: 1
 }
 
 const cardStyle = {
   background: '#fff', borderRadius: 12, padding: 16,
-  border: '1px solid #e2e8f0', marginBottom: 12
+  border: '1px solid #e5e7eb', marginBottom: 12
 }

@@ -31,9 +31,9 @@ const CSS = `
 
 // Type/color mapping for announcement badges
 const TARGET_STYLE = {
-  all:   { bg: '#eff6ff', color: '#0f2044', label: 'All parents', icon: '📢' },
+  all:   { bg: '#f0f5fa', color: '#003049', label: 'All parents', icon: '📢' },
   grade: { bg: '#faf5ff', color: '#7c3aed', label: 'Grade', icon: '🎓' },
-  class: { bg: '#fef3c7', color: '#a16207', label: 'Class', icon: '🏫' },
+  class: { bg: '#fef3c7', color: '#b8870a', label: 'Class', icon: '🏫' },
 }
 
 function ConfirmModal({ open, title, message, confirmLabel, danger, onConfirm, onCancel }) {
@@ -46,16 +46,16 @@ function ConfirmModal({ open, title, message, confirmLabel, danger, onConfirm, o
         position:'relative', background:'#fff', borderRadius:16, padding:'28px 32px', maxWidth:400, width:'90%',
         boxShadow:'0 20px 60px rgba(0,0,0,.2)'
       }} onClick={e => e.stopPropagation()}>
-        <div style={{ fontWeight:800, fontSize:17, color:'#0f172a', marginBottom:8 }}>{title || 'Confirm'}</div>
-        <div style={{ fontSize:14, color:'#64748b', lineHeight:1.6, marginBottom:24 }}>{message}</div>
+        <div style={{ fontWeight:800, fontSize:17, color:'#1f2937', marginBottom:8 }}>{title || 'Confirm'}</div>
+        <div style={{ fontSize:14, color:'#6b7280', lineHeight:1.6, marginBottom:24 }}>{message}</div>
         <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
           <button onClick={onCancel} style={{
-            padding:'9px 18px', borderRadius:8, border:'1.5px solid #e2e8f0', background:'#fff',
+            padding:'9px 18px', borderRadius:8, border:'1.5px solid #e5e7eb', background:'#fff',
             fontSize:13, fontWeight:600, cursor:'pointer', color:'#374151', fontFamily:'inherit'
           }}>Cancel</button>
           <button onClick={onConfirm} style={{
             padding:'9px 18px', borderRadius:8, border:'none',
-            background: danger ? '#dc2626' : '#0f2044', color:'#fff',
+            background: danger ? '#dc2626' : '#003049', color:'#fff',
             fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:'inherit'
           }}>{confirmLabel || 'Confirm'}</button>
         </div>
@@ -129,8 +129,8 @@ export default function Announcements() {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>Announcements</h1>
-          <p style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>Send messages and SMS blasts to parents</p>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1f2937', letterSpacing: '-0.3px' }}>Announcements</h1>
+          <p style={{ fontSize: 14, color: '#6b7280', marginTop: 2 }}>Send messages and SMS blasts to parents</p>
         </div>
         {isAdmin && (
           <button style={t.btn.primary} onClick={() => { setLast(null); setShow(true) }}>+ New announcement</button>
@@ -145,7 +145,7 @@ export default function Announcements() {
       )}
 
       {announcements.length === 0 && (
-        <div style={{ background: '#fff', borderRadius: 16, padding: '48px', textAlign: 'center', color: '#94a3b8', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+        <div style={{ background: '#fff', borderRadius: 16, padding: '48px', textAlign: 'center', color: '#9ca3af', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
           <div style={{ fontSize: 32, marginBottom: 12 }}>📢</div>
           <div style={{ fontWeight: 600, fontSize: 15 }}>No announcements yet</div>
           {isAdmin && <div style={{ fontSize: 13, marginTop: 6 }}>Create one to get started.</div>}
@@ -171,9 +171,9 @@ export default function Announcements() {
                     {ts.icon}
                   </div>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{a.title}</div>
+                    <div style={{ fontWeight: 700, fontSize: 15, color: '#1f2937' }}>{a.title}</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3, flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: 12, color: '#94a3b8' }}>{timeAgo(a.created_at)}</span>
+                      <span style={{ fontSize: 12, color: '#9ca3af' }}>{timeAgo(a.created_at)}</span>
                       <span style={{ background: ts.bg, color: ts.color, padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
                         {ts.label}
                       </span>
@@ -187,9 +187,9 @@ export default function Announcements() {
                 </div>
                 {isAdmin && (
                   <button onClick={(e) => { e.stopPropagation(); remove(a.id) }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#cbd5e1', padding: 6, borderRadius: 8, transition: 'color .15s', flexShrink: 0 }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d1d5db', padding: 6, borderRadius: 8, transition: 'color .15s', flexShrink: 0 }}
                     onMouseEnter={e => e.target.style.color = '#ef4444'}
-                    onMouseLeave={e => e.target.style.color = '#cbd5e1'}>
+                    onMouseLeave={e => e.target.style.color = '#d1d5db'}>
                     <IconTrash size={15} />
                   </button>
                 )}
@@ -205,13 +205,13 @@ export default function Announcements() {
               {isLong && (
                 <div
                   onClick={(e) => { e.stopPropagation(); toggleExpand(a.id) }}
-                  style={{ marginLeft: 46, marginTop: 6, fontSize: 12, color: '#0f2044', fontWeight: 600, cursor: 'pointer' }}>
+                  style={{ marginLeft: 46, marginTop: 6, fontSize: 12, color: '#003049', fontWeight: 600, cursor: 'pointer' }}>
                   {isExpanded ? 'Show less ↑' : 'Read more ↓'}
                 </div>
               )}
 
               {/* Date footer */}
-              <div style={{ marginLeft: 46, marginTop: 10, fontSize: 11, color: '#cbd5e1' }}>
+              <div style={{ marginLeft: 46, marginTop: 10, fontSize: 11, color: '#d1d5db' }}>
                 {new Date(a.created_at).toLocaleDateString('en-ZA', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
               </div>
             </div>
@@ -235,11 +235,11 @@ export default function Announcements() {
                 <option value="grade">Specific grade</option>
                 <option value="class">Specific class</option>
               </select>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, padding: '12px', background: '#f8fafc', borderRadius: 9 }}>
-                <input type="checkbox" id="sms" name="send_sms" checked={form.send_sms} onChange={hf} style={{ width: 16, height: 16, accentColor: '#0f2044' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, padding: '12px', background: '#fafafa', borderRadius: 9 }}>
+                <input type="checkbox" id="sms" name="send_sms" checked={form.send_sms} onChange={hf} style={{ width: 16, height: 16, accentColor: '#003049' }} />
                 <label htmlFor="sms" style={{ fontSize: 14, color: '#374151', cursor: 'pointer', fontWeight: 500 }}>
                   Also send as SMS to parents
-                  <span style={{ display: 'block', fontSize: 12, color: '#94a3b8', fontWeight: 400 }}>Africa's Talking integration — activates in next build step</span>
+                  <span style={{ display: 'block', fontSize: 12, color: '#9ca3af', fontWeight: 400 }}>Africa's Talking integration — activates in next build step</span>
                 </label>
               </div>
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>

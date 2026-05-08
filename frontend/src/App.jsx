@@ -28,7 +28,7 @@ import Timetable from './pages/Timetable'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
-  if (loading) return <div style={{ padding: 40, color: '#64748b' }}>Loading…</div>
+  if (loading) return <div style={{ padding: 40, color: '#6b7280' }}>Loading…</div>
   if (!user) return <Navigate to="/" replace />
   return children
 }
@@ -42,7 +42,7 @@ function PublicRoute({ children }) {
 
 function HomeRoute() {
   const { user, loading } = useAuth()
-  if (loading) return <div style={{ padding: 40, color: '#64748b' }}>Loading…</div>
+  if (loading) return <div style={{ padding: 40, color: '#6b7280' }}>Loading…</div>
   if (user) return <Navigate to="/dashboard" replace />
   return <LandingPage />
 }

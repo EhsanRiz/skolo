@@ -4,8 +4,8 @@ import { useAuth } from '../contexts/AuthContext'
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import api from '../lib/api'
 
-const COLORS = ['#16a34a', '#e2e8f0']
-const ATT_COLORS = { present: '#16a34a', late: '#f59e0b', absent: '#dc2626', excused: '#94a3b8' }
+const COLORS = ['#16a34a', '#e5e7eb']
+const ATT_COLORS = { present: '#16a34a', late: '#f7c548', absent: '#dc2626', excused: '#9ca3af' }
 
 export default function Dashboard() {
   const { user, school } = useAuth()
@@ -26,9 +26,9 @@ export default function Dashboard() {
   const currency = school?.countries?.currency_symbol || 'M'
 
   if (loading) return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh', color: '#64748b' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '40vh', color: '#6b7280' }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ width: 32, height: 32, border: '3px solid #e2e8f0', borderTopColor: '#1d4ed8', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
+        <div style={{ width: 32, height: 32, border: '3px solid #e5e7eb', borderTopColor: '#003049', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
         Loading dashboard...
       </div>
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
@@ -73,10 +73,10 @@ export default function Dashboard() {
 
       {/* Welcome */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px', margin: 0 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1f2937', letterSpacing: '-0.3px', margin: 0 }}>
           Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {data?.guardian?.first_name || user?.full_name?.split(' ')[0]}
         </h1>
-        <p style={{ color: '#64748b', fontSize: 13, marginTop: 4 }}>
+        <p style={{ color: '#6b7280', fontSize: 13, marginTop: 4 }}>
           {new Date().toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
         </p>
       </div>
@@ -89,15 +89,15 @@ export default function Dashboard() {
           onClick={() => navigate('/fees')} />
         <StatCard label="ATTENDANCE" value={avgAttendance != null ? `${avgAttendance}%` : '—'}
           sub={`${new Date().toLocaleString('en-ZA', { month: 'long' })} school-wide`}
-          color={avgAttendance >= 80 ? '#16a34a' : avgAttendance >= 60 ? '#f59e0b' : '#dc2626'} delay={60}
+          color={avgAttendance >= 80 ? '#16a34a' : avgAttendance >= 60 ? '#f7c548' : '#dc2626'} delay={60}
           onClick={() => navigate('/attendance')} />
         <StatCard label="GRADE AVG" value={latestAvg != null ? `${latestAvg}%` : '—'}
           sub={learners[0]?.latest_grade ? `Term ${learners[0].latest_grade.term}` : 'No results yet'}
-          color="#1d4ed8" delay={120}
+          color="#003049" delay={120}
           onClick={() => navigate('/grades')} />
         <StatCard label="MESSAGES" value={unread}
           sub={unread > 0 ? 'unread' : 'No new messages'}
-          color={unread > 0 ? '#7c3aed' : '#64748b'} delay={180}
+          color={unread > 0 ? '#7c3aed' : '#6b7280'} delay={180}
           onClick={() => navigate('/messages')} />
       </div>
 
@@ -105,8 +105,8 @@ export default function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16, marginBottom: 24 }}>
         {/* Fee Overview Donut */}
         <div className="dash-card" style={{ ...cardStyle, animationDelay: '0.2s' }}>
-          <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>Fee Overview</div>
-          <div style={{ fontSize: 12, color: '#64748b', marginBottom: 16 }}>{new Date().getFullYear()} — paid vs outstanding</div>
+          <div style={{ fontWeight: 700, fontSize: 15, color: '#1f2937', marginBottom: 4 }}>Fee Overview</div>
+          <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 16 }}>{new Date().getFullYear()} — paid vs outstanding</div>
           {feeChartData.length > 0 ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
               <ResponsiveContainer width={140} height={140}>
@@ -119,32 +119,32 @@ export default function Dashboard() {
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                   <div style={{ width: 10, height: 10, borderRadius: 2, background: '#16a34a' }} />
-                  <span style={{ fontSize: 13, color: '#0f172a' }}>Paid: <strong>{currency}{totalPaid.toFixed(0)}</strong></span>
+                  <span style={{ fontSize: 13, color: '#1f2937' }}>Paid: <strong>{currency}{totalPaid.toFixed(0)}</strong></span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: 2, background: '#e2e8f0' }} />
-                  <span style={{ fontSize: 13, color: '#0f172a' }}>Outstanding: <strong>{currency}{(totalDue - totalPaid).toFixed(0)}</strong></span>
+                  <div style={{ width: 10, height: 10, borderRadius: 2, background: '#e5e7eb' }} />
+                  <span style={{ fontSize: 13, color: '#1f2937' }}>Outstanding: <strong>{currency}{(totalDue - totalPaid).toFixed(0)}</strong></span>
                 </div>
-                <div style={{ fontSize: 11, color: '#64748b', marginTop: 8 }}>
+                <div style={{ fontSize: 11, color: '#6b7280', marginTop: 8 }}>
                   {totalDue > 0 ? `${Math.round((totalPaid / totalDue) * 100)}% collected` : 'No fees due'}
                 </div>
               </div>
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: 30, color: '#94a3b8', fontSize: 13 }}>No fee data yet</div>
+            <div style={{ textAlign: 'center', padding: 30, color: '#9ca3af', fontSize: 13 }}>No fee data yet</div>
           )}
         </div>
 
         {/* Attendance Bar Chart */}
         <div className="dash-card" style={{ ...cardStyle, animationDelay: '0.3s' }}>
-          <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>Attendance This Month</div>
-          <div style={{ fontSize: 12, color: '#64748b', marginBottom: 16 }}>{new Date().toLocaleString('en-ZA', { month: 'long' })} — by child</div>
+          <div style={{ fontWeight: 700, fontSize: 15, color: '#1f2937', marginBottom: 4 }}>Attendance This Month</div>
+          <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 16 }}>{new Date().toLocaleString('en-ZA', { month: 'long' })} — by child</div>
           {attBarData.length > 0 ? (
             <ResponsiveContainer width="100%" height={Math.max(120, attBarData.length * 50 + 40)}>
               <BarChart data={attBarData} layout="vertical" barSize={14} margin={{ left: 0, right: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis type="number" fontSize={11} stroke="#94a3b8" />
-                <YAxis dataKey="name" type="category" width={60} fontSize={12} stroke="#64748b" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f7f7f7" />
+                <XAxis type="number" fontSize={11} stroke="#9ca3af" />
+                <YAxis dataKey="name" type="category" width={60} fontSize={12} stroke="#6b7280" />
                 <Tooltip />
                 <Bar dataKey="present" stackId="a" fill={ATT_COLORS.present} name="Present" radius={[0, 0, 0, 0]} />
                 <Bar dataKey="late" stackId="a" fill={ATT_COLORS.late} name="Late" />
@@ -153,7 +153,7 @@ export default function Dashboard() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div style={{ textAlign: 'center', padding: 30, color: '#94a3b8', fontSize: 13 }}>No attendance data this month</div>
+            <div style={{ textAlign: 'center', padding: 30, color: '#9ca3af', fontSize: 13 }}>No attendance data this month</div>
           )}
         </div>
       </div>
@@ -161,16 +161,16 @@ export default function Dashboard() {
       {/* Monthly Fee Trend */}
       {data?.monthly_fees?.length > 0 && (
         <div className="dash-card" style={{ ...cardStyle, marginBottom: 24, animationDelay: '0.35s' }}>
-          <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 4 }}>Fee Collection Trend</div>
-          <div style={{ fontSize: 12, color: '#64748b', marginBottom: 16 }}>Monthly due vs paid — {new Date().getFullYear()}</div>
+          <div style={{ fontWeight: 700, fontSize: 15, color: '#1f2937', marginBottom: 4 }}>Fee Collection Trend</div>
+          <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 16 }}>Monthly due vs paid — {new Date().getFullYear()}</div>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={data.monthly_fees} barGap={2}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="month" fontSize={11} stroke="#94a3b8" />
-              <YAxis fontSize={11} stroke="#94a3b8" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f7f7f7" />
+              <XAxis dataKey="month" fontSize={11} stroke="#9ca3af" />
+              <YAxis fontSize={11} stroke="#9ca3af" />
               <Tooltip />
               <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="due" name="Due" fill="#e2e8f0" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="due" name="Due" fill="#e5e7eb" radius={[4, 4, 0, 0]} />
               <Bar dataKey="paid" name="Collected" fill="#16a34a" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -180,21 +180,21 @@ export default function Dashboard() {
       {/* Children cards */}
       {learners.length > 0 && (
         <div className="dash-card" style={{ ...cardStyle, marginBottom: 24, animationDelay: '0.4s' }}>
-          <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 14 }}>Your Children</div>
+          <div style={{ fontWeight: 700, fontSize: 15, color: '#1f2937', marginBottom: 14 }}>Your Children</div>
           {learners.map(child => (
             <div key={child.id} style={{
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '12px 0', borderBottom: '1px solid #f1f5f9'
+              padding: '12px 0', borderBottom: '1px solid #f7f7f7'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{
-                  width: 40, height: 40, borderRadius: '50%', background: '#eff6ff',
+                  width: 40, height: 40, borderRadius: '50%', background: '#f0f5fa',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontWeight: 700, color: '#1d4ed8', fontSize: 15
+                  fontWeight: 700, color: '#003049', fontSize: 15
                 }}>{child.first_name[0]}</div>
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: 14, color: '#0f172a' }}>{child.first_name} {child.last_name}</div>
-                  <div style={{ fontSize: 12, color: '#64748b' }}>
+                  <div style={{ fontWeight: 600, fontSize: 14, color: '#1f2937' }}>{child.first_name} {child.last_name}</div>
+                  <div style={{ fontSize: 12, color: '#6b7280' }}>
                     {child.classes?.grades?.name} {child.classes?.name} {child.reference_no && `\u00B7 ${child.reference_no}`}
                   </div>
                 </div>
@@ -218,20 +218,20 @@ export default function Dashboard() {
         {/* Upcoming Events */}
         <div className="dash-card" style={{ ...cardStyle, animationDelay: '0.45s' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>Upcoming Events</div>
-            <Link to="/events" style={{ fontSize: 12, color: '#1d4ed8', fontWeight: 600, textDecoration: 'none' }}>View all &rarr;</Link>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#1f2937' }}>Upcoming Events</div>
+            <Link to="/events" style={{ fontSize: 12, color: '#003049', fontWeight: 600, textDecoration: 'none' }}>View all &rarr;</Link>
           </div>
           {(data?.events || []).length === 0 ? (
-            <div style={{ color: '#94a3b8', fontSize: 13, padding: 16, textAlign: 'center' }}>No upcoming events</div>
+            <div style={{ color: '#9ca3af', fontSize: 13, padding: 16, textAlign: 'center' }}>No upcoming events</div>
           ) : data.events.slice(0, 4).map(ev => (
-            <div key={ev.id} style={{ display: 'flex', gap: 10, padding: '8px 0', borderBottom: '1px solid #f8fafc' }}>
+            <div key={ev.id} style={{ display: 'flex', gap: 10, padding: '8px 0', borderBottom: '1px solid #fafafa' }}>
               <div style={{
-                width: 36, height: 36, borderRadius: 8, background: '#eff6ff', color: '#1d4ed8',
+                width: 36, height: 36, borderRadius: 8, background: '#f0f5fa', color: '#003049',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0
               }}>{new Date(ev.event_date).getDate()}</div>
               <div>
-                <div style={{ fontWeight: 500, fontSize: 13, color: '#0f172a' }}>{ev.title}</div>
-                <div style={{ fontSize: 11, color: '#64748b' }}>
+                <div style={{ fontWeight: 500, fontSize: 13, color: '#1f2937' }}>{ev.title}</div>
+                <div style={{ fontSize: 11, color: '#6b7280' }}>
                   {new Date(ev.event_date).toLocaleDateString('en-ZA', { month: 'short', day: 'numeric' })}
                   {ev.event_type && ` \u00B7 ${ev.event_type}`}
                 </div>
@@ -243,18 +243,18 @@ export default function Dashboard() {
         {/* Recent Announcements */}
         <div className="dash-card" style={{ ...cardStyle, animationDelay: '0.5s' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>Announcements</div>
-            <Link to="/announcements" style={{ fontSize: 12, color: '#1d4ed8', fontWeight: 600, textDecoration: 'none' }}>View all &rarr;</Link>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#1f2937' }}>Announcements</div>
+            <Link to="/announcements" style={{ fontSize: 12, color: '#003049', fontWeight: 600, textDecoration: 'none' }}>View all &rarr;</Link>
           </div>
           {(data?.announcements || []).length === 0 ? (
-            <div style={{ color: '#94a3b8', fontSize: 13, padding: 16, textAlign: 'center' }}>No announcements</div>
+            <div style={{ color: '#9ca3af', fontSize: 13, padding: 16, textAlign: 'center' }}>No announcements</div>
           ) : data.announcements.slice(0, 4).map(a => (
-            <div key={a.id} style={{ padding: '8px 0', borderBottom: '1px solid #f8fafc' }}>
-              <div style={{ fontWeight: 500, fontSize: 13, color: '#0f172a' }}>{a.title}</div>
-              <div style={{ fontSize: 12, color: '#64748b', marginTop: 2, lineHeight: 1.4 }}>
+            <div key={a.id} style={{ padding: '8px 0', borderBottom: '1px solid #fafafa' }}>
+              <div style={{ fontWeight: 500, fontSize: 13, color: '#1f2937' }}>{a.title}</div>
+              <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2, lineHeight: 1.4 }}>
                 {a.body?.length > 70 ? a.body.slice(0, 70) + '...' : a.body}
               </div>
-              <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 3 }}>
+              <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 3 }}>
                 {new Date(a.created_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}
               </div>
             </div>
@@ -269,17 +269,17 @@ function StatCard({ label, value, sub, color, delay, onClick }) {
   return (
     <div className="stat-card" onClick={onClick} style={{
       background: '#fff', borderRadius: 12, padding: '18px 20px',
-      border: '1px solid #e2e8f0', animationDelay: `${delay}ms`,
+      border: '1px solid #e5e7eb', animationDelay: `${delay}ms`,
       borderLeft: `3px solid ${color}`
     }}>
-      <div style={{ fontSize: 10, fontWeight: 700, color: '#64748b', letterSpacing: '0.5px', marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 10, fontWeight: 700, color: '#6b7280', letterSpacing: '0.5px', marginBottom: 6 }}>{label}</div>
       <div style={{ fontSize: 24, fontWeight: 800, color, lineHeight: 1.1, marginBottom: 4 }}>{value}</div>
-      <div style={{ fontSize: 11, color: '#94a3b8' }}>{sub}</div>
+      <div style={{ fontSize: 11, color: '#9ca3af' }}>{sub}</div>
     </div>
   )
 }
 
 const cardStyle = {
   background: '#fff', borderRadius: 14, padding: '20px',
-  boxShadow: '0 1px 3px rgba(0,0,0,.06)', border: '1px solid #e2e8f0'
+  boxShadow: '0 1px 3px rgba(0,0,0,.06)', border: '1px solid #e5e7eb'
 }

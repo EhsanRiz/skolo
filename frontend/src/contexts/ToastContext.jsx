@@ -13,7 +13,7 @@ const COLORS = {
   success: { bg: '#f0fdf4', border: '#86efac', icon: '#16a34a', text: '#14532d' },
   error:   { bg: '#fef2f2', border: '#fca5a5', icon: '#dc2626', text: '#7f1d1d' },
   warning: { bg: '#fffbeb', border: '#fcd34d', icon: '#d97706', text: '#78350f' },
-  info:    { bg: '#eff6ff', border: '#93c5fd', icon: '#2563eb', text: '#1e3a8a' },
+  info:    { bg: '#f0f5fa', border: '#c6dae7', icon: '#003049', text: '#003049' },
 }
 
 const CSS = `

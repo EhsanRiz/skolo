@@ -7,7 +7,7 @@ const STATUS = [
   { key: 'present', label: 'P', full: 'Present', color: '#16a34a', bg: '#f0fdf4', border: '#86efac' },
   { key: 'absent',  label: 'A', full: 'Absent',  color: '#dc2626', bg: '#fff5f5', border: '#fca5a5' },
   { key: 'late',    label: 'L', full: 'Late',    color: '#d97706', bg: '#fffbeb', border: '#fcd34d' },
-  { key: 'excused', label: 'E', full: 'Excused', color: '#2563eb', bg: '#eff6ff', border: '#93c5fd' },
+  { key: 'excused', label: 'E', full: 'Excused', color: '#003049', bg: '#f0f5fa', border: '#c6dae7' },
 ]
 const STATUS_MAP = Object.fromEntries(STATUS.map(s => [s.key, s]))
 
@@ -51,8 +51,8 @@ export default function Attendance() {
   const tabStyle = active => ({
     padding: '8px 20px', borderRadius: 8, border: 'none', cursor: 'pointer',
     fontWeight: 600, fontSize: 13,
-    background: active ? '#0f2044' : '#f1f5f9',
-    color: active ? '#fff' : '#64748b',
+    background: active ? '#003049' : '#f7f7f7',
+    color: active ? '#fff' : '#6b7280',
     transition: 'all .15s'
   })
 
@@ -60,12 +60,12 @@ export default function Attendance() {
     <div style={{ padding: '24px 28px', maxWidth: 1050, margin: '0 auto' }}>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 22, fontWeight: 800, color: '#0f172a' }}>Attendance</div>
-        <div style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>Daily register, monthly summary and learner history</div>
+        <div style={{ fontSize: 22, fontWeight: 800, color: '#1f2937' }}>Attendance</div>
+        <div style={{ fontSize: 14, color: '#6b7280', marginTop: 2 }}>Daily register, monthly summary and learner history</div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 24, background: '#f1f5f9', padding: 4, borderRadius: 10, width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 24, background: '#f7f7f7', padding: 4, borderRadius: 10, width: 'fit-content' }}>
         {['register', 'summary', 'history'].map(t => (
           <button key={t} onClick={() => setTab(t)} style={tabStyle(tab === t)}>
             {t === 'register' ? '📋 Register' : t === 'summary' ? '📊 Monthly Summary' : '👤 Learner History'}
@@ -190,13 +190,13 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
         <button onClick={() => shiftDate(-1)} style={navBtn}>‹</button>
         <input type="date" value={date} onChange={e => setDate(e.target.value)}
           max={today()}
-          style={{ padding: '8px 12px', border: '1.5px solid #e2e8f0', borderRadius: 9, fontSize: 14, outline: 'none' }} />
+          style={{ padding: '8px 12px', border: '1.5px solid #e5e7eb', borderRadius: 9, fontSize: 14, outline: 'none' }} />
         <button onClick={() => shiftDate(1)} disabled={date >= today()} style={navBtn}>›</button>
-        <span style={{ fontSize: 13, color: '#64748b', marginLeft: 4 }}>{fmtDate(date)}</span>
+        <span style={{ fontSize: 13, color: '#6b7280', marginLeft: 4 }}>{fmtDate(date)}</span>
 
         {!readOnly && (
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 600 }}>Mark all:</span>
+            <span style={{ fontSize: 12, color: '#9ca3af', fontWeight: 600 }}>Mark all:</span>
             {STATUS.map(s => (
               <button key={s.key} onClick={() => markAll(s.key)} style={{
                 padding: '5px 12px', borderRadius: 7, border: `1.5px solid ${s.border}`,
@@ -212,12 +212,12 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '12px 18px', borderRadius: 10, marginBottom: 14, flexWrap: 'wrap', gap: 10,
-          background: override ? '#fffbeb' : '#eff6ff',
-          border: `1px solid ${override ? '#fcd34d' : '#bfdbfe'}`
+          background: override ? '#fffbeb' : '#f0f5fa',
+          border: `1px solid ${override ? '#fcd34d' : '#e6eff5'}`
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 16 }}>{override ? '⚠️' : '👁️'}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: override ? '#92400e' : '#1e40af' }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: override ? '#92400e' : '#00253a' }}>
               {override
                 ? `Editing as ${userRole} — changes will be logged as an admin override`
                 : `Viewing as ${userRole} — attendance is managed by the class teacher`}
@@ -228,7 +228,7 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
             style={{
               padding: '6px 16px', borderRadius: 7, border: 'none', cursor: 'pointer',
               fontWeight: 700, fontSize: 12, transition: 'all .15s',
-              background: override ? '#dc2626' : '#0f2044',
+              background: override ? '#dc2626' : '#003049',
               color: '#fff'
             }}
           >
@@ -241,10 +241,10 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
       {meta && canOverride && (
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px',
-          borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0',
-          marginBottom: 14, fontSize: 12, color: '#64748b'
+          borderRadius: 8, background: '#fafafa', border: '1px solid #e5e7eb',
+          marginBottom: 14, fontSize: 12, color: '#6b7280'
         }}>
-          <span style={{ fontWeight: 700, color: '#0f172a' }}>Last saved by:</span>
+          <span style={{ fontWeight: 700, color: '#1f2937' }}>Last saved by:</span>
           <span style={{ fontWeight: 600, color: meta.saved_by_role === 'teacher' ? '#16a34a' : '#d97706' }}>
             {meta.saved_by}
           </span>
@@ -275,15 +275,15 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
       )}
 
       {/* Register grid */}
-      <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 14, overflow: 'hidden' }}>
+      <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, overflow: 'hidden' }}>
         {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>Loading…</div>
+          <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Loading…</div>
         ) : learners.length === 0 ? (
           <Empty msg="No active learners in this class" />
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+              <tr style={{ background: '#fafafa', borderBottom: '1px solid #e5e7eb' }}>
                 <th style={th}>#</th>
                 <th style={{ ...th, textAlign: 'left' }}>Learner</th>
                 <th style={{ ...th, textAlign: 'left' }}>Ref</th>
@@ -298,9 +298,9 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
                 const s = STATUS_MAP[status]
                 const editedByOther = l.marked_by_role && l.marked_by_role !== 'teacher'
                 return (
-                  <tr key={l.id} style={{ borderBottom: i < learners.length - 1 ? '1px solid #f1f5f9' : 'none', background: editedByOther ? '#fffbeb' : (i % 2 === 0 ? '#fff' : '#fafafa') }}>
-                    <td style={{ ...td, color: '#94a3b8', width: 40 }}>{i + 1}</td>
-                    <td style={{ ...td, fontWeight: 600, color: '#0f172a', textAlign: 'left' }}>
+                  <tr key={l.id} style={{ borderBottom: i < learners.length - 1 ? '1px solid #f7f7f7' : 'none', background: editedByOther ? '#fffbeb' : (i % 2 === 0 ? '#fff' : '#fafafa') }}>
+                    <td style={{ ...td, color: '#9ca3af', width: 40 }}>{i + 1}</td>
+                    <td style={{ ...td, fontWeight: 600, color: '#1f2937', textAlign: 'left' }}>
                       {l.last_name}, {l.first_name}
                       {editedByOther && (
                         <span style={{
@@ -312,7 +312,7 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
                         </span>
                       )}
                     </td>
-                    <td style={{ ...td, color: '#94a3b8', fontSize: 12, textAlign: 'left' }}>{l.reference_no || '—'}</td>
+                    <td style={{ ...td, color: '#9ca3af', fontSize: 12, textAlign: 'left' }}>{l.reference_no || '—'}</td>
                     <td style={{ ...td, width: 220 }}>
                       <div style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
                         {STATUS.map(opt => (
@@ -320,9 +320,9 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
                             disabled={readOnly}
                             style={{
                               width: 38, height: 32, borderRadius: 7,
-                              border: `1.5px solid ${status === opt.key ? opt.border : '#e2e8f0'}`,
+                              border: `1.5px solid ${status === opt.key ? opt.border : '#e5e7eb'}`,
                               background: status === opt.key ? opt.bg : '#fff',
-                              color: status === opt.key ? opt.color : '#94a3b8',
+                              color: status === opt.key ? opt.color : '#9ca3af',
                               fontWeight: 700, fontSize: 13,
                               cursor: readOnly ? 'default' : 'pointer',
                               transition: 'all .1s'
@@ -336,7 +336,7 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
                         onChange={e => setNote(l.id, e.target.value)}
                         disabled={readOnly}
                         placeholder={readOnly ? '' : 'Optional note…'}
-                        style={{ width: '100%', maxWidth: 200, padding: '4px 8px', border: '1px solid #e2e8f0', borderRadius: 6, fontSize: 12, outline: 'none', background: readOnly ? 'transparent' : '#fff', color: '#374151' }}
+                        style={{ width: '100%', maxWidth: 200, padding: '4px 8px', border: '1px solid #e5e7eb', borderRadius: 6, fontSize: 12, outline: 'none', background: readOnly ? 'transparent' : '#fff', color: '#374151' }}
                       />
                     </td>
                   </tr>
@@ -351,7 +351,7 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
       {!readOnly && learners.length > 0 && (
         <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
           <button onClick={save} disabled={saving}
-            style={{ padding: '10px 28px', background: dirty ? (canOverride ? '#d97706' : '#0f2044') : '#94a3b8', color: '#fff', border: 'none', borderRadius: 9, fontWeight: 700, fontSize: 14, cursor: saving ? 'not-allowed' : 'pointer', transition: 'background .2s' }}>
+            style={{ padding: '10px 28px', background: dirty ? (canOverride ? '#d97706' : '#003049') : '#9ca3af', color: '#fff', border: 'none', borderRadius: 9, fontWeight: 700, fontSize: 14, cursor: saving ? 'not-allowed' : 'pointer', transition: 'background .2s' }}>
             {saving ? 'Saving…' : dirty ? (canOverride ? '⚠️ Save as admin override' : '💾 Save register') : 'Saved ✓'}
           </button>
         </div>
@@ -359,9 +359,9 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
 
       {/* Sticky bar when dirty */}
       {dirty && !readOnly && (
-        <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', background: '#0f2044', color: '#fff', padding: '12px 28px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.25)', zIndex: 100 }}>
+        <div style={{ position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)', background: '#003049', color: '#fff', padding: '12px 28px', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 16, boxShadow: '0 8px 32px rgba(0,0,0,0.25)', zIndex: 100 }}>
           <span style={{ fontWeight: 600, fontSize: 14 }}>Unsaved register</span>
-          <button onClick={save} disabled={saving} style={{ background: '#fff', color: '#0f2044', border: 'none', borderRadius: 8, padding: '7px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+          <button onClick={save} disabled={saving} style={{ background: '#fff', color: '#003049', border: 'none', borderRadius: 8, padding: '7px 18px', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
             {saving ? 'Saving…' : 'Save now'}
           </button>
         </div>
@@ -398,7 +398,7 @@ function SummaryTab({ classId }) {
   }
 
   function pctColor(pct) {
-    if (pct === null) return '#94a3b8'
+    if (pct === null) return '#9ca3af'
     if (pct >= 90) return '#16a34a'
     if (pct >= 75) return '#d97706'
     return '#dc2626'
@@ -411,20 +411,20 @@ function SummaryTab({ classId }) {
       {/* Month nav */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
         <button onClick={() => shiftMonth(-1)} style={navBtn}>‹</button>
-        <span style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', minWidth: 140, textAlign: 'center' }}>{monthName(year, month)}</span>
+        <span style={{ fontWeight: 700, fontSize: 15, color: '#1f2937', minWidth: 140, textAlign: 'center' }}>{monthName(year, month)}</span>
         <button onClick={() => shiftMonth(1)} style={navBtn}>›</button>
-        {data && <span style={{ fontSize: 13, color: '#64748b' }}>{data.school_days} school day{data.school_days !== 1 ? 's' : ''} recorded</span>}
+        {data && <span style={{ fontSize: 13, color: '#6b7280' }}>{data.school_days} school day{data.school_days !== 1 ? 's' : ''} recorded</span>}
       </div>
 
-      <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 14, overflow: 'hidden' }}>
+      <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, overflow: 'hidden' }}>
         {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>Loading…</div>
+          <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Loading…</div>
         ) : !data || data.learners.length === 0 ? (
           <Empty msg="No attendance data for this period" />
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+              <tr style={{ background: '#fafafa', borderBottom: '1px solid #e5e7eb' }}>
                 <th style={{ ...th, textAlign: 'left' }}>Learner</th>
                 {STATUS.map(s => <th key={s.key} style={{ ...th, color: s.color }}>{s.full}</th>)}
                 <th style={th}>Attendance %</th>
@@ -432,22 +432,22 @@ function SummaryTab({ classId }) {
             </thead>
             <tbody>
               {data.learners.map((l, i) => (
-                <tr key={l.id} style={{ borderBottom: i < data.learners.length - 1 ? '1px solid #f1f5f9' : 'none', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
-                  <td style={{ ...td, textAlign: 'left', fontWeight: 600, color: '#0f172a' }}>{l.last_name}, {l.first_name}</td>
+                <tr key={l.id} style={{ borderBottom: i < data.learners.length - 1 ? '1px solid #f7f7f7' : 'none', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
+                  <td style={{ ...td, textAlign: 'left', fontWeight: 600, color: '#1f2937' }}>{l.last_name}, {l.first_name}</td>
                   {STATUS.map(s => (
                     <td key={s.key} style={{ ...td }}>
-                      <span style={{ fontWeight: 700, color: l[s.key] > 0 ? s.color : '#94a3b8' }}>{l[s.key] || 0}</span>
+                      <span style={{ fontWeight: 700, color: l[s.key] > 0 ? s.color : '#9ca3af' }}>{l[s.key] || 0}</span>
                     </td>
                   ))}
                   <td style={{ ...td }}>
                     {l.pct !== null ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
-                        <div style={{ width: 60, height: 6, background: '#f1f5f9', borderRadius: 3, overflow: 'hidden' }}>
+                        <div style={{ width: 60, height: 6, background: '#f7f7f7', borderRadius: 3, overflow: 'hidden' }}>
                           <div style={{ width: `${l.pct}%`, height: '100%', background: pctColor(l.pct), borderRadius: 3 }} />
                         </div>
                         <span style={{ fontWeight: 700, color: pctColor(l.pct), fontSize: 13 }}>{l.pct}%</span>
                       </div>
-                    ) : <span style={{ color: '#94a3b8' }}>—</span>}
+                    ) : <span style={{ color: '#9ca3af' }}>—</span>}
                   </td>
                 </tr>
               ))}
@@ -515,7 +515,7 @@ function HistoryTab({ classId }) {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button onClick={() => shiftMonth(-1)} style={navBtn}>‹</button>
-          <span style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', minWidth: 130, textAlign: 'center' }}>{monthName(year, month)}</span>
+          <span style={{ fontWeight: 700, fontSize: 14, color: '#1f2937', minWidth: 130, textAlign: 'center' }}>{monthName(year, month)}</span>
           <button onClick={() => shiftMonth(1)} style={navBtn}>›</button>
         </div>
       </div>
@@ -531,23 +531,23 @@ function HistoryTab({ classId }) {
               </div>
             ))}
             {pct !== null && (
-              <div style={{ flex: '1 1 80px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: '10px 14px', textAlign: 'center' }}>
+              <div style={{ flex: '1 1 80px', background: '#fafafa', border: '1px solid #e5e7eb', borderRadius: 10, padding: '10px 14px', textAlign: 'center' }}>
                 <div style={{ fontSize: 20, fontWeight: 800, color: pct >= 90 ? '#16a34a' : pct >= 75 ? '#d97706' : '#dc2626' }}>{pct}%</div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Attendance</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Attendance</div>
               </div>
             )}
           </div>
 
           {/* History list */}
-          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 14, overflow: 'hidden' }}>
+          <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, overflow: 'hidden' }}>
             {loading ? (
-              <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>Loading…</div>
+              <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Loading…</div>
             ) : history.length === 0 ? (
               <Empty msg="No attendance records for this period" />
             ) : (
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                  <tr style={{ background: '#fafafa', borderBottom: '1px solid #e5e7eb' }}>
                     <th style={{ ...th, textAlign: 'left' }}>Date</th>
                     <th style={th}>Status</th>
                     <th style={{ ...th, textAlign: 'left' }}>Note</th>
@@ -557,14 +557,14 @@ function HistoryTab({ classId }) {
                   {history.map((h, i) => {
                     const s = STATUS_MAP[h.status]
                     return (
-                      <tr key={h.date} style={{ borderBottom: i < history.length - 1 ? '1px solid #f1f5f9' : 'none', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
+                      <tr key={h.date} style={{ borderBottom: i < history.length - 1 ? '1px solid #f7f7f7' : 'none', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
                         <td style={{ ...td, textAlign: 'left', fontWeight: 500, color: '#374151' }}>{fmtDate(h.date)}</td>
                         <td style={{ ...td }}>
                           <span style={{ display: 'inline-block', padding: '3px 12px', borderRadius: 20, background: s.bg, border: `1px solid ${s.border}`, color: s.color, fontWeight: 700, fontSize: 13 }}>
                             {s.full}
                           </span>
                         </td>
-                        <td style={{ ...td, textAlign: 'left', color: '#64748b', fontSize: 13 }}>{h.note || '—'}</td>
+                        <td style={{ ...td, textAlign: 'left', color: '#6b7280', fontSize: 13 }}>{h.note || '—'}</td>
                       </tr>
                     )
                   })}
@@ -583,15 +583,15 @@ function HistoryTab({ classId }) {
 // ── Shared helpers ────────────────────────────────────────────
 function Empty({ msg }) {
   return (
-    <div style={{ padding: '48px 24px', textAlign: 'center', color: '#94a3b8' }}>
+    <div style={{ padding: '48px 24px', textAlign: 'center', color: '#9ca3af' }}>
       <div style={{ fontSize: 32, marginBottom: 8 }}>📋</div>
       <div style={{ fontWeight: 600 }}>{msg}</div>
     </div>
   )
 }
 
-const lbl   = { display: 'block', fontSize: 12, fontWeight: 600, color: '#64748b', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.4px' }
-const sel   = { padding: '8px 12px', border: '1.5px solid #e2e8f0', borderRadius: 9, fontSize: 14, outline: 'none', minWidth: 200, background: '#fff' }
-const th    = { padding: '11px 14px', fontSize: 12, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.4px', textAlign: 'center' }
+const lbl   = { display: 'block', fontSize: 12, fontWeight: 600, color: '#6b7280', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.4px' }
+const sel   = { padding: '8px 12px', border: '1.5px solid #e5e7eb', borderRadius: 9, fontSize: 14, outline: 'none', minWidth: 200, background: '#fff' }
+const th    = { padding: '11px 14px', fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.4px', textAlign: 'center' }
 const td    = { padding: '10px 14px', fontSize: 14, textAlign: 'center' }
-const navBtn = { padding: '6px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, background: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: 16, color: '#374151' }
+const navBtn = { padding: '6px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, background: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: 16, color: '#374151' }

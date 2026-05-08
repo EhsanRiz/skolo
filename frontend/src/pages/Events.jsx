@@ -3,11 +3,11 @@ import { IconTrash, t } from '../components/ui'
 import api from '../lib/api'
 
 const TYPE_COLORS = {
-  academic: { bg: '#dbeafe', color: '#0f2044', dot: '#2563eb' },
+  academic: { bg: '#e6eff5', color: '#003049', dot: '#003049' },
   sports:   { bg: '#dcfce7', color: '#15803d', dot: '#16a34a' },
-  meeting:  { bg: '#fef9c3', color: '#a16207', dot: '#ca8a04' },
+  meeting:  { bg: '#fef4d6', color: '#b8870a', dot: '#ca8a04' },
   holiday:  { bg: '#fce7f3', color: '#be185d', dot: '#db2777' },
-  general:  { bg: '#f1f5f9', color: '#475569', dot: '#64748b' },
+  general:  { bg: '#f7f7f7', color: '#4b5563', dot: '#6b7280' },
 }
 const TYPES = ['academic','sports','meeting','holiday','general']
 const empty = { title: '', description: '', event_date: '', end_date: '', event_type: 'general' }
@@ -46,21 +46,21 @@ export default function Events() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>Events</h1>
-          <p style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>School calendar — terms, sports, meetings and holidays</p>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1f2937', letterSpacing: '-0.3px' }}>Events</h1>
+          <p style={{ fontSize: 14, color: '#6b7280', marginTop: 2 }}>School calendar — terms, sports, meetings and holidays</p>
         </div>
         <button style={t.btn.primary} onClick={() => setShow(true)}>+ Add event</button>
       </div>
 
       {Object.keys(grouped).length === 0 && (
-        <div style={{ background: '#fff', borderRadius: 14, padding: '48px', textAlign: 'center', color: '#94a3b8', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+        <div style={{ background: '#fff', borderRadius: 14, padding: '48px', textAlign: 'center', color: '#9ca3af', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
           No events yet. Add your first school event.
         </div>
       )}
 
       {Object.entries(grouped).map(([month, evs]) => (
         <div key={month} style={{ marginBottom: 28 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '1px' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '1px' }}>
             {month}
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
@@ -75,15 +75,15 @@ export default function Events() {
                   <button onClick={() => remove(ev.id)} style={{
                     position: 'absolute', top: 14, right: 14,
                     background: 'none', border: 'none', cursor: 'pointer',
-                    color: '#cbd5e1', padding: 0, display: 'flex'
+                    color: '#d1d5db', padding: 0, display: 'flex'
                   }}><IconTrash size={14} /></button>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', marginBottom: 6 }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: '#9ca3af', marginBottom: 6 }}>
                     {new Date(ev.event_date).toLocaleDateString('en-ZA', { weekday: 'short', day: 'numeric', month: 'short' })}
                     {ev.end_date && ev.end_date !== ev.event_date &&
                       ` – ${new Date(ev.end_date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}`}
                   </div>
-                  <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a', marginBottom: 6, paddingRight: 20 }}>{ev.title}</div>
-                  {ev.description && <div style={{ fontSize: 13, color: '#64748b', marginBottom: 10, lineHeight: 1.5 }}>{ev.description}</div>}
+                  <div style={{ fontWeight: 700, fontSize: 15, color: '#1f2937', marginBottom: 6, paddingRight: 20 }}>{ev.title}</div>
+                  {ev.description && <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 10, lineHeight: 1.5 }}>{ev.description}</div>}
                   <span style={{ display: 'inline-block', padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: c.bg, color: c.color }}>
                     {ev.event_type}
                   </span>

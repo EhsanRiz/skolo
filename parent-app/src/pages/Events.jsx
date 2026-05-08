@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react'
 import api from '../lib/api'
 
 const EVENT_COLORS = {
-  academic: { bg: '#eff6ff', color: '#1d4ed8', icon: '&#128218;' },
+  academic: { bg: '#f0f5fa', color: '#003049', icon: '&#128218;' },
   sports: { bg: '#ecfdf5', color: '#059669', icon: '&#9917;' },
   meeting: { bg: '#fef3c7', color: '#d97706', icon: '&#128101;' },
   holiday: { bg: '#fce7f3', color: '#db2777', icon: '&#127881;' },
-  general: { bg: '#f1f5f9', color: '#475569', icon: '&#128197;' }
+  general: { bg: '#f7f7f7', color: '#4b5563', icon: '&#128197;' }
 }
 
 export default function Events() {
@@ -23,7 +23,7 @@ export default function Events() {
     setLoading(false)
   }
 
-  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>Loading...</div>
+  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#6b7280' }}>Loading...</div>
 
   // Group events by month
   const grouped = {}
@@ -35,16 +35,16 @@ export default function Events() {
 
   return (
     <div style={{ maxWidth: 600, margin: '0 auto' }}>
-      <h1 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', margin: '0 0 16px' }}>Events</h1>
+      <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1f2937', margin: '0 0 16px' }}>Events</h1>
 
       {events.length === 0 ? (
-        <div style={{ textAlign: 'center', color: '#94a3b8', padding: 40, fontSize: 14 }}>
+        <div style={{ textAlign: 'center', color: '#9ca3af', padding: 40, fontSize: 14 }}>
           No upcoming events
         </div>
       ) : (
         Object.entries(grouped).map(([month, monthEvents]) => (
           <div key={month} style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#64748b', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#6b7280', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 }}>
               {month}
             </div>
             {monthEvents.map(ev => {
@@ -54,7 +54,7 @@ export default function Events() {
               return (
                 <div key={ev.id} style={{
                   background: '#fff', borderRadius: 12, padding: 14,
-                  border: '1px solid #e2e8f0', marginBottom: 8,
+                  border: '1px solid #e5e7eb', marginBottom: 8,
                   display: 'flex', gap: 12, alignItems: 'flex-start'
                 }}>
                   {/* Date badge */}
@@ -72,9 +72,9 @@ export default function Events() {
                   </div>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: 14, color: '#0f172a' }}>{ev.title}</div>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: '#1f2937' }}>{ev.title}</div>
                     {ev.description && (
-                      <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0', lineHeight: 1.4 }}>
+                      <p style={{ fontSize: 13, color: '#6b7280', margin: '4px 0 0', lineHeight: 1.4 }}>
                         {ev.description.length > 100 ? ev.description.slice(0, 100) + '...' : ev.description}
                       </p>
                     )}
@@ -86,7 +86,7 @@ export default function Events() {
                         {ev.event_type || 'general'}
                       </span>
                       {ev.end_date && ev.end_date !== ev.event_date && (
-                        <span style={{ fontSize: 11, color: '#94a3b8' }}>
+                        <span style={{ fontSize: 11, color: '#9ca3af' }}>
                           until {new Date(ev.end_date).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}
                         </span>
                       )}

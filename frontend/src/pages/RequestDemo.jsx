@@ -6,7 +6,7 @@ const CSS = `
 .demo-wrapper {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f2044 0%, #162d5a 100%);
+  background: linear-gradient(135deg, #003049 0%, #162d5a 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -36,7 +36,7 @@ const CSS = `
 .demo-dot {
   width: 8px;
   height: 8px;
-  background: #0f2044;
+  background: #003049;
   border-radius: 50%;
   display: inline-block;
 }
@@ -65,14 +65,14 @@ const CSS = `
 .demo-heading {
   font-size: 28px;
   font-weight: 900;
-  color: #0f172a;
+  color: #1f2937;
   margin: 0 0 8px 0;
   letter-spacing: -0.6px;
 }
 
 .demo-subtext {
   font-size: 14px;
-  color: #64748b;
+  color: #6b7280;
   margin: 0 0 28px 0;
   line-height: 1.5;
 }
@@ -91,7 +91,7 @@ const CSS = `
 .demo-label {
   font-size: 12px;
   font-weight: 600;
-  color: #334155;
+  color: #374151;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 6px;
@@ -107,7 +107,7 @@ const CSS = `
 .demo-select {
   width: 100%;
   padding: 12px 14px;
-  border: 1.5px solid #e2e8f0;
+  border: 1.5px solid #e5e7eb;
   border-radius: 10px;
   font-size: 14px;
   font-family: inherit;
@@ -115,19 +115,19 @@ const CSS = `
   transition: border-color 0.15s, box-shadow 0.15s;
   box-sizing: border-box;
   background: #fff;
-  color: #0f172a;
+  color: #1f2937;
 }
 
 .demo-input:focus,
 .demo-textarea:focus,
 .demo-select:focus {
-  border-color: #0f2044;
-  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+  border-color: #003049;
+  box-shadow: 0 0 0 3px rgba(0, 48, 73, 0.12);
 }
 
 .demo-input::placeholder,
 .demo-textarea::placeholder {
-  color: #cbd5e1;
+  color: #d1d5db;
 }
 
 .demo-textarea {
@@ -139,7 +139,7 @@ const CSS = `
 .demo-button {
   width: 100%;
   padding: 14px 24px;
-  background: #0f2044;
+  background: #003049;
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -168,20 +168,20 @@ const CSS = `
 .demo-footer {
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #e5e7eb;
   text-align: center;
   font-size: 13px;
 }
 
 .demo-footer a {
-  color: #0f2044;
+  color: #003049;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.15s;
 }
 
 .demo-footer a:hover {
-  color: #1e40af;
+  color: #00253a;
 }
 
 .demo-back-link {
@@ -249,13 +249,13 @@ const CSS = `
 .demo-success-title {
   font-size: 20px;
   font-weight: 800;
-  color: #0f172a;
+  color: #1f2937;
   margin-bottom: 8px;
 }
 
 .demo-success-text {
   font-size: 14px;
-  color: #64748b;
+  color: #6b7280;
   line-height: 1.6;
   margin-bottom: 24px;
 }
@@ -263,7 +263,7 @@ const CSS = `
 .demo-success-link {
   display: inline-block;
   padding: 12px 24px;
-  background: #0f2044;
+  background: #003049;
   color: #fff;
   text-decoration: none;
   border-radius: 10px;

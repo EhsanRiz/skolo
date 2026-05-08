@@ -102,7 +102,7 @@ function NotificationBell() {
           <span style={{
             position: 'absolute', top: 1, right: 1, width: 16, height: 16, background: '#dc2626',
             borderRadius: 20, fontSize: 9, fontWeight: 800, color: '#fff',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #0f2044'
+            display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #003049'
           }}>{data.total_unread > 9 ? '9+' : data.total_unread}</span>
         )}
       </button>
@@ -110,28 +110,28 @@ function NotificationBell() {
       {open && (
         <div style={{
           position: 'absolute', right: 0, top: 'calc(100% + 8px)', width: 320, background: '#fff',
-          borderRadius: 14, boxShadow: '0 8px 32px rgba(0,0,0,.18)', zIndex: 300, overflow: 'hidden', border: '1px solid #e2e8f0'
+          borderRadius: 14, boxShadow: '0 8px 32px rgba(0,0,0,.18)', zIndex: 300, overflow: 'hidden', border: '1px solid #e5e7eb'
         }}>
-          <div style={{ padding: '14px 16px 10px', borderBottom: '1px solid #f1f5f9', fontWeight: 700, fontSize: 14, color: '#0f172a' }}>
+          <div style={{ padding: '14px 16px 10px', borderBottom: '1px solid #f7f7f7', fontWeight: 700, fontSize: 14, color: '#1f2937' }}>
             Notifications
           </div>
           <div style={{ maxHeight: 340, overflowY: 'auto' }}>
             {data.items.length === 0 ? (
-              <div style={{ padding: 32, textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>All caught up!</div>
+              <div style={{ padding: 32, textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>All caught up!</div>
             ) : data.items.map((item, i) => (
               <div key={i} onClick={() => { setOpen(false); navigate(item.link) }} style={{
-                padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #f8fafc', display: 'flex', gap: 10, alignItems: 'flex-start',
+                padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #fafafa', display: 'flex', gap: 10, alignItems: 'flex-start',
                 transition: 'background 0.1s'
               }}
-              onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+              onMouseEnter={e => e.currentTarget.style.background = '#fafafa'}
               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
                 <span style={{ fontSize: 18, flexShrink: 0, marginTop: 2 }}>{typeIcon[item.type] || '\uD83D\uDD14'}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, fontSize: 13, color: '#0f172a' }}>{item.title}</div>
-                  <div style={{ fontSize: 12, color: '#64748b', marginTop: 1 }}>{item.body}</div>
+                  <div style={{ fontWeight: 600, fontSize: 13, color: '#1f2937' }}>{item.title}</div>
+                  <div style={{ fontSize: 12, color: '#6b7280', marginTop: 1 }}>{item.body}</div>
                 </div>
-                <div style={{ fontSize: 10, color: '#94a3b8', flexShrink: 0, marginTop: 2 }}>{timeAgo(item.created_at)}</div>
+                <div style={{ fontSize: 10, color: '#9ca3af', flexShrink: 0, marginTop: 2 }}>{timeAgo(item.created_at)}</div>
               </div>
             ))}
           </div>
@@ -201,11 +201,11 @@ export default function Layout() {
   return (
     <>
       <style>{CSS}</style>
-      <div style={{ display: 'flex', minHeight: '100vh', background: '#f1f5f9' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', background: '#f7f7f7' }}>
 
         {/* ── DESKTOP SIDEBAR ── */}
         <aside className="desktop-sidebar" style={{
-          width: 232, background: '#0f2044', flexDirection: 'column',
+          width: 232, background: '#003049', flexDirection: 'column',
           flexShrink: 0, position: 'sticky', top: 0, height: '100vh'
         }}>
           <SidebarContent />
@@ -214,7 +214,7 @@ export default function Layout() {
         {/* ── MOBILE TOPBAR ── */}
         <div className="mobile-topbar" style={{
           display: 'none', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
-          background: '#0f2044', height: 56, alignItems: 'center',
+          background: '#003049', height: 56, alignItems: 'center',
           justifyContent: 'space-between', padding: '0 16px', flexShrink: 0
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -236,7 +236,7 @@ export default function Layout() {
             <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(2px)' }} />
             <div style={{
               position: 'absolute', top: 0, left: 0, bottom: 0, width: 260,
-              background: '#0f2044', display: 'flex', flexDirection: 'column'
+              background: '#003049', display: 'flex', flexDirection: 'column'
             }} onClick={e => e.stopPropagation()}>
               <SidebarContent />
             </div>
@@ -247,13 +247,13 @@ export default function Layout() {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           {/* Desktop topbar */}
           <header className="desktop-topbar" style={{
-            background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '0 32px', height: 60,
+            background: '#fff', borderBottom: '1px solid #e5e7eb', padding: '0 32px', height: 60,
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0
           }}>
-            <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{school?.name || 'Parent Portal'}</div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#1f2937' }}>{school?.name || 'Parent Portal'}</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <NotificationBell />
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#64748b', background: '#f1f5f9', padding: '5px 12px', borderRadius: 20 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', background: '#f7f7f7', padding: '5px 12px', borderRadius: 20 }}>
                 {school?.countries?.currency_symbol || ''} {school?.countries?.currency_code || ''} · parent
               </div>
             </div>
@@ -268,7 +268,7 @@ export default function Layout() {
         {/* ── MOBILE BOTTOM NAV ── */}
         <div className="mobile-bottom" style={{
           display: 'none', position: 'fixed', bottom: 0, left: 0, right: 0,
-          background: '#0f2044', padding: '6px 8px env(safe-area-inset-bottom, 10px)',
+          background: '#003049', padding: '6px 8px env(safe-area-inset-bottom, 10px)',
           zIndex: 150, justifyContent: 'space-around', alignItems: 'center',
           boxShadow: '0 -2px 12px rgba(0,0,0,0.2)'
         }}>

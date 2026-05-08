@@ -246,7 +246,7 @@ export default function Learners() {
     )
     return (
       <><label style={t.label}>Grade / Class</label>
-        <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 14, padding: '9px 13px', background: '#f8fafc', borderRadius: 9 }}>
+        <div style={{ fontSize: 13, color: '#9ca3af', marginBottom: 14, padding: '9px 13px', background: '#fafafa', borderRadius: 9 }}>
           No grades yet — go to Settings → Grades & Classes
         </div></>
     )
@@ -254,8 +254,8 @@ export default function Learners() {
 
   const Field = ({ label, value }) => (
     <div style={{ marginBottom: 14 }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 3 }}>{label}</div>
-      <div style={{ fontSize: 15, color: '#0f172a', fontWeight: 500 }}>{value || '—'}</div>
+      <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 3 }}>{label}</div>
+      <div style={{ fontSize: 15, color: '#1f2937', fontWeight: 500 }}>{value || '—'}</div>
     </div>
   )
 
@@ -266,8 +266,8 @@ export default function Learners() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', letterSpacing: '-0.3px' }}>Learners</h1>
-          <p style={{ fontSize: 14, color: '#64748b', marginTop: 2 }}>{learners.length} active learner{learners.length !== 1 ? 's' : ''}</p>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1f2937', letterSpacing: '-0.3px' }}>Learners</h1>
+          <p style={{ fontSize: 14, color: '#6b7280', marginTop: 2 }}>{learners.length} active learner{learners.length !== 1 ? 's' : ''}</p>
         </div>
         {!isReadOnly && (
           <div style={{ display: 'flex', gap: 10 }}>
@@ -279,14 +279,14 @@ export default function Learners() {
 
       {/* Search + Filters */}
       <div style={{ background: '#fff', borderRadius: 12, padding: '12px 16px', marginBottom: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-        <input style={{ ...t.input, marginBottom: 0, background: '#f8fafc' }}
+        <input style={{ ...t.input, marginBottom: 0, background: '#fafafa' }}
           placeholder="Search by name…" value={search} onChange={e => setSearch(e.target.value)} />
 
         <div style={{ display: 'flex', gap: 10, marginTop: 10, flexWrap: 'wrap', alignItems: 'center' }}>
           <select
             value={gradeFilter}
             onChange={e => { setGradeFilter(e.target.value); setClassFilter('') }}
-            style={{ padding: '7px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, outline: 'none', background: gradeFilter ? '#eff6ff' : '#fff', color: gradeFilter ? '#1d4ed8' : '#374151', fontWeight: gradeFilter ? 600 : 400, minWidth: 140 }}
+            style={{ padding: '7px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, outline: 'none', background: gradeFilter ? '#f0f5fa' : '#fff', color: gradeFilter ? '#003049' : '#374151', fontWeight: gradeFilter ? 600 : 400, minWidth: 140 }}
           >
             <option value="">All grades</option>
             {grades.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
@@ -296,7 +296,7 @@ export default function Learners() {
             <select
               value={classFilter}
               onChange={e => setClassFilter(e.target.value)}
-              style={{ padding: '7px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, outline: 'none', background: classFilter ? '#eff6ff' : '#fff', color: classFilter ? '#1d4ed8' : '#374151', fontWeight: classFilter ? 600 : 400, minWidth: 120 }}
+              style={{ padding: '7px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, outline: 'none', background: classFilter ? '#f0f5fa' : '#fff', color: classFilter ? '#003049' : '#374151', fontWeight: classFilter ? 600 : 400, minWidth: 120 }}
             >
               <option value="">All classes</option>
               {filteredClasses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -305,12 +305,12 @@ export default function Learners() {
 
           {(gradeFilter || classFilter) && (
             <button onClick={() => { setGradeFilter(''); setClassFilter('') }}
-              style={{ padding: '6px 12px', border: '1px solid #e2e8f0', borderRadius: 7, background: '#fff', color: '#94a3b8', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+              style={{ padding: '6px 12px', border: '1px solid #e5e7eb', borderRadius: 7, background: '#fff', color: '#9ca3af', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
               Clear filters
             </button>
           )}
 
-          <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 600, marginLeft: 'auto' }}>
+          <span style={{ fontSize: 12, color: '#9ca3af', fontWeight: 600, marginLeft: 'auto' }}>
             {filtered.length} learner{filtered.length !== 1 ? 's' : ''}
           </span>
         </div>
@@ -336,8 +336,8 @@ export default function Learners() {
                 <tr key={l.id}
                   onMouseEnter={e => e.currentTarget.style.background = '#fafafa'}
                   onMouseLeave={e => e.currentTarget.style.background = ''}>
-                  <td style={{ ...t.td, fontSize:12, color:'#94a3b8', fontWeight:600, letterSpacing:'0.5px' }}>{l.reference_no||'—'}</td>
-                  <td style={{ ...t.td, fontWeight: 600, color: '#0f172a' }}>{l.first_name} {l.last_name}</td>
+                  <td style={{ ...t.td, fontSize:12, color:'#9ca3af', fontWeight:600, letterSpacing:'0.5px' }}>{l.reference_no||'—'}</td>
+                  <td style={{ ...t.td, fontWeight: 600, color: '#1f2937' }}>{l.first_name} {l.last_name}</td>
                   <td style={t.td}>{getClassName(l)}</td>
                   <td style={t.td}>{primary ? `${primary.first_name} ${primary.last_name}` : '—'}</td>
                   <td style={t.td}>{primary?.phone || '—'}</td>
@@ -350,7 +350,7 @@ export default function Learners() {
               )
             })}
             {filtered.length === 0 && (
-              <tr><td colSpan={6} style={{ ...t.td, color: '#94a3b8', textAlign: 'center', padding: 40 }}>
+              <tr><td colSpan={6} style={{ ...t.td, color: '#9ca3af', textAlign: 'center', padding: 40 }}>
                 No learners found.
               </td></tr>
             )}
@@ -364,14 +364,14 @@ export default function Learners() {
           <div style={{ ...t.modal, maxWidth: 640 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <h2 style={{ fontSize: 19, fontWeight: 800 }}>Import learners</h2>
-              <button onClick={closeImport} style={{ background: '#f1f5f9', border: 'none', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 16 }}>✕</button>
+              <button onClick={closeImport} style={{ background: '#f7f7f7', border: 'none', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 16 }}>✕</button>
             </div>
 
             {/* Step 1 — template */}
-            <div style={{ background: '#f8fafc', borderRadius: 10, padding: '14px 16px', marginBottom: 16 }}>
+            <div style={{ background: '#fafafa', borderRadius: 10, padding: '14px 16px', marginBottom: 16 }}>
               <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6 }}>Step 1 — Download the template</div>
-              <div style={{ fontSize: 13, color: '#64748b', marginBottom: 10 }}>
-                Fill in learner and guardian details. Required columns: <code style={{ background: '#e2e8f0', padding: '1px 6px', borderRadius: 4, fontSize: 12 }}>first_name</code> <code style={{ background: '#e2e8f0', padding: '1px 6px', borderRadius: 4, fontSize: 12 }}>last_name</code> <code style={{ background: '#e2e8f0', padding: '1px 6px', borderRadius: 4, fontSize: 12 }}>guardian_phone</code>
+              <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 10 }}>
+                Fill in learner and guardian details. Required columns: <code style={{ background: '#e5e7eb', padding: '1px 6px', borderRadius: 4, fontSize: 12 }}>first_name</code> <code style={{ background: '#e5e7eb', padding: '1px 6px', borderRadius: 4, fontSize: 12 }}>last_name</code> <code style={{ background: '#e5e7eb', padding: '1px 6px', borderRadius: 4, fontSize: 12 }}>guardian_phone</code>
               </div>
               <button onClick={downloadTemplate} style={{ ...t.btn.ghost, fontSize: 13, padding: '7px 14px', display: 'flex', alignItems: 'center', gap: 6 }}>
                 ⬇ Download Excel template
@@ -379,7 +379,7 @@ export default function Learners() {
             </div>
 
             {/* Step 2 — upload */}
-            <div style={{ background: '#f8fafc', borderRadius: 10, padding: '14px 16px', marginBottom: 16 }}>
+            <div style={{ background: '#fafafa', borderRadius: 10, padding: '14px 16px', marginBottom: 16 }}>
               <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 10 }}>Step 2 — Upload your file</div>
               <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" onChange={handleFileSelect} style={{ display: 'none' }} />
               <button onClick={() => fileRef.current?.click()} style={{ ...t.btn.ghost, fontSize: 13, padding: '7px 14px' }}>
@@ -398,7 +398,7 @@ export default function Learners() {
                 <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 8 }}>
                   Preview — first {Math.min(5, importRows.length)} of {importRows.length} rows
                 </div>
-                <div style={{ overflowX: 'auto', borderRadius: 8, border: '1px solid #e2e8f0' }}>
+                <div style={{ overflowX: 'auto', borderRadius: 8, border: '1px solid #e5e7eb' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                     <thead>
                       <tr>
@@ -510,7 +510,7 @@ export default function Learners() {
               <Field label="Reference No" value={selected.reference_no} />
               <Field label="Grade / Class" value={getClassName(selected)} />
             </div>
-            <div style={{ borderTop: '1px solid #f1f5f9', margin: '16px 0' }} />
+            <div style={{ borderTop: '1px solid #f7f7f7', margin: '16px 0' }} />
             <div style={t.sectionLabel}>Parent / Guardian</div>
             {selected.learner_guardians?.map(lg => {
               const g = lg.guardians
@@ -527,8 +527,8 @@ export default function Learners() {
                 </div>
               )
             })}
-            <div style={{ borderTop:'1px solid #f1f5f9', margin:'16px 0' }} />
-            <div style={{ fontSize:12, color:'#64748b', marginBottom:12 }}>
+            <div style={{ borderTop:'1px solid #f7f7f7', margin:'16px 0' }} />
+            <div style={{ fontSize:12, color:'#6b7280', marginBottom:12 }}>
               <strong style={{color:'#374151'}}>Parent portal link</strong> — send this to the guardian so they can view their child's fee balance without logging in.
             </div>
             <PortalLinkBox learnerId={selected.id} guardians={selected.learner_guardians} />
@@ -560,8 +560,8 @@ export default function Learners() {
               </div>
               <GradeSelect />
               {/* Medical — optional */}
-              <div style={{ borderTop:'1px solid #f1f5f9', paddingTop:14, marginTop:4 }}>
-                <div style={{ fontSize:11, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.6px', marginBottom:12 }}>
+              <div style={{ borderTop:'1px solid #f7f7f7', paddingTop:14, marginTop:4 }}>
+                <div style={{ fontSize:11, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.6px', marginBottom:12 }}>
                   Medical <span style={{ fontWeight:400, textTransform:'none' }}>(optional · with parent consent)</span>
                 </div>
                 <div><label style={t.label}>Medical condition</label>

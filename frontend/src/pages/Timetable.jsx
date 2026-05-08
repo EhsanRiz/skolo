@@ -8,15 +8,15 @@ const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
 // ── Color palette for teacher cards ──────────────────────────
 const PALETTE = [
-  { bg: '#eff6ff', border: '#93c5fd', text: '#1e40af', dragBg: '#dbeafe' },
+  { bg: '#f0f5fa', border: '#c6dae7', text: '#00253a', dragBg: '#e6eff5' },
   { bg: '#f0fdf4', border: '#86efac', text: '#166534', dragBg: '#dcfce7' },
   { bg: '#faf5ff', border: '#d8b4fe', text: '#7c3aed', dragBg: '#f3e8ff' },
   { bg: '#fff7ed', border: '#fdba74', text: '#c2410c', dragBg: '#ffedd5' },
   { bg: '#fdf2f8', border: '#f9a8d4', text: '#be185d', dragBg: '#fce7f3' },
   { bg: '#f0fdfa', border: '#5eead4', text: '#0d9488', dragBg: '#ccfbf1' },
-  { bg: '#fefce8', border: '#fde047', text: '#a16207', dragBg: '#fef9c3' },
+  { bg: '#fefce8', border: '#fde047', text: '#b8870a', dragBg: '#fef4d6' },
   { bg: '#fef2f2', border: '#fca5a5', text: '#dc2626', dragBg: '#fee2e2' },
-  { bg: '#f8fafc', border: '#94a3b8', text: '#475569', dragBg: '#e2e8f0' },
+  { bg: '#fafafa', border: '#9ca3af', text: '#4b5563', dragBg: '#e5e7eb' },
   { bg: '#ecfdf5', border: '#6ee7b7', text: '#059669', dragBg: '#d1fae5' },
 ]
 
@@ -48,8 +48,8 @@ function TeacherSidebar({ teacherClasses, colorMap, busyMap, dragTcId }) {
     return (
       <div style={{ padding: '24px 16px', textAlign: 'center' }}>
         <div style={{ fontSize: 28, marginBottom: 8, opacity: 0.4 }}>👩‍🏫</div>
-        <div style={{ fontWeight: 600, fontSize: 13, color: '#64748b', marginBottom: 4 }}>No teachers assigned</div>
-        <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>
+        <div style={{ fontWeight: 600, fontSize: 13, color: '#6b7280', marginBottom: 4 }}>No teachers assigned</div>
+        <div style={{ fontSize: 12, color: '#9ca3af', lineHeight: 1.5 }}>
           Assign teachers to this class in Settings → Teachers first.
         </div>
       </div>
@@ -61,7 +61,7 @@ function TeacherSidebar({ teacherClasses, colorMap, busyMap, dragTcId }) {
       {teachers.map(({ teacher, items }) => (
         <div key={teacher.id} style={{ marginBottom: 14 }}>
           {/* Teacher name header */}
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', padding: '0 8px', marginBottom: 6 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px', padding: '0 8px', marginBottom: 6 }}>
             {teacher.full_name}
           </div>
           {/* Draggable subject cards */}
@@ -80,8 +80,8 @@ function TeacherSidebar({ teacherClasses, colorMap, busyMap, dragTcId }) {
                   e.dataTransfer.effectAllowed = 'move'
                 }}
                 style={{
-                  background: isDragging ? color.dragBg : isBusy ? '#f8fafc' : color.bg,
-                  border: `1.5px solid ${isBusy ? '#e2e8f0' : color.border}`,
+                  background: isDragging ? color.dragBg : isBusy ? '#fafafa' : color.bg,
+                  border: `1.5px solid ${isBusy ? '#e5e7eb' : color.border}`,
                   borderRadius: 10, padding: '8px 12px', marginBottom: 5,
                   cursor: isBusy ? 'not-allowed' : 'grab',
                   opacity: isBusy ? 0.45 : isDragging ? 0.6 : 1,
@@ -91,11 +91,11 @@ function TeacherSidebar({ teacherClasses, colorMap, busyMap, dragTcId }) {
               >
                 <div style={{
                   fontWeight: 700, fontSize: 13,
-                  color: isBusy ? '#94a3b8' : color.text
+                  color: isBusy ? '#9ca3af' : color.text
                 }}>
                   {tc.subject || 'General'}
                 </div>
-                <div style={{ fontSize: 11, color: isBusy ? '#cbd5e1' : '#64748b', marginTop: 1 }}>
+                <div style={{ fontSize: 11, color: isBusy ? '#d1d5db' : '#6b7280', marginTop: 1 }}>
                   {tc.classes?.grades?.name} {tc.classes?.name}
                 </div>
                 {isBusy && (
@@ -146,11 +146,11 @@ function DroppableCell({ day, period, cellSlots, isAdmin, viewMode, onDrop, onRe
       onDrop={isAdmin && viewMode === 'class' ? handleDrop : undefined}
       style={{
         padding: '5px 4px', verticalAlign: 'top',
-        borderRight: day < 5 ? '1px solid #f1f5f9' : 'none',
+        borderRight: day < 5 ? '1px solid #f7f7f7' : 'none',
         minWidth: 130, minHeight: 56,
-        background: dragOver ? '#dbeafe' : isEmpty && isAdmin && viewMode === 'class' ? '#fafbfc' : '#fff',
+        background: dragOver ? '#e6eff5' : isEmpty && isAdmin && viewMode === 'class' ? '#fafbfc' : '#fff',
         transition: 'background .12s',
-        outline: dragOver ? '2px dashed #3b82f6' : 'none',
+        outline: dragOver ? '2px dashed #669bbc' : 'none',
         outlineOffset: -2, borderRadius: dragOver ? 6 : 0,
       }}
     >
@@ -167,27 +167,27 @@ function DroppableCell({ day, period, cellSlots, isAdmin, viewMode, onDrop, onRe
             <div style={{ fontWeight: 700, fontSize: 12, color: color.text }}>
               {tc?.subject || 'General'}
             </div>
-            <div style={{ fontSize: 11, color: '#64748b', marginTop: 1 }}>
+            <div style={{ fontSize: 11, color: '#6b7280', marginTop: 1 }}>
               {tc?.teachers?.full_name || '—'}
             </div>
             {viewMode === 'my' && (
-              <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 1 }}>
+              <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 1 }}>
                 {tc?.classes?.grades?.name} {tc?.classes?.name}
               </div>
             )}
-            {s.room && <div style={{ fontSize: 10, color: '#94a3b8' }}>📍 {s.room}</div>}
+            {s.room && <div style={{ fontSize: 10, color: '#9ca3af' }}>📍 {s.room}</div>}
             {isAdmin && viewMode === 'class' && (
               <button
                 onClick={() => onRemove(s.id)}
                 style={{
                   position: 'absolute', top: 3, right: 5,
                   background: 'none', border: 'none', cursor: 'pointer',
-                  color: '#cbd5e1', fontSize: 13, padding: 2,
+                  color: '#d1d5db', fontSize: 13, padding: 2,
                   borderRadius: 4, lineHeight: 1, transition: 'color .1s'
                 }}
                 title="Remove"
                 onMouseEnter={e => e.currentTarget.style.color = '#dc2626'}
-                onMouseLeave={e => e.currentTarget.style.color = '#cbd5e1'}
+                onMouseLeave={e => e.currentTarget.style.color = '#d1d5db'}
               >
                 ✕
               </button>
@@ -199,12 +199,12 @@ function DroppableCell({ day, period, cellSlots, isAdmin, viewMode, onDrop, onRe
       {/* Empty slot — drop target indicator */}
       {isEmpty && isAdmin && viewMode === 'class' && (
         <div style={{
-          border: dragOver ? '2px solid #3b82f6' : '1.5px dashed #e2e8f0',
+          border: dragOver ? '2px solid #669bbc' : '1.5px dashed #e5e7eb',
           borderRadius: 10, padding: '12px 8px', textAlign: 'center',
-          color: dragOver ? '#3b82f6' : '#cbd5e1',
+          color: dragOver ? '#669bbc' : '#d1d5db',
           fontSize: dragOver ? 12 : 20, fontWeight: dragOver ? 700 : 300,
           minHeight: 48, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: dragOver ? 'rgba(59,130,246,0.06)' : 'transparent',
+          background: dragOver ? 'rgba(102,155,188,0.06)' : 'transparent',
           transition: 'all .15s',
         }}>
           {dragOver ? 'Drop here' : '+'}
@@ -214,7 +214,7 @@ function DroppableCell({ day, period, cellSlots, isAdmin, viewMode, onDrop, onRe
       {isEmpty && viewMode === 'my' && (
         <div style={{
           borderRadius: 10, padding: '12px 8px', textAlign: 'center',
-          color: '#e2e8f0', fontSize: 12, minHeight: 48,
+          color: '#e5e7eb', fontSize: 12, minHeight: 48,
           display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}>
           —
@@ -266,12 +266,12 @@ function TeacherAvailability({ classTcs, allSlots, periods, colorMap, selectedCl
           textAlign: 'left'
         }}
       >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
           style={{ transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform .2s' }}>
           <polyline points="9 18 15 12 9 6"/>
         </svg>
-        <span style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>Teacher Availability</span>
-        <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500 }}>
+        <span style={{ fontWeight: 700, fontSize: 15, color: '#1f2937' }}>Teacher Availability</span>
+        <span style={{ fontSize: 12, color: '#9ca3af', fontWeight: 500 }}>
           — {teacherList.length} teacher{teacherList.length !== 1 ? 's' : ''} for {selectedClassName?.grade_name} {selectedClassName?.name}
         </span>
       </button>
@@ -280,14 +280,14 @@ function TeacherAvailability({ classTcs, allSlots, periods, colorMap, selectedCl
         <div>
           {/* Legend */}
           <div style={{
-            display: 'flex', gap: 16, fontSize: 11, color: '#64748b', marginBottom: 12, paddingLeft: 4
+            display: 'flex', gap: 16, fontSize: 11, color: '#6b7280', marginBottom: 12, paddingLeft: 4
           }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               <span style={{ width: 14, height: 14, borderRadius: 4, background: '#f0fdf4', border: '1.5px solid #86efac', display: 'inline-block' }} />
               Free
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ width: 14, height: 14, borderRadius: 4, background: '#eff6ff', border: '1.5px solid #93c5fd', display: 'inline-block' }} />
+              <span style={{ width: 14, height: 14, borderRadius: 4, background: '#f0f5fa', border: '1.5px solid #c6dae7', display: 'inline-block' }} />
               This class
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -306,13 +306,13 @@ function TeacherAvailability({ classTcs, allSlots, periods, colorMap, selectedCl
 
               return (
                 <div key={teacher.id} style={{
-                  background: '#fff', borderRadius: 12, border: '1px solid #e2e8f0',
+                  background: '#fff', borderRadius: 12, border: '1px solid #e5e7eb',
                   overflow: 'hidden'
                 }}>
                   {/* Teacher header */}
                   <div style={{
                     padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10,
-                    borderBottom: '1px solid #f1f5f9', background: '#fafbfc'
+                    borderBottom: '1px solid #f7f7f7', background: '#fafbfc'
                   }}>
                     <div style={{
                       width: 32, height: 32, borderRadius: 8,
@@ -323,23 +323,23 @@ function TeacherAvailability({ classTcs, allSlots, periods, colorMap, selectedCl
                       {teacher.full_name?.charAt(0) || '?'}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 700, fontSize: 13, color: '#0f172a' }}>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: '#1f2937' }}>
                         {teacher.full_name}
                       </div>
-                      <div style={{ fontSize: 11, color: '#94a3b8' }}>
+                      <div style={{ fontSize: 11, color: '#9ca3af' }}>
                         {busyCount} of {totalCells} slots filled
                       </div>
                     </div>
                     {/* Utilization bar */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div style={{ width: 48, height: 5, background: '#f1f5f9', borderRadius: 3, overflow: 'hidden' }}>
+                      <div style={{ width: 48, height: 5, background: '#f7f7f7', borderRadius: 3, overflow: 'hidden' }}>
                         <div style={{
                           width: `${utilization}%`, height: '100%', borderRadius: 3,
-                          background: utilization > 80 ? '#dc2626' : utilization > 50 ? '#f59e0b' : '#16a34a',
+                          background: utilization > 80 ? '#dc2626' : utilization > 50 ? '#f7c548' : '#16a34a',
                           transition: 'width .3s'
                         }} />
                       </div>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#64748b' }}>{utilization}%</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#6b7280' }}>{utilization}%</span>
                     </div>
                   </div>
 
@@ -352,7 +352,7 @@ function TeacherAvailability({ classTcs, allSlots, periods, colorMap, selectedCl
                           {DAYS.map(d => (
                             <th key={d} style={{
                               padding: '3px 2px', fontSize: 10, fontWeight: 700,
-                              color: '#94a3b8', textAlign: 'center'
+                              color: '#9ca3af', textAlign: 'center'
                             }}>
                               {d.slice(0, 3)}
                             </th>
@@ -364,7 +364,7 @@ function TeacherAvailability({ classTcs, allSlots, periods, colorMap, selectedCl
                           <tr key={p.number}>
                             <td style={{
                               padding: '2px 4px 2px 0', fontSize: 9, fontWeight: 600,
-                              color: '#cbd5e1', textAlign: 'right', whiteSpace: 'nowrap'
+                              color: '#d1d5db', textAlign: 'right', whiteSpace: 'nowrap'
                             }}>
                               P{p.number}
                             </td>
@@ -617,7 +617,7 @@ export default function Timetable() {
   // ── Render ───────────────────────────────────────────────────
   if (loading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 60, color: '#64748b' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 60, color: '#6b7280' }}>
         Loading timetable…
       </div>
     )
@@ -628,13 +628,13 @@ export default function Timetable() {
       <div style={{ maxWidth: 500, margin: '40px auto', textAlign: 'center' }}>
         <div style={{ ...t.card, padding: 40 }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🕐</div>
-          <div style={{ fontWeight: 700, fontSize: 18, color: '#0f172a', marginBottom: 8 }}>No periods defined yet</div>
-          <div style={{ fontSize: 14, color: '#64748b', marginBottom: 20, lineHeight: 1.6 }}>
+          <div style={{ fontWeight: 700, fontSize: 18, color: '#1f2937', marginBottom: 8 }}>No periods defined yet</div>
+          <div style={{ fontSize: 14, color: '#6b7280', marginBottom: 20, lineHeight: 1.6 }}>
             Set up your school's period structure first — periods, times, and breaks.
           </div>
           {isAdmin && (
             <a href="/settings" style={{
-              display: 'inline-block', padding: '10px 24px', background: '#0f2044', color: '#fff',
+              display: 'inline-block', padding: '10px 24px', background: '#003049', color: '#fff',
               borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: 'none'
             }}>
               Go to Settings → Timetable
@@ -650,21 +650,21 @@ export default function Timetable() {
       {/* ── Header ── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 16 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', margin: 0 }}>Timetable</h1>
-          <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1f2937', margin: 0 }}>Timetable</h1>
+          <p style={{ fontSize: 13, color: '#6b7280', margin: '4px 0 0' }}>
             {isAdmin ? 'Drag teachers from the sidebar onto the grid to build the schedule.' : 'Your weekly teaching schedule.'}
           </p>
         </div>
 
         {/* View toggle */}
         {(isAdmin || isTeacher) && (
-          <div style={{ display: 'flex', gap: 2, background: '#f1f5f9', borderRadius: 8, padding: 3 }}>
+          <div style={{ display: 'flex', gap: 2, background: '#f7f7f7', borderRadius: 8, padding: 3 }}>
             {isAdmin && (
               <button onClick={() => setView('class')} style={{
                 padding: '7px 16px', borderRadius: 6, border: 'none', cursor: 'pointer',
                 fontWeight: 600, fontSize: 13, transition: 'all .15s',
                 background: view === 'class' ? '#fff' : 'transparent',
-                color: view === 'class' ? '#0f2044' : '#64748b',
+                color: view === 'class' ? '#003049' : '#6b7280',
                 boxShadow: view === 'class' ? '0 1px 3px rgba(0,0,0,.1)' : 'none'
               }}>
                 By Class
@@ -674,7 +674,7 @@ export default function Timetable() {
               padding: '7px 16px', borderRadius: 6, border: 'none', cursor: 'pointer',
               fontWeight: 600, fontSize: 13, transition: 'all .15s',
               background: view === 'my' ? '#fff' : 'transparent',
-              color: view === 'my' ? '#0f2044' : '#64748b',
+              color: view === 'my' ? '#003049' : '#6b7280',
               boxShadow: view === 'my' ? '0 1px 3px rgba(0,0,0,.1)' : 'none'
             }}>
               {isTeacher ? 'My Timetable' : 'Teacher View'}
@@ -693,9 +693,9 @@ export default function Timetable() {
               style={{
                 padding: '7px 14px', borderRadius: 8, border: '1.5px solid',
                 fontWeight: 600, fontSize: 13, cursor: 'pointer', transition: 'all .15s',
-                background: selectedClass === c.id ? '#0f2044' : '#fff',
+                background: selectedClass === c.id ? '#003049' : '#fff',
                 color: selectedClass === c.id ? '#fff' : '#374151',
-                borderColor: selectedClass === c.id ? '#0f2044' : '#e2e8f0'
+                borderColor: selectedClass === c.id ? '#003049' : '#e5e7eb'
               }}
             >
               {c.grade_name} {c.name}
@@ -705,14 +705,14 @@ export default function Timetable() {
           {/* Fill rate */}
           {selectedClass && (
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 80, height: 6, background: '#f1f5f9', borderRadius: 3, overflow: 'hidden' }}>
+              <div style={{ width: 80, height: 6, background: '#f7f7f7', borderRadius: 3, overflow: 'hidden' }}>
                 <div style={{
                   width: `${fillRate}%`, height: '100%', borderRadius: 3,
-                  background: fillRate === 100 ? '#16a34a' : fillRate > 50 ? '#2563eb' : '#f59e0b',
+                  background: fillRate === 100 ? '#16a34a' : fillRate > 50 ? '#003049' : '#f7c548',
                   transition: 'width .3s'
                 }} />
               </div>
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#64748b' }}>{fillRate}%</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280' }}>{fillRate}%</span>
             </div>
           )}
         </div>
@@ -722,15 +722,15 @@ export default function Timetable() {
       {view === 'my' && myTeacher && (
         <div style={{ ...t.card, padding: '14px 20px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{
-            width: 40, height: 40, borderRadius: 10, background: '#eff6ff',
+            width: 40, height: 40, borderRadius: 10, background: '#f0f5fa',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 800, fontSize: 16, color: '#1e40af'
+            fontWeight: 800, fontSize: 16, color: '#00253a'
           }}>
             {myTeacher.full_name?.charAt(0) || 'T'}
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>{myTeacher.full_name}</div>
-            <div style={{ fontSize: 12, color: '#64748b' }}>{filledSlots} periods this week</div>
+            <div style={{ fontWeight: 700, fontSize: 15, color: '#1f2937' }}>{myTeacher.full_name}</div>
+            <div style={{ fontSize: 12, color: '#6b7280' }}>{filledSlots} periods this week</div>
           </div>
         </div>
       )}
@@ -742,16 +742,16 @@ export default function Timetable() {
         {isAdmin && view === 'class' && selectedClass && (
           <div style={{
             width: 220, flexShrink: 0, background: '#fff', borderRadius: 14,
-            border: '1px solid #e2e8f0', overflow: 'hidden',
+            border: '1px solid #e5e7eb', overflow: 'hidden',
             position: 'sticky', top: 80,
             maxHeight: 'calc(100vh - 100px)', overflowY: 'auto'
           }}>
             <div style={{
-              padding: '14px 16px 10px', borderBottom: '1px solid #f1f5f9',
-              background: '#f8fafc'
+              padding: '14px 16px 10px', borderBottom: '1px solid #f7f7f7',
+              background: '#fafafa'
             }}>
-              <div style={{ fontWeight: 700, fontSize: 13, color: '#0f172a' }}>Teachers</div>
-              <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
+              <div style={{ fontWeight: 700, fontSize: 13, color: '#1f2937' }}>Teachers</div>
+              <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>
                 Drag onto the grid →
               </div>
             </div>
@@ -768,24 +768,24 @@ export default function Timetable() {
 
         {/* ── Weekly Grid ── */}
         <div style={{ flex: 1, minWidth: 0, overflowX: 'auto' }}>
-          <div style={{ borderRadius: 14, border: '1px solid #e2e8f0', background: '#fff', overflow: 'hidden' }}>
+          <div style={{ borderRadius: 14, border: '1px solid #e5e7eb', background: '#fff', overflow: 'hidden' }}>
             <table style={{ width: '100%', minWidth: 650, borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: '#f8fafc' }}>
+                <tr style={{ background: '#fafafa' }}>
                   <th style={{
-                    padding: '12px 14px', fontSize: 11, fontWeight: 700, color: '#64748b',
+                    padding: '12px 14px', fontSize: 11, fontWeight: 700, color: '#6b7280',
                     textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'left',
-                    width: 110, borderBottom: '1px solid #e2e8f0', borderRight: '1px solid #f1f5f9',
-                    position: 'sticky', left: 0, background: '#f8fafc', zIndex: 2
+                    width: 110, borderBottom: '1px solid #e5e7eb', borderRight: '1px solid #f7f7f7',
+                    position: 'sticky', left: 0, background: '#fafafa', zIndex: 2
                   }}>
                     Period
                   </th>
                   {DAYS.map((d, i) => (
                     <th key={d} style={{
-                      padding: '12px 8px', fontSize: 11, fontWeight: 700, color: '#64748b',
+                      padding: '12px 8px', fontSize: 11, fontWeight: 700, color: '#6b7280',
                       textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'center',
-                      borderBottom: '1px solid #e2e8f0',
-                      borderRight: i < 4 ? '1px solid #f1f5f9' : 'none'
+                      borderBottom: '1px solid #e5e7eb',
+                      borderRight: i < 4 ? '1px solid #f7f7f7' : 'none'
                     }}>
                       {d}
                     </th>
@@ -798,8 +798,8 @@ export default function Timetable() {
                     return (
                       <tr key={pi} style={{ background: '#fefce8' }}>
                         <td colSpan={6} style={{
-                          padding: '10px 14px', fontSize: 12, fontWeight: 600, color: '#a16207',
-                          textAlign: 'center', borderBottom: '1px solid #f1f5f9'
+                          padding: '10px 14px', fontSize: 12, fontWeight: 600, color: '#b8870a',
+                          textAlign: 'center', borderBottom: '1px solid #f7f7f7'
                         }}>
                           ☕ {p.label} ({p.start}–{p.end})
                         </td>
@@ -808,14 +808,14 @@ export default function Timetable() {
                   }
 
                   return (
-                    <tr key={pi} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <tr key={pi} style={{ borderBottom: '1px solid #f7f7f7' }}>
                       <td style={{
-                        padding: '10px 14px', borderRight: '1px solid #f1f5f9',
+                        padding: '10px 14px', borderRight: '1px solid #f7f7f7',
                         verticalAlign: 'top', position: 'sticky', left: 0,
                         background: '#fff', zIndex: 1
                       }}>
-                        <div style={{ fontWeight: 700, fontSize: 13, color: '#0f172a' }}>{p.label}</div>
-                        <div style={{ fontSize: 11, color: '#94a3b8' }}>{p.start}–{p.end}</div>
+                        <div style={{ fontWeight: 700, fontSize: 13, color: '#1f2937' }}>{p.label}</div>
+                        <div style={{ fontSize: 11, color: '#9ca3af' }}>{p.start}–{p.end}</div>
                       </td>
 
                       {DAYS.map((d, dayIdx) => {
@@ -857,7 +857,7 @@ export default function Timetable() {
           )}
 
           {view === 'class' && classes.length === 0 && (
-            <div style={{ textAlign: 'center', padding: 40, color: '#94a3b8' }}>
+            <div style={{ textAlign: 'center', padding: 40, color: '#9ca3af' }}>
               No classes set up yet. Go to Settings → Grades & Classes to create grades.
             </div>
           )}

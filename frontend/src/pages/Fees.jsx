@@ -34,33 +34,33 @@ function printReceipt(entry, schoolName, sym, schoolLogoUrl) {
     @page{size:A5;margin:8mm}
   }
   .receipt{max-width:420px;margin:0 auto;background:#fff}
-  .header{background:#0f2044;color:#fff;padding:24px 28px 20px;display:flex;justify-content:space-between;align-items:flex-start}
+  .header{background:#003049;color:#fff;padding:24px 28px 20px;display:flex;justify-content:space-between;align-items:flex-start}
   .brand{font-size:22px;font-weight:900;letter-spacing:-0.5px}
   .brand-tag{font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px}
   .school-logo{height:44px;max-width:120px;object-fit:contain;background:rgba(255,255,255,0.1);border-radius:6px;padding:4px}
   .receipt-label{text-align:right;font-size:11px;font-weight:700;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.8px}
   .receipt-no{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px}
-  .school-row{padding:14px 28px;border-bottom:1px solid #f1f5f9}
-  .school-name{font-size:14px;font-weight:800;color:#0f172a}
-  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:16px 28px;border-bottom:1px solid #f1f5f9}
+  .school-row{padding:14px 28px;border-bottom:1px solid #f7f7f7}
+  .school-name{font-size:14px;font-weight:800;color:#1f2937}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:16px 28px;border-bottom:1px solid #f7f7f7}
   .info-block{margin-bottom:14px}
-  .info-label{font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:3px}
-  .info-value{font-size:13px;font-weight:600;color:#0f172a}
-  .desc-box{margin:0 28px 16px;background:#f8fafc;border-radius:8px;padding:12px 14px}
-  .desc-text{font-size:13px;font-weight:700;color:#0f172a}
-  .amounts{border-top:1px solid #f1f5f9}
-  .amount-row{display:flex;justify-content:space-between;align-items:center;padding:10px 28px;border-bottom:1px solid #f8fafc}
-  .amount-row:nth-child(2){background:#f8fafc}
-  .amount-label{font-size:12px;color:#64748b}
-  .amount-value{font-size:14px;font-weight:700;color:#0f172a}
+  .info-label{font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:3px}
+  .info-value{font-size:13px;font-weight:600;color:#1f2937}
+  .desc-box{margin:0 28px 16px;background:#fafafa;border-radius:8px;padding:12px 14px}
+  .desc-text{font-size:13px;font-weight:700;color:#1f2937}
+  .amounts{border-top:1px solid #f7f7f7}
+  .amount-row{display:flex;justify-content:space-between;align-items:center;padding:10px 28px;border-bottom:1px solid #fafafa}
+  .amount-row:nth-child(2){background:#fafafa}
+  .amount-label{font-size:12px;color:#6b7280}
+  .amount-value{font-size:14px;font-weight:700;color:#1f2937}
   .amount-value.paid{color:#15803d}
   .amount-value.balance{color:${balance>0?'#dc2626':'#15803d'}}
   .stamp{margin:16px 28px;padding:10px 14px;border-radius:8px;text-align:center;font-size:15px;font-weight:900;letter-spacing:1px;border:2.5px solid ${isPaid?'#16a34a':'#dc2626'};color:${isPaid?'#15803d':'#dc2626'}}
-  .method-row{padding:12px 28px;font-size:12px;color:#64748b;border-top:1px solid #f1f5f9}
-  .footer{background:#f8fafc;padding:14px 28px;margin-top:8px}
-  .footer-text{font-size:10px;color:#94a3b8;text-align:center;line-height:1.6}
-  .print-bar{background:#0f2044;padding:12px 20px;display:flex;gap:10px;justify-content:center;position:sticky;top:0;z-index:10}
-  .print-btn{padding:8px 20px;background:#fff;color:#0f2044;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer}
+  .method-row{padding:12px 28px;font-size:12px;color:#6b7280;border-top:1px solid #f7f7f7}
+  .footer{background:#fafafa;padding:14px 28px;margin-top:8px}
+  .footer-text{font-size:10px;color:#9ca3af;text-align:center;line-height:1.6}
+  .print-bar{background:#003049;padding:12px 20px;display:flex;gap:10px;justify-content:center;position:sticky;top:0;z-index:10}
+  .print-btn{padding:8px 20px;background:#fff;color:#003049;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer}
   .close-btn{padding:8px 20px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:7px;font-size:13px;font-weight:600;cursor:pointer}
 </style>
 </head>
@@ -86,7 +86,7 @@ function printReceipt(entry, schoolName, sym, schoolLogoUrl) {
 
   <div class="school-row">
     <div class="school-name">${schoolName}</div>
-    <div style="font-size:11px;color:#64748b;margin-top:2px">${today}</div>
+    <div style="font-size:11px;color:#6b7280;margin-top:2px">${today}</div>
   </div>
 
   <div class="info-grid">
@@ -160,9 +160,9 @@ const STATUS_STYLE = {
   paid:            { bg: '#dcfce7', color: '#15803d' },
   waived:          { bg: '#f3e8ff', color: '#7c3aed' },
   partial_waiver:  { bg: '#ede9fe', color: '#6d28d9' },
-  partial:         { bg: '#fef9c3', color: '#a16207' },
+  partial:         { bg: '#fef4d6', color: '#b8870a' },
   overdue:         { bg: '#fee2e2', color: '#dc2626' },
-  pending:         { bg: '#f1f5f9', color: '#64748b' },
+  pending:         { bg: '#f7f7f7', color: '#6b7280' },
 }
 
 const CSS = `
@@ -471,14 +471,14 @@ export default function Fees() {
     const hasWaiver = Number(row.amount_waived||0) > 0
     return (
       <tr className="fee-row" style={{ background: row.status==='overdue' ? '#fff9f9' : '#fff' }}>
-        <td style={{ padding:'10px 16px 10px 40px', fontSize:11, color:'#94a3b8', fontWeight:700, letterSpacing:'0.5px', width:70 }}>
+        <td style={{ padding:'10px 16px 10px 40px', fontSize:11, color:'#9ca3af', fontWeight:700, letterSpacing:'0.5px', width:70 }}>
           {row.learners?.reference_no || '—'}
         </td>
-        <td style={{ padding:'10px 8px', fontWeight:600, color:'#0f172a', fontSize:14 }}>
+        <td style={{ padding:'10px 8px', fontWeight:600, color:'#1f2937', fontSize:14 }}>
           {row.learners?.first_name} {row.learners?.last_name}
         </td>
-        <td style={{ padding:'10px 8px', fontSize:13, color:'#64748b' }}>{row.description}</td>
-        <td style={{ padding:'10px 8px', fontSize:12, color: row.status==='overdue' ? '#dc2626' : '#64748b', whiteSpace:'nowrap' }}>
+        <td style={{ padding:'10px 8px', fontSize:13, color:'#6b7280' }}>{row.description}</td>
+        <td style={{ padding:'10px 8px', fontSize:12, color: row.status==='overdue' ? '#dc2626' : '#6b7280', whiteSpace:'nowrap' }}>
           {new Date(row.due_date).toLocaleDateString('en-ZA')}
           {row.status==='overdue' && <div style={{ fontSize:10, fontWeight:800 }}>OVERDUE</div>}
         </td>
@@ -492,7 +492,7 @@ export default function Fees() {
           <div style={{ display:'flex', gap:5, alignItems:'center' }}>
             {!isReadOnly && row.status !== 'paid' && row.status !== 'waived' && balance > 0 && (
               <button className="pay-btn" onClick={() => openPay(row)}
-                style={{ padding:'5px 14px', background:'#0f2044', color:'#fff', border:'none', borderRadius:7, fontSize:12, fontWeight:700, cursor:'pointer' }}>
+                style={{ padding:'5px 14px', background:'#003049', color:'#fff', border:'none', borderRadius:7, fontSize:12, fontWeight:700, cursor:'pointer' }}>
                 Pay
               </button>
             )}
@@ -506,8 +506,8 @@ export default function Fees() {
               <button onClick={() => printReceipt(row, schoolName, sym, school?.logo_url)}
                 title="Print / view receipt"
                 style={{ display:'inline-flex', alignItems:'center', justifyContent:'center',
-                  width:26, height:26, border:'1px solid #bfdbfe', borderRadius:6,
-                  background:'#eff6ff', color:'#0f2044', cursor:'pointer', flexShrink:0 }}>
+                  width:26, height:26, border:'1px solid #e6eff5', borderRadius:6,
+                  background:'#f0f5fa', color:'#003049', cursor:'pointer', flexShrink:0 }}>
                 <ReceiptIcon />
               </button>
             )}
@@ -532,22 +532,22 @@ export default function Fees() {
         {/* Grade header */}
         <div onClick={() => toggleGrade(gname)}
           style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 16px',
-            background: hasOverdue ? '#fff5f5' : allPaid ? '#f0fdf4' : '#f8fafc',
+            background: hasOverdue ? '#fff5f5' : allPaid ? '#f0fdf4' : '#fafafa',
             borderRadius: isOpen ? '10px 10px 0 0' : 10,
-            border: `1px solid ${hasOverdue ? '#fca5a5' : allPaid ? '#86efac' : '#e2e8f0'}`,
+            border: `1px solid ${hasOverdue ? '#fca5a5' : allPaid ? '#86efac' : '#e5e7eb'}`,
             cursor:'pointer', userSelect:'none', transition:'background 0.15s' }}>
           <ChevronIcon open={isOpen} />
-          <div style={{ fontWeight:700, fontSize:14, color:'#0f172a', flex:1 }}>{gname}</div>
+          <div style={{ fontWeight:700, fontSize:14, color:'#1f2937', flex:1 }}>{gname}</div>
           {allPaid && <span style={{ fontSize:12, fontWeight:700, color:'#16a34a' }}>✓ All paid</span>}
           {!allPaid && (
-            <span style={{ fontSize:12, color:'#64748b' }}>
+            <span style={{ fontSize:12, color:'#6b7280' }}>
               {unpaidCount} unpaid ·{' '}
               <span style={{ fontWeight:700, color: hasOverdue?'#dc2626':'#374151' }}>
                 {sym}{gradeBalance.toLocaleString()} outstanding
               </span>
             </span>
           )}
-          <div style={{ fontSize:12, color:'#94a3b8', marginLeft:8 }}>
+          <div style={{ fontSize:12, color:'#9ca3af', marginLeft:8 }}>
             {sym}{gradeOwed.toLocaleString()} due · {sym}{gradePaid.toLocaleString()} paid
           </div>
           {hasOverdue && (
@@ -560,12 +560,12 @@ export default function Fees() {
 
         {/* Grade rows */}
         {isOpen && (
-          <div className="grade-rows" style={{ border:'1px solid #e2e8f0', borderTop:'none', borderRadius:'0 0 10px 10px', overflow:'hidden' }}>
+          <div className="grade-rows" style={{ border:'1px solid #e5e7eb', borderTop:'none', borderRadius:'0 0 10px 10px', overflow:'hidden' }}>
             <table style={{ width:'100%', borderCollapse:'collapse' }}>
               <thead>
-                <tr style={{ background:'#f8fafc' }}>
+                <tr style={{ background:'#fafafa' }}>
                   {['Ref','Learner','Description','Due date','Due','Paid','Balance','Status',''].map(h =>
-                    <th key={h} style={{ textAlign:'left', padding: h==='Ref'?'8px 8px 8px 40px':'8px', fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.6px', borderBottom:'1px solid #e2e8f0' }}>{h}</th>
+                    <th key={h} style={{ textAlign:'left', padding: h==='Ref'?'8px 8px 8px 40px':'8px', fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.6px', borderBottom:'1px solid #e5e7eb' }}>{h}</th>
                   )}
                 </tr>
               </thead>
@@ -586,8 +586,8 @@ export default function Fees() {
         {/* Header */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
           <div>
-            <h1 style={{ fontSize:22, fontWeight:800, color:'#0f172a', letterSpacing:'-0.3px' }}>Fees</h1>
-            <p style={{ fontSize:14, color:'#64748b', marginTop:2 }}>
+            <h1 style={{ fontSize:22, fontWeight:800, color:'#1f2937', letterSpacing:'-0.3px' }}>Fees</h1>
+            <p style={{ fontSize:14, color:'#6b7280', marginTop:2 }}>
               Fee collection — {monthLabel} · <span style={{ color:'#16a34a', fontSize:13 }}>Auto-managed</span>
               {autoGenMsg && <span style={{ marginLeft:12, fontSize:12, color:'#16a34a', fontWeight:700 }}>{autoGenMsg}</span>}
             </p>
@@ -603,22 +603,22 @@ export default function Fees() {
 
         {/* Big search bar */}
         <div style={{ position:'relative', marginBottom:16 }}>
-          <svg style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', color:'#94a3b8' }}
+          <svg style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', color:'#9ca3af' }}
             width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
           <input ref={searchRef} value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search by learner name or reference number…"
-            style={{ width:'100%', padding:'12px 16px 12px 42px', border:'1.5px solid #e2e8f0', borderRadius:10,
+            style={{ width:'100%', padding:'12px 16px 12px 42px', border:'1.5px solid #e5e7eb', borderRadius:10,
               fontSize:15, outline:'none', boxSizing:'border-box', background:'#fff',
               boxShadow:'0 1px 3px rgba(0,0,0,.06)', transition:'border-color .15s' }}
-            onFocus={e => e.target.style.borderColor='#0f2044'}
-            onBlur={e => e.target.style.borderColor='#e2e8f0'}
+            onFocus={e => e.target.style.borderColor='#003049'}
+            onBlur={e => e.target.style.borderColor='#e5e7eb'}
           />
           {search && (
             <button onClick={() => setSearch('')}
               style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)',
-                background:'none', border:'none', cursor:'pointer', color:'#94a3b8', fontSize:18 }}>✕</button>
+                background:'none', border:'none', cursor:'pointer', color:'#9ca3af', fontSize:18 }}>✕</button>
           )}
         </div>
 
@@ -627,7 +627,7 @@ export default function Fees() {
           <div style={{ display:'flex', gap:8, alignItems:'center', flexWrap:'wrap' }}>
             {/* Month picker */}
             <select value={month} onChange={e => setMonth(e.target.value)}
-              style={{ padding:'7px 12px', border:'1.5px solid #e2e8f0', borderRadius:8, fontSize:13, background:'#fff', fontWeight:500 }}>
+              style={{ padding:'7px 12px', border:'1.5px solid #e5e7eb', borderRadius:8, fontSize:13, background:'#fff', fontWeight:500 }}>
               {Array.from({length:12},(_,i) => {
                 const mo = String(i+1).padStart(2,'0')
                 return <option key={i} value={`${year}-${mo}`}>{MONTHS[i]} {year}</option>
@@ -644,9 +644,9 @@ export default function Fees() {
             ].map(p => (
               <button key={p.key} onClick={() => setStatusFilter(p.key)}
                 style={{ padding:'5px 13px', borderRadius:20, border:'1.5px solid',
-                  borderColor: statusFilter===p.key ? '#0f2044' : '#e2e8f0',
-                  background:  statusFilter===p.key ? '#0f2044' : '#fff',
-                  color:       statusFilter===p.key ? '#fff' : '#64748b',
+                  borderColor: statusFilter===p.key ? '#003049' : '#e5e7eb',
+                  background:  statusFilter===p.key ? '#003049' : '#fff',
+                  color:       statusFilter===p.key ? '#fff' : '#6b7280',
                   fontWeight:600, fontSize:12, cursor:'pointer', transition:'all .15s',
                   ...(p.key==='overdue' && counts.overdue>0 && statusFilter!==p.key ? { borderColor:'#fca5a5', color:'#dc2626' } : {})
                 }}>
@@ -658,26 +658,26 @@ export default function Fees() {
           {/* Expand/collapse + show paid */}
           {!search && processed.groups && (
             <div style={{ display:'flex', gap:10, alignItems:'center' }}>
-              <button onClick={expandAll}   style={{ fontSize:12, color:'#64748b', background:'none', border:'none', cursor:'pointer' }}>Expand all</button>
-              <button onClick={collapseAll} style={{ fontSize:12, color:'#64748b', background:'none', border:'none', cursor:'pointer' }}>Collapse all</button>
+              <button onClick={expandAll}   style={{ fontSize:12, color:'#6b7280', background:'none', border:'none', cursor:'pointer' }}>Expand all</button>
+              <button onClick={collapseAll} style={{ fontSize:12, color:'#6b7280', background:'none', border:'none', cursor:'pointer' }}>Collapse all</button>
             </div>
           )}
         </div>
 
 {/* Summary bar — always visible, reflects current filter */}
         {!loading && (
-          <div style={{ display:'flex', gap:0, marginBottom:16, background:'#fff', borderRadius:10, overflow:'hidden', boxShadow:'0 1px 3px rgba(0,0,0,.06)', border:'1px solid #e2e8f0' }}>
+          <div style={{ display:'flex', gap:0, marginBottom:16, background:'#fff', borderRadius:10, overflow:'hidden', boxShadow:'0 1px 3px rgba(0,0,0,.06)', border:'1px solid #e5e7eb' }}>
             {[
               { label: statusFilter==='all' ? 'Total due' : `${statusFilter.charAt(0).toUpperCase()+statusFilter.slice(1)} — due`,
-                value:`${sym}${monthDue.toLocaleString()}`, color:'#0f172a' },
+                value:`${sym}${monthDue.toLocaleString()}`, color:'#1f2937' },
               { label:'Collected',   value:`${sym}${monthPaid.toLocaleString()}`,    color:'#16a34a' },
               { label:'Outstanding', value:`${sym}${monthBalance.toLocaleString()}`, color: monthBalance>0?'#dc2626':'#16a34a' },
               { label:'Collection rate (month)', value:`${fullPct}%`,               color: fullPct>=80?'#16a34a':fullPct>=50?'#ca8a04':'#dc2626' },
             ].map((c, i) => (
-              <div key={c.label} style={{ flex:1, padding:'12px 20px', borderLeft: i>0?'1px solid #f1f5f9':'none' }}>
-                <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.6px', marginBottom:4 }}>{c.label}</div>
+              <div key={c.label} style={{ flex:1, padding:'12px 20px', borderLeft: i>0?'1px solid #f7f7f7':'none' }}>
+                <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.6px', marginBottom:4 }}>{c.label}</div>
                 <div style={{ fontSize:20, fontWeight:800, color:c.color }}>
-                  {ledger.length===0 ? <span style={{color:'#94a3b8',fontSize:14}}>No entries</span> : c.value}
+                  {ledger.length===0 ? <span style={{color:'#9ca3af',fontSize:14}}>No entries</span> : c.value}
                 </div>
               </div>
             ))}
@@ -688,16 +688,16 @@ export default function Fees() {
         {search && processed.isSearch && (
           <div style={{ background:'#fff', borderRadius:12, boxShadow:'0 1px 3px rgba(0,0,0,.06)', overflow:'hidden' }}>
             {processed.rows.length === 0 ? (
-              <div style={{ padding:48, textAlign:'center', color:'#94a3b8' }}>
+              <div style={{ padding:48, textAlign:'center', color:'#9ca3af' }}>
                 <div style={{ fontSize:20, marginBottom:8 }}>🔍</div>
                 No results for "<strong>{search}</strong>"
               </div>
             ) : (
               <table style={{ width:'100%', borderCollapse:'collapse' }}>
                 <thead>
-                  <tr style={{ background:'#f8fafc' }}>
+                  <tr style={{ background:'#fafafa' }}>
                     {['Ref','Learner','Description','Due date','Due','Paid','Balance','Status',''].map(h =>
-                      <th key={h} style={{ textAlign:'left', padding:'10px 8px', fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.6px', borderBottom:'1px solid #e2e8f0', ...(h==='Ref'?{paddingLeft:16}:{}) }}>{h}</th>
+                      <th key={h} style={{ textAlign:'left', padding:'10px 8px', fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.6px', borderBottom:'1px solid #e5e7eb', ...(h==='Ref'?{paddingLeft:16}:{}) }}>{h}</th>
                     )}
                   </tr>
                 </thead>
@@ -730,22 +730,22 @@ export default function Fees() {
                       return (
                         <div key={gname} style={{
                           background:'#fff', borderRadius:12, padding:'18px 20px',
-                          border: `1.5px solid ${hasOverdue ? '#fca5a5' : allPaid ? '#86efac' : '#e2e8f0'}`,
+                          border: `1.5px solid ${hasOverdue ? '#fca5a5' : allPaid ? '#86efac' : '#e5e7eb'}`,
                           boxShadow:'0 1px 3px rgba(0,0,0,.04)'
                         }}>
                           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
-                            <div style={{ fontWeight:800, fontSize:15, color:'#0f172a' }}>{gname}</div>
+                            <div style={{ fontWeight:800, fontSize:15, color:'#1f2937' }}>{gname}</div>
                             {allPaid && <span style={{ fontSize:11, fontWeight:700, color:'#16a34a', background:'#f0fdf4', padding:'2px 8px', borderRadius:10 }}>All paid</span>}
                             {hasOverdue && <span style={{ fontSize:11, fontWeight:700, color:'#dc2626', background:'#fee2e2', padding:'2px 8px', borderRadius:10 }}>{overdueCount} overdue</span>}
                           </div>
 
                           {/* Collection progress bar */}
                           <div style={{ marginBottom:12 }}>
-                            <div style={{ display:'flex', justifyContent:'space-between', fontSize:11, fontWeight:600, color:'#64748b', marginBottom:4 }}>
+                            <div style={{ display:'flex', justifyContent:'space-between', fontSize:11, fontWeight:600, color:'#6b7280', marginBottom:4 }}>
                               <span>Collection rate</span>
                               <span style={{ color: collPct>=80?'#16a34a':collPct>=50?'#d97706':'#dc2626', fontWeight:800 }}>{collPct}%</span>
                             </div>
-                            <div style={{ height:8, background:'#f1f5f9', borderRadius:4, overflow:'hidden' }}>
+                            <div style={{ height:8, background:'#f7f7f7', borderRadius:4, overflow:'hidden' }}>
                               <div style={{ height:'100%', width:`${collPct}%`, borderRadius:4, transition:'width .3s',
                                 background: collPct>=80?'#16a34a':collPct>=50?'#d97706':'#dc2626' }} />
                             </div>
@@ -753,21 +753,21 @@ export default function Fees() {
 
                           {/* Stats grid */}
                           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
-                            <div style={{ background:'#f8fafc', borderRadius:8, padding:'8px 10px' }}>
-                              <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.4px' }}>Due</div>
-                              <div style={{ fontSize:15, fontWeight:800, color:'#0f172a' }}>{sym}{gradeOwed.toLocaleString()}</div>
+                            <div style={{ background:'#fafafa', borderRadius:8, padding:'8px 10px' }}>
+                              <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.4px' }}>Due</div>
+                              <div style={{ fontSize:15, fontWeight:800, color:'#1f2937' }}>{sym}{gradeOwed.toLocaleString()}</div>
                             </div>
                             <div style={{ background:'#f0fdf4', borderRadius:8, padding:'8px 10px' }}>
-                              <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.4px' }}>Collected</div>
+                              <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.4px' }}>Collected</div>
                               <div style={{ fontSize:15, fontWeight:800, color:'#16a34a' }}>{sym}{gradePaid.toLocaleString()}</div>
                             </div>
                             <div style={{ background: gradeBalance>0?'#fff5f5':'#f0fdf4', borderRadius:8, padding:'8px 10px' }}>
-                              <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.4px' }}>Outstanding</div>
+                              <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.4px' }}>Outstanding</div>
                               <div style={{ fontSize:15, fontWeight:800, color: gradeBalance>0?'#dc2626':'#16a34a' }}>{sym}{gradeBalance.toLocaleString()}</div>
                             </div>
-                            <div style={{ background:'#f8fafc', borderRadius:8, padding:'8px 10px' }}>
-                              <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', letterSpacing:'0.4px' }}>Learners</div>
-                              <div style={{ fontSize:15, fontWeight:800, color:'#0f172a' }}>{paidCount}<span style={{ fontSize:11, color:'#94a3b8', fontWeight:600 }}>/{totalCount} paid</span></div>
+                            <div style={{ background:'#fafafa', borderRadius:8, padding:'8px 10px' }}>
+                              <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.4px' }}>Learners</div>
+                              <div style={{ fontSize:15, fontWeight:800, color:'#1f2937' }}>{paidCount}<span style={{ fontSize:11, color:'#9ca3af', fontWeight:600 }}>/{totalCount} paid</span></div>
                             </div>
                           </div>
                         </div>
@@ -781,7 +781,7 @@ export default function Fees() {
                   ))
                 ))
               : (
-                <div style={{ background:'#fff', borderRadius:12, padding:56, textAlign:'center', color:'#94a3b8', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>
+                <div style={{ background:'#fff', borderRadius:12, padding:56, textAlign:'center', color:'#9ca3af', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>
                   <div style={{ fontSize:24, marginBottom:10 }}>
                     {statusFilter==='paid' ? '🎉' : '📋'}
                   </div>
@@ -800,7 +800,7 @@ export default function Fees() {
         )}
 
         {loading && (
-          <div style={{ background:'#fff', borderRadius:12, padding:48, textAlign:'center', color:'#94a3b8', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>
+          <div style={{ background:'#fff', borderRadius:12, padding:48, textAlign:'center', color:'#9ca3af', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>
             Loading…
           </div>
         )}
@@ -808,28 +808,28 @@ export default function Fees() {
 
                 {/* WAIVE MODAL */}
         {waiveEntry && (
-          <div style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:100, backdropFilter:'blur(2px)' }}
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,48,73,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:100, backdropFilter:'blur(2px)' }}
             onClick={e => e.target===e.currentTarget && setWaiveEntry(null)}>
             <div style={{ background:'#fff', borderRadius:18, padding:'32px', width:'100%', maxWidth:420, boxShadow:'0 24px 60px rgba(0,0,0,0.2)' }}>
               <h2 style={{ fontSize:18, fontWeight:800, marginBottom:6 }}>Request waiver</h2>
               <div style={{ marginBottom:16 }}>
-                <span style={{ fontWeight:700, color:'#0f172a', fontSize:15 }}>
+                <span style={{ fontWeight:700, color:'#1f2937', fontSize:15 }}>
                   {waiveEntry.learners?.first_name} {waiveEntry.learners?.last_name}
                 </span>
                 {waiveEntry.learners?.reference_no && (
-                  <span style={{ marginLeft:8, fontSize:11, background:'#f1f5f9', color:'#64748b', padding:'2px 8px', borderRadius:10, fontWeight:700 }}>
+                  <span style={{ marginLeft:8, fontSize:11, background:'#f7f7f7', color:'#6b7280', padding:'2px 8px', borderRadius:10, fontWeight:700 }}>
                     #{waiveEntry.learners.reference_no}
                   </span>
                 )}
-                <div style={{ fontSize:13, color:'#94a3b8', marginTop:3 }}>{waiveEntry.description}</div>
+                <div style={{ fontSize:13, color:'#9ca3af', marginTop:3 }}>{waiveEntry.description}</div>
               </div>
               <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:12, marginBottom:18, padding:'12px 14px', background:'#faf5ff', borderRadius:10, border:'1px solid #e9d5ff' }}>
                 <div>
-                  <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', marginBottom:3 }}>Total due</div>
+                  <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', marginBottom:3 }}>Total due</div>
                   <div style={{ fontWeight:700, fontSize:18 }}>{sym}{Number(waiveEntry.amount_due).toLocaleString()}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', marginBottom:3 }}>Remaining</div>
+                  <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', marginBottom:3 }}>Remaining</div>
                   <div style={{ fontWeight:700, fontSize:18, color:'#7c3aed' }}>
                     {sym}{(Number(waiveEntry.amount_due) - Number(waiveEntry.amount_paid) - Number(waiveEntry.amount_waived||0)).toLocaleString()}
                   </div>
@@ -837,12 +837,12 @@ export default function Fees() {
               </div>
               <form onSubmit={submitWaiverRequest}>
                 <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>Amount to waive ({sym}) *</label>
-                <input style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
+                <input style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e5e7eb', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
                   type="number" step="0.01" min="0.01"
                   max={Number(waiveEntry.amount_due) - Number(waiveEntry.amount_paid) - Number(waiveEntry.amount_waived||0)}
                   value={waiveForm.amount} onChange={e => setWaiveForm(f=>({...f,amount:e.target.value}))} required />
                 <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>Reason *</label>
-                <select style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
+                <select style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e5e7eb', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
                   value={waiveForm.reason} onChange={e => setWaiveForm(f=>({...f,reason:e.target.value}))} required>
                   <option value="">Select reason…</option>
                   {['Scholarship','Financial hardship','Staff discount','Government bursary','Orphan / vulnerable child','Other'].map(r => (
@@ -859,9 +859,9 @@ export default function Fees() {
                   </>
                 )}
                 <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>
-                  Note <span style={{ color:'#94a3b8', fontWeight:400 }}>(optional)</span>
+                  Note <span style={{ color:'#9ca3af', fontWeight:400 }}>(optional)</span>
                 </label>
-                <input style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:16, background:'#fff' }}
+                <input style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e5e7eb', borderRadius:9, fontSize:14, outline:'none', marginBottom:16, background:'#fff' }}
                   value={waiveForm.note} onChange={e => setWaiveForm(f=>({...f,note:e.target.value}))}
                   placeholder="e.g. Approved by principal on 03 Apr 2026" />
                 <div style={{ background:'#faf5ff', border:'1px solid #e9d5ff', borderRadius:9, padding:'10px 14px', marginBottom:14, fontSize:12, color:'#7c3aed' }}>
@@ -869,7 +869,7 @@ export default function Fees() {
                 </div>
                 <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
                   <button type="button" onClick={() => setWaiveEntry(null)}
-                    style={{ padding:'9px 18px', background:'#f1f5f9', color:'#374151', border:'none', borderRadius:9, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+                    style={{ padding:'9px 18px', background:'#f7f7f7', color:'#374151', border:'none', borderRadius:9, fontWeight:600, cursor:'pointer' }}>Cancel</button>
                   <button type="submit" disabled={waiving}
                     style={{ padding:'9px 18px', background:'#7c3aed', color:'#fff', border:'none', borderRadius:9, fontWeight:700, cursor:'pointer' }}>
                     {waiving ? 'Submitting…' : 'Submit request'}
@@ -882,28 +882,28 @@ export default function Fees() {
 
         {/* PAY MODAL */}
         {payEntry && (
-          <div style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:100, backdropFilter:'blur(2px)' }}
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,48,73,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:100, backdropFilter:'blur(2px)' }}
             onClick={e => e.target===e.currentTarget && setPayEntry(null)}>
             <div style={{ background:'#fff', borderRadius:18, padding:'32px', width:'100%', maxWidth:400, boxShadow:'0 24px 60px rgba(0,0,0,0.2)' }}>
               <h2 style={{ fontSize:18, fontWeight:800, marginBottom:6 }}>Record payment</h2>
               <div style={{ marginBottom:16 }}>
-                <span style={{ fontWeight:700, color:'#0f172a', fontSize:15 }}>
+                <span style={{ fontWeight:700, color:'#1f2937', fontSize:15 }}>
                   {payEntry.learners?.first_name} {payEntry.learners?.last_name}
                 </span>
                 {payEntry.learners?.reference_no && (
-                  <span style={{ marginLeft:8, fontSize:11, background:'#f1f5f9', color:'#64748b', padding:'2px 8px', borderRadius:10, fontWeight:700, letterSpacing:'0.5px' }}>
+                  <span style={{ marginLeft:8, fontSize:11, background:'#f7f7f7', color:'#6b7280', padding:'2px 8px', borderRadius:10, fontWeight:700, letterSpacing:'0.5px' }}>
                     #{payEntry.learners.reference_no}
                   </span>
                 )}
-                <div style={{ fontSize:13, color:'#94a3b8', marginTop:3 }}>{payEntry.description}</div>
+                <div style={{ fontSize:13, color:'#9ca3af', marginTop:3 }}>{payEntry.description}</div>
               </div>
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:12, marginBottom:18, padding:'12px 14px', background:'#f8fafc', borderRadius:10 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:12, marginBottom:18, padding:'12px 14px', background:'#fafafa', borderRadius:10 }}>
                 <div>
-                  <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', marginBottom:3 }}>Total due</div>
+                  <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', marginBottom:3 }}>Total due</div>
                   <div style={{ fontWeight:800, fontSize:20 }}>{sym}{Number(payEntry.amount_due).toLocaleString()}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize:10, fontWeight:700, color:'#94a3b8', textTransform:'uppercase', marginBottom:3 }}>Remaining</div>
+                  <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', marginBottom:3 }}>Remaining</div>
                   <div style={{ fontWeight:800, fontSize:20, color:'#dc2626' }}>
                     {sym}{(Number(payEntry.amount_due)-Number(payEntry.amount_paid)).toLocaleString()}
                   </div>
@@ -911,28 +911,28 @@ export default function Fees() {
               </div>
               <form onSubmit={recordPay}>
                 <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>Amount ({sym}) *</label>
-                <input style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
+                <input style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e5e7eb', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
                   type="number" step="0.01" min="0.01"
                   max={Number(payEntry.amount_due)-Number(payEntry.amount_paid)}
                   value={payForm.amount} onChange={e => setPayForm(f=>({...f,amount:e.target.value}))} required />
                 <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>Payment method</label>
-                <select style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
+                <select style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e5e7eb', borderRadius:9, fontSize:14, outline:'none', marginBottom:14, background:'#fff' }}
                   value={payForm.payment_method} onChange={e => setPayForm(f=>({...f,payment_method:e.target.value}))}>
                   {PAYMENT_METHODS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
                 </select>
                 <label style={{ display:'block', fontSize:13, fontWeight:600, color:'#374151', marginBottom:6 }}>
-                  Notes <span style={{ color:'#94a3b8', fontWeight:400 }}>(optional)</span>
+                  Notes <span style={{ color:'#9ca3af', fontWeight:400 }}>(optional)</span>
                 </label>
-                <input style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e2e8f0', borderRadius:9, fontSize:14, outline:'none', marginBottom:16, background:'#fff' }}
+                <input style={{ width:'100%', padding:'10px 13px', border:'1.5px solid #e5e7eb', borderRadius:9, fontSize:14, outline:'none', marginBottom:16, background:'#fff' }}
                   value={payForm.notes} onChange={e => setPayForm(f=>({...f,notes:e.target.value}))}
                   placeholder="e.g. Cash received at front office" />
                 <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
                   <button type="button" onClick={() => setPayEntry(null)}
-                    style={{ padding:'9px 18px', background:'#f1f5f9', color:'#374151', border:'none', borderRadius:9, fontWeight:600, cursor:'pointer' }}>
+                    style={{ padding:'9px 18px', background:'#f7f7f7', color:'#374151', border:'none', borderRadius:9, fontWeight:600, cursor:'pointer' }}>
                     Cancel
                   </button>
                   <button type="submit" disabled={paying}
-                    style={{ padding:'9px 18px', background:'#0f2044', color:'#fff', border:'none', borderRadius:9, fontWeight:700, cursor:paying?'not-allowed':'pointer' }}>
+                    style={{ padding:'9px 18px', background:'#003049', color:'#fff', border:'none', borderRadius:9, fontWeight:700, cursor:paying?'not-allowed':'pointer' }}>
                     {paying ? 'Saving…' : 'Record payment'}
                   </button>
                 </div>

@@ -42,16 +42,16 @@ function ConfirmModal({ open, title, message, confirmLabel, danger, onConfirm, o
         position:'relative', background:'#fff', borderRadius:16, padding:'28px 32px', maxWidth:400, width:'90%',
         boxShadow:'0 20px 60px rgba(0,0,0,.2)', animation:'fadeUp .2s ease'
       }} onClick={e => e.stopPropagation()}>
-        <div style={{ fontWeight:800, fontSize:17, color:'#0f172a', marginBottom:8 }}>{title || 'Confirm'}</div>
-        <div style={{ fontSize:14, color:'#64748b', lineHeight:1.6, marginBottom:24 }}>{message}</div>
+        <div style={{ fontWeight:800, fontSize:17, color:'#1f2937', marginBottom:8 }}>{title || 'Confirm'}</div>
+        <div style={{ fontSize:14, color:'#6b7280', lineHeight:1.6, marginBottom:24 }}>{message}</div>
         <div style={{ display:'flex', gap:10, justifyContent:'flex-end' }}>
           <button onClick={onCancel} style={{
-            padding:'9px 18px', borderRadius:8, border:'1.5px solid #e2e8f0', background:'#fff',
+            padding:'9px 18px', borderRadius:8, border:'1.5px solid #e5e7eb', background:'#fff',
             fontSize:13, fontWeight:600, cursor:'pointer', color:'#374151', fontFamily:'inherit'
           }}>Cancel</button>
           <button onClick={onConfirm} style={{
             padding:'9px 18px', borderRadius:8, border:'none',
-            background: danger ? '#dc2626' : '#0f2044', color:'#fff',
+            background: danger ? '#dc2626' : '#003049', color:'#fff',
             fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:'inherit'
           }}>{confirmLabel || 'Confirm'}</button>
         </div>
@@ -349,7 +349,7 @@ export default function Settings() {
       display:'flex', alignItems:'center', gap:6,
       padding:'7px 14px', borderRadius:8, border:'none', cursor:'pointer',
       fontWeight:600, fontSize:13, transition:'all .15s',
-      background:tab===k?'#fff':'none', color:tab===k?'#0f2044':'#64748b',
+      background:tab===k?'#fff':'none', color:tab===k?'#003049':'#6b7280',
       boxShadow:tab===k?'0 1px 3px rgba(0,0,0,.1)':'none'
     }}><Icon/>{label}</button>
   )
@@ -364,11 +364,11 @@ export default function Settings() {
   return (
     <div>
       <div style={{marginBottom:24}}>
-        <h1 style={{fontSize:22,fontWeight:800,color:'#0f172a',letterSpacing:'-0.3px'}}>Settings</h1>
-        <p style={{fontSize:14,color:'#64748b',marginTop:2}}>Grades, fee plans, teachers, school profile and staff</p>
+        <h1 style={{fontSize:22,fontWeight:800,color:'#1f2937',letterSpacing:'-0.3px'}}>Settings</h1>
+        <p style={{fontSize:14,color:'#6b7280',marginTop:2}}>Grades, fee plans, teachers, school profile and staff</p>
       </div>
 
-      <div style={{display:'flex',gap:2,marginBottom:24,background:'#f1f5f9',borderRadius:10,padding:4,flexWrap:'wrap'}}>
+      <div style={{display:'flex',gap:2,marginBottom:24,background:'#f7f7f7',borderRadius:10,padding:4,flexWrap:'wrap'}}>
         {TABS.map(({key,label,Icon})=><TabBtn key={key} k={key} label={label} Icon={Icon}/>)}
       </div>
 
@@ -379,20 +379,20 @@ export default function Settings() {
             <div style={{fontWeight:700,fontSize:16}}>Grades</div>
             <button style={t.btn.ghost} onClick={addAllPresets} disabled={saving}>+ Add all standard grades (R–12)</button>
           </div>
-          {!grades.length && <div style={{color:'#94a3b8',fontSize:14,marginBottom:20}}>No grades yet.</div>}
+          {!grades.length && <div style={{color:'#9ca3af',fontSize:14,marginBottom:20}}>No grades yet.</div>}
           {grades.map(g=>(
-            <div key={g.id} style={{border:'1.5px solid #f1f5f9',borderRadius:10,padding:'16px',marginBottom:10}}>
+            <div key={g.id} style={{border:'1.5px solid #f7f7f7',borderRadius:10,padding:'16px',marginBottom:10}}>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
                 <div style={{fontWeight:700,fontSize:14}}>{g.name}</div>
                 <button onClick={()=>deleteGrade(g.id,g.name)} style={{...t.btn.danger,padding:'5px 12px',fontSize:12}}>Delete</button>
               </div>
               <div style={{display:'flex',flexWrap:'wrap',gap:6,marginBottom:10}}>
                 {(g.classes||[]).map(c=>(
-                  <div key={c.id} style={{display:'flex',alignItems:'center',gap:6,background:'#f1f5f9',borderRadius:20,padding:'4px 10px 4px 12px',fontSize:13,fontWeight:500}}>
-                    {c.name}<button onClick={()=>deleteClass(c.id)} style={{background:'none',border:'none',cursor:'pointer',color:'#94a3b8',fontSize:14,padding:0}}>✕</button>
+                  <div key={c.id} style={{display:'flex',alignItems:'center',gap:6,background:'#f7f7f7',borderRadius:20,padding:'4px 10px 4px 12px',fontSize:13,fontWeight:500}}>
+                    {c.name}<button onClick={()=>deleteClass(c.id)} style={{background:'none',border:'none',cursor:'pointer',color:'#9ca3af',fontSize:14,padding:0}}>✕</button>
                   </div>
                 ))}
-                {!(g.classes||[]).length && <div style={{fontSize:12,color:'#94a3b8'}}>No classes — add letters below (A, B, C…)</div>}
+                {!(g.classes||[]).length && <div style={{fontSize:12,color:'#9ca3af'}}>No classes — add letters below (A, B, C…)</div>}
               </div>
               <div style={{display:'flex',gap:8}}>
                 <input style={{...t.input,marginBottom:0,flex:1,padding:'7px 12px',fontSize:13}}
@@ -419,13 +419,13 @@ export default function Settings() {
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
             <div>
               <div style={{fontWeight:700,fontSize:16}}>Fee Plans</div>
-              <div style={{fontSize:13,color:'#64748b',marginTop:2}}>Define fees per grade. Use Fees → Generate to create learner entries.</div>
+              <div style={{fontSize:13,color:'#6b7280',marginTop:2}}>Define fees per grade. Use Fees → Generate to create learner entries.</div>
             </div>
             <button style={t.btn.primary} onClick={()=>setShowFeePlan(true)}>+ New fee plan</button>
           </div>
           <Card>
             {!feePlans.length && (
-              <div style={{color:'#94a3b8',fontSize:14,textAlign:'center',padding:'32px 0'}}>
+              <div style={{color:'#9ca3af',fontSize:14,textAlign:'center',padding:'32px 0'}}>
                 No fee plans yet. Create one to get started.
               </div>
             )}
@@ -438,13 +438,13 @@ export default function Settings() {
                   {feePlans.map(fp=>(
                     <tr key={fp.id}>
                       <td style={{...t.td,fontWeight:600}}>{fp.name}</td>
-                      <td style={t.td}>{fp.grades?.name||<span style={{color:'#94a3b8'}}>All grades</span>}</td>
+                      <td style={t.td}>{fp.grades?.name||<span style={{color:'#9ca3af'}}>All grades</span>}</td>
                       <td style={{...t.td,fontWeight:700}}>{school?.countries?.currency_symbol}{Number(fp.amount).toLocaleString()}</td>
                       <td style={t.td}>{fp.frequency}</td>
                       <td style={t.td}>{fp.frequency==='monthly' ? `Day ${fp.due_day}` : `Term ${fp.term}`}</td>
                       <td style={t.td}>{fp.year}</td>
                       <td style={t.td}>
-                        <span style={{background:fp.is_active?'#dcfce7':'#f1f5f9',color:fp.is_active?'#15803d':'#64748b',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>
+                        <span style={{background:fp.is_active?'#dcfce7':'#f7f7f7',color:fp.is_active?'#15803d':'#6b7280',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>
                           {fp.is_active?'active':'inactive'}
                         </span>
                       </td>
@@ -471,7 +471,7 @@ export default function Settings() {
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
             <div>
               <div style={{fontWeight:700,fontSize:16}}>Teachers</div>
-              <div style={{fontSize:12,color:'#94a3b8',marginTop:2}}>
+              <div style={{fontSize:12,color:'#9ca3af',marginTop:2}}>
                 Teachers appear here automatically when invited via Staff Accounts with role <strong>teacher</strong>. Assign their classes below.
               </div>
             </div>
@@ -485,19 +485,19 @@ export default function Settings() {
                   const linkedUser = users.find(u=>u.id===tc.user_id)
                   return (
                     <tr key={tc.id}>
-                      <td style={{...t.td,fontSize:11,color:'#94a3b8',fontWeight:700}}>{tc.reference_no||'—'}</td>
+                      <td style={{...t.td,fontSize:11,color:'#9ca3af',fontWeight:700}}>{tc.reference_no||'—'}</td>
                       <td style={{...t.td,fontWeight:600}}>
                         {tc.full_name}
-                        {tc.phone && <div style={{fontSize:11,color:'#94a3b8'}}>{tc.phone}</div>}
+                        {tc.phone && <div style={{fontSize:11,color:'#9ca3af'}}>{tc.phone}</div>}
                       </td>
                       <td style={t.td}>{tc.email||'—'}</td>
                       <td style={t.td}>
                         <div style={{display:'flex',flexWrap:'wrap',gap:4,alignItems:'center'}}>
                           {myClasses.length === 0
-                            ? <span style={{color:'#94a3b8',fontSize:12}}>None assigned</span>
+                            ? <span style={{color:'#9ca3af',fontSize:12}}>None assigned</span>
                             : myClasses.map(c=>(
                                 <span key={c.id} style={{display:'inline-flex',alignItems:'center',gap:3,
-                                  background:c.is_home_class?'#0f2044':'#f1f5f9',
+                                  background:c.is_home_class?'#003049':'#f7f7f7',
                                   color:c.is_home_class?'#fff':'#374151',
                                   borderRadius:20,padding:'2px 8px',fontSize:11,fontWeight:600}}>
                                   {c.classes?.grades?.name} {c.classes?.name}
@@ -505,14 +505,14 @@ export default function Settings() {
                                   {c.is_home_class ? ' 🏠' : ''}
                                   <button onClick={()=>removeTeacherClass(c.id)}
                                     style={{background:'none',border:'none',cursor:'pointer',
-                                      color:c.is_home_class?'rgba(255,255,255,0.6)':'#94a3b8',
+                                      color:c.is_home_class?'rgba(255,255,255,0.6)':'#9ca3af',
                                       fontSize:12,padding:'0 0 0 2px',lineHeight:1}}>✕</button>
                                 </span>
                               ))
                           }
                           <button onClick={()=>openAssignClass(tc)}
-                            style={{background:'none',border:'1px dashed #cbd5e1',borderRadius:20,
-                              padding:'2px 8px',fontSize:11,color:'#64748b',cursor:'pointer',fontWeight:600}}>
+                            style={{background:'none',border:'1px dashed #d1d5db',borderRadius:20,
+                              padding:'2px 8px',fontSize:11,color:'#6b7280',cursor:'pointer',fontWeight:600}}>
                             + class
                           </button>
                         </div>
@@ -539,7 +539,7 @@ export default function Settings() {
                   )
                 })}
                 {!teachers.filter(tc=>tc.is_active).length && (
-                  <tr><td colSpan={6} style={{...t.td,color:'#94a3b8',textAlign:'center',padding:40}}>No teachers yet.</td></tr>
+                  <tr><td colSpan={6} style={{...t.td,color:'#9ca3af',textAlign:'center',padding:40}}>No teachers yet.</td></tr>
                 )}
               </tbody>
             </table>
@@ -559,20 +559,20 @@ export default function Settings() {
       {/* ── PROFILE ── */}
       {tab==='profile' && (
         <Card title="School Profile">
-          <div style={{marginBottom:24,padding:'20px',background:'#f8fafc',borderRadius:12,border:'1.5px dashed #e2e8f0'}}>
+          <div style={{marginBottom:24,padding:'20px',background:'#fafafa',borderRadius:12,border:'1.5px dashed #e5e7eb'}}>
             <div style={{fontWeight:600,fontSize:14,marginBottom:12}}>School Logo</div>
             <div style={{display:'flex',alignItems:'center',gap:20}}>
               {logoPreview
-                ? <img src={logoPreview} alt="logo" style={{height:60,maxWidth:160,objectFit:'contain',borderRadius:8,border:'1px solid #e2e8f0',background:'#fff',padding:6}}/>
-                : <div style={{width:80,height:60,background:'#e2e8f0',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center'}}><SchoolIcon/></div>
+                ? <img src={logoPreview} alt="logo" style={{height:60,maxWidth:160,objectFit:'contain',borderRadius:8,border:'1px solid #e5e7eb',background:'#fff',padding:6}}/>
+                : <div style={{width:80,height:60,background:'#e5e7eb',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center'}}><SchoolIcon/></div>
               }
               <div>
                 <input ref={fileRef} type="file" accept="image/*" onChange={handleLogoFile} style={{display:'none'}}/>
                 <button style={{...t.btn.ghost,display:'flex',alignItems:'center',gap:8}} onClick={()=>fileRef.current?.click()} disabled={uploading}>
                   <IconUpload size={14}/>{uploading?'Uploading…':logoPreview?'Change logo':'Upload logo'}
                 </button>
-                <div style={{fontSize:12,color:'#94a3b8',marginTop:6}}>PNG or JPG · max 2MB · appears in sidebar</div>
-                <div style={{fontSize:11,color:'#94a3b8',marginTop:3}}>Logo is stored securely — no external bucket required</div>
+                <div style={{fontSize:12,color:'#9ca3af',marginTop:6}}>PNG or JPG · max 2MB · appears in sidebar</div>
+                <div style={{fontSize:11,color:'#9ca3af',marginTop:3}}>Logo is stored securely — no external bucket required</div>
               </div>
             </div>
           </div>
@@ -607,12 +607,12 @@ export default function Settings() {
                   const isSelf = u.id===currentUser?.id
                   return (
                     <tr key={u.id}>
-                      <td style={{...t.td,fontWeight:600}}>{u.full_name}{isSelf&&<span style={{marginLeft:8,fontSize:11,color:'#94a3b8'}}>(you)</span>}</td>
+                      <td style={{...t.td,fontWeight:600}}>{u.full_name}{isSelf&&<span style={{marginLeft:8,fontSize:11,color:'#9ca3af'}}>(you)</span>}</td>
                       <td style={t.td}>{u.email}</td>
-                      <td style={t.td}><span style={{background:'#dbeafe',color:'#0f2044',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>{u.role}</span></td>
+                      <td style={t.td}><span style={{background:'#e6eff5',color:'#003049',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>{u.role}</span></td>
                       <td style={t.td}>
                         {u.password_set === false
-                          ? <span style={{background:'#fef9c3',color:'#a16207',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>⏳ Invite pending</span>
+                          ? <span style={{background:'#fef4d6',color:'#b8870a',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>⏳ Invite pending</span>
                           : <span style={{background:u.is_active?'#dcfce7':'#fee2e2',color:u.is_active?'#15803d':'#dc2626',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>{u.is_active?'active':'disabled'}</span>
                         }
                       </td>
@@ -623,11 +623,11 @@ export default function Settings() {
                           {u.password_set === false ? (
                             <div style={{display:'flex',gap:6}}>
                               <button onClick={()=>copyInviteLink(u.id)}
-                                style={{...t.btn.ghost,padding:'5px 10px',fontSize:11,color:'#0f2044',border:'1px solid #0f2044',fontWeight:700}}>
+                                style={{...t.btn.ghost,padding:'5px 10px',fontSize:11,color:'#003049',border:'1px solid #003049',fontWeight:700}}>
                                 📋 Copy link
                               </button>
                               <button onClick={()=>resendInvite(u.id, u.email)}
-                                style={{...t.btn.ghost,padding:'5px 10px',fontSize:11,color:'#a16207',border:'1px solid #fcd34d'}}>
+                                style={{...t.btn.ghost,padding:'5px 10px',fontSize:11,color:'#b8870a',border:'1px solid #fcd34d'}}>
                                 Resend
                               </button>
                               <button onClick={()=>deleteUser(u.id, u.full_name)}
@@ -652,7 +652,7 @@ export default function Settings() {
                     </tr>
                   )
                 })}
-                {!users.length&&<tr><td colSpan={5} style={{...t.td,color:'#94a3b8',textAlign:'center',padding:40}}>No staff yet.</td></tr>}
+                {!users.length&&<tr><td colSpan={5} style={{...t.td,color:'#9ca3af',textAlign:'center',padding:40}}>No staff yet.</td></tr>}
               </tbody>
             </table>
           </Card>
@@ -687,9 +687,9 @@ export default function Settings() {
                 {/* Summary */}
                 <div style={{display:'flex',gap:12,marginBottom:20,flexWrap:'wrap'}}>
                   {[
-                    {label:'Total',     count:guardians.length, bg:'#f1f5f9', color:'#0f172a'},
+                    {label:'Total',     count:guardians.length, bg:'#f7f7f7', color:'#1f2937'},
                     {label:'Active',    count:active,           bg:'#dcfce7', color:'#15803d'},
-                    {label:'Invited',   count:invited,          bg:'#fef9c3', color:'#a16207'},
+                    {label:'Invited',   count:invited,          bg:'#fef4d6', color:'#b8870a'},
                     {label:'Not invited',count:notInvited,      bg:'#fee2e2', color:'#dc2626'},
                   ].map(s=>(
                     <div key={s.label} style={{background:s.bg,borderRadius:10,padding:'12px 20px',minWidth:100,flex:1}}>
@@ -701,33 +701,33 @@ export default function Settings() {
 
                 <Card>
                   {loadingGuardians ? (
-                    <div style={{textAlign:'center',padding:40,color:'#94a3b8'}}>Loading guardians…</div>
+                    <div style={{textAlign:'center',padding:40,color:'#9ca3af'}}>Loading guardians…</div>
                   ) : (
                     <table style={{width:'100%',borderCollapse:'collapse'}}>
                       <thead><tr>{['Guardian','Contact','Learner(s)','Status','Action'].map(h=><th key={h} style={t.th}>{h}</th>)}</tr></thead>
                       <tbody>
                         {guardians.map(g=>(
                           <tr key={g.id}>
-                            <td style={{...t.td,fontWeight:600}}>{g.first_name} {g.last_name}{g.relationship?<span style={{marginLeft:6,fontSize:11,color:'#94a3b8'}}>({g.relationship})</span>:null}</td>
+                            <td style={{...t.td,fontWeight:600}}>{g.first_name} {g.last_name}{g.relationship?<span style={{marginLeft:6,fontSize:11,color:'#9ca3af'}}>({g.relationship})</span>:null}</td>
                             <td style={t.td}>
-                              <div style={{fontSize:13}}>{g.email||<span style={{color:'#cbd5e1'}}>No email</span>}</div>
-                              {g.phone&&<div style={{fontSize:12,color:'#64748b'}}>{g.phone}</div>}
+                              <div style={{fontSize:13}}>{g.email||<span style={{color:'#d1d5db'}}>No email</span>}</div>
+                              {g.phone&&<div style={{fontSize:12,color:'#6b7280'}}>{g.phone}</div>}
                             </td>
                             <td style={t.td}>
-                              {g.learners.length?g.learners.map(l=><div key={l.id} style={{fontSize:13}}>{l.first_name} {l.last_name}</div>):<span style={{color:'#cbd5e1',fontSize:13}}>—</span>}
+                              {g.learners.length?g.learners.map(l=><div key={l.id} style={{fontSize:13}}>{l.first_name} {l.last_name}</div>):<span style={{color:'#d1d5db',fontSize:13}}>—</span>}
                             </td>
                             <td style={t.td}>
                               {g.status==='active'&&<span style={{background:'#dcfce7',color:'#15803d',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>Active</span>}
-                              {g.status==='invited'&&<span style={{background:'#fef9c3',color:'#a16207',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>Invited{g.invite_sent_at?<span style={{marginLeft:4,fontWeight:400}}>{new Date(g.invite_sent_at).toLocaleDateString()}</span>:null}</span>}
-                              {g.status==='not_invited'&&<span style={{background:'#f1f5f9',color:'#64748b',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>Not invited</span>}
+                              {g.status==='invited'&&<span style={{background:'#fef4d6',color:'#b8870a',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>Invited{g.invite_sent_at?<span style={{marginLeft:4,fontWeight:400}}>{new Date(g.invite_sent_at).toLocaleDateString()}</span>:null}</span>}
+                              {g.status==='not_invited'&&<span style={{background:'#f7f7f7',color:'#6b7280',padding:'2px 10px',borderRadius:20,fontSize:12,fontWeight:600}}>Not invited</span>}
                             </td>
                             <td style={t.td}>
                               {g.status==='active' ? (
-                                <span style={{fontSize:12,color:'#94a3b8'}}>—</span>
+                                <span style={{fontSize:12,color:'#9ca3af'}}>—</span>
                               ) : (
                                 <button disabled={inviting===g.id||!g.email}
                                   title={!g.email?'No email on file':''}
-                                  style={{...t.btn.ghost,padding:'5px 12px',fontSize:12,opacity:(!g.email)?.4:1,cursor:(!g.email)?'not-allowed':'pointer',border:'1px solid #0f2044',color:'#0f2044',fontWeight:600}}
+                                  style={{...t.btn.ghost,padding:'5px 12px',fontSize:12,opacity:(!g.email)?.4:1,cursor:(!g.email)?'not-allowed':'pointer',border:'1px solid #003049',color:'#003049',fontWeight:600}}
                                   onClick={async()=>{
                                     setInviting(g.id)
                                     try {
@@ -743,7 +743,7 @@ export default function Settings() {
                             </td>
                           </tr>
                         ))}
-                        {!guardians.length&&<tr><td colSpan={5} style={{...t.td,color:'#94a3b8',textAlign:'center',padding:40}}>No guardians found. Add guardians when creating learners.</td></tr>}
+                        {!guardians.length&&<tr><td colSpan={5} style={{...t.td,color:'#9ca3af',textAlign:'center',padding:40}}>No guardians found. Add guardians when creating learners.</td></tr>}
                       </tbody>
                     </table>
                   )}
@@ -762,7 +762,7 @@ export default function Settings() {
             <form onSubmit={saveFeePlan}>
               <label style={t.label}>Name *</label>
               <input style={t.input} value={fpForm.name} onChange={e=>setFpForm(f=>({...f,name:e.target.value}))} placeholder="e.g. Monthly Tuition" required/>
-              <label style={t.label}>Grade <span style={{color:'#94a3b8',fontWeight:400}}>(leave blank to apply to all grades)</span></label>
+              <label style={t.label}>Grade <span style={{color:'#9ca3af',fontWeight:400}}>(leave blank to apply to all grades)</span></label>
               <select style={t.input} value={fpForm.grade_id} onChange={e=>setFpForm(f=>({...f,grade_id:e.target.value}))}>
                 <option value="">All grades</option>
                 {grades.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}
@@ -801,7 +801,7 @@ export default function Settings() {
         <div style={t.overlay} onClick={e=>e.target===e.currentTarget&&(setShowTeacher(false),setEditTeacher(null))}>
           <div style={{...t.modal,maxWidth:440}}>
             <h2 style={{fontSize:18,fontWeight:800,marginBottom:6}}>{editTeacher?'Edit teacher':'Add teacher'}</h2>
-            <p style={{fontSize:13,color:'#64748b',marginBottom:20}}>Class scheduling is managed in the timetable view.</p>
+            <p style={{fontSize:13,color:'#6b7280',marginBottom:20}}>Class scheduling is managed in the timetable view.</p>
             <form onSubmit={saveTeacher}>
               <label style={t.label}>Full name *</label>
               <input style={t.input} value={tcForm.full_name} onChange={e=>setTcForm(f=>({...f,full_name:e.target.value}))} required/>
@@ -832,8 +832,8 @@ export default function Settings() {
             <h2 style={{fontSize:18,fontWeight:800,marginBottom:20}}>{viewUser.full_name}</h2>
             {[['Email',viewUser.email],['Role',viewUser.role],['Status',viewUser.is_active?'Active':'Disabled'],['Joined',new Date(viewUser.created_at).toLocaleDateString('en-ZA')]].map(([l,v])=>(
               <div key={l} style={{marginBottom:14}}>
-                <div style={{fontSize:11,fontWeight:700,color:'#94a3b8',textTransform:'uppercase',letterSpacing:'0.6px',marginBottom:3}}>{l}</div>
-                <div style={{fontSize:15,color:'#0f172a',fontWeight:500}}>{v}</div>
+                <div style={{fontSize:11,fontWeight:700,color:'#9ca3af',textTransform:'uppercase',letterSpacing:'0.6px',marginBottom:3}}>{l}</div>
+                <div style={{fontSize:15,color:'#1f2937',fontWeight:500}}>{v}</div>
               </div>
             ))}
             <div style={{display:'flex',gap:10,justifyContent:'flex-end',marginTop:8}}>
@@ -858,7 +858,7 @@ export default function Settings() {
               <select style={t.input} value={editForm.role} onChange={e=>setEditForm(f=>({...f,role:e.target.value}))}>
                 <option value="teacher">Teacher</option><option value="bursar">Bursar</option><option value="principal">Principal</option><option value="admin">Admin</option>
               </select>
-              <label style={t.label}>New password <span style={{color:'#94a3b8',fontWeight:400}}>(leave blank to keep current)</span></label>
+              <label style={t.label}>New password <span style={{color:'#9ca3af',fontWeight:400}}>(leave blank to keep current)</span></label>
               <input style={t.input} type="password" value={editForm.password} onChange={e=>setEditForm(f=>({...f,password:e.target.value}))} minLength={8} placeholder="Min 8 characters"/>
               <div style={{display:'flex',gap:10,justifyContent:'flex-end',marginTop:4}}>
                 <button type="button" style={t.btn.ghost} onClick={()=>setEditUser(null)}>Cancel</button>
@@ -874,7 +874,7 @@ export default function Settings() {
         <div style={t.overlay} onClick={e=>e.target===e.currentTarget&&setAssignTeacher(null)}>
           <div style={{...t.modal,maxWidth:420}}>
             <h2 style={{fontSize:18,fontWeight:800,marginBottom:6}}>Assign class</h2>
-            <p style={{fontSize:13,color:'#64748b',marginBottom:20}}>Assign {assignTeacher.full_name} to a class and subject.</p>
+            <p style={{fontSize:13,color:'#6b7280',marginBottom:20}}>Assign {assignTeacher.full_name} to a class and subject.</p>
             <form onSubmit={saveClassAssignment}>
               <label style={t.label}>Class *</label>
               <select style={t.input} value={assignForm.class_id} onChange={e=>setAssignForm(f=>({...f,class_id:e.target.value}))} required>
@@ -901,7 +901,7 @@ export default function Settings() {
         <div style={t.overlay} onClick={e=>e.target===e.currentTarget&&setLinkTeacher(null)}>
           <div style={{...t.modal,maxWidth:420}}>
             <h2 style={{fontSize:18,fontWeight:800,marginBottom:6}}>Link login account</h2>
-            <p style={{fontSize:13,color:'#64748b',marginBottom:20}}>
+            <p style={{fontSize:13,color:'#6b7280',marginBottom:20}}>
               Link {linkTeacher.full_name}'s record to a staff login account so they can access My Classes.
             </p>
             <label style={t.label}>Staff account</label>
@@ -1103,14 +1103,14 @@ function TimetableTab({ school, refreshSchool, toast }) {
   return (
     <div>
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a', marginBottom: 4 }}>Timetable</div>
-        <div style={{ fontSize: 13, color: '#64748b' }}>
+        <div style={{ fontWeight: 700, fontSize: 16, color: '#1f2937', marginBottom: 4 }}>Timetable</div>
+        <div style={{ fontSize: 13, color: '#6b7280' }}>
           Define your school's period times, then assign teachers to each slot in the weekly grid.
         </div>
       </div>
 
       {/* Step toggle */}
-      <div style={{ display: 'flex', gap: 2, marginBottom: 20, background: '#f1f5f9', borderRadius: 8, padding: 3, width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: 2, marginBottom: 20, background: '#f7f7f7', borderRadius: 8, padding: 3, width: 'fit-content' }}>
         {[{ key:'periods', label:'① Define Periods' }, { key:'assign', label:'② Assign Timetable' }].map(s => (
           <button key={s.key} onClick={() => {
             if (s.key === 'assign' && periods.length === 0) {
@@ -1123,7 +1123,7 @@ function TimetableTab({ school, refreshSchool, toast }) {
               padding: '7px 16px', borderRadius: 6, border: 'none', cursor: 'pointer',
               fontWeight: 600, fontSize: 13, transition: 'all .15s',
               background: step === s.key ? '#fff' : 'transparent',
-              color: step === s.key ? '#0f2044' : '#64748b',
+              color: step === s.key ? '#003049' : '#6b7280',
               boxShadow: step === s.key ? '0 1px 3px rgba(0,0,0,.1)' : 'none'
             }}>
             {s.label}
@@ -1135,51 +1135,51 @@ function TimetableTab({ school, refreshSchool, toast }) {
       {step === 'periods' && (
         <div style={{ maxWidth: 700 }}>
           {periods.length === 0 && (
-            <div style={{ background: '#fff', borderRadius: 12, padding: 32, textAlign: 'center', border: '1.5px dashed #e2e8f0', marginBottom: 16 }}>
+            <div style={{ background: '#fff', borderRadius: 12, padding: 32, textAlign: 'center', border: '1.5px dashed #e5e7eb', marginBottom: 16 }}>
               <div style={{ fontSize: 28, marginBottom: 8 }}>🕐</div>
               <div style={{ fontWeight: 600, fontSize: 14, color: '#374151', marginBottom: 4 }}>No periods defined yet</div>
-              <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 16 }}>Set up your school day — periods, breaks and times.</div>
-              <button onClick={loadDefaults} style={{ padding: '8px 20px', background: '#0f2044', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+              <div style={{ fontSize: 13, color: '#9ca3af', marginBottom: 16 }}>Set up your school day — periods, breaks and times.</div>
+              <button onClick={loadDefaults} style={{ padding: '8px 20px', background: '#003049', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
                 Load default template
               </button>
             </div>
           )}
 
           {periods.length > 0 && (
-            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', marginBottom: 16 }}>
+            <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden', marginBottom: 16 }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', textAlign: 'left', width: 40 }}>#</th>
-                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', textAlign: 'left' }}>Label</th>
-                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', textAlign: 'left', width: 100 }}>Start</th>
-                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', textAlign: 'left', width: 100 }}>End</th>
-                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', textAlign: 'center', width: 60 }}>Break?</th>
+                  <tr style={{ background: '#fafafa', borderBottom: '1px solid #e5e7eb' }}>
+                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', textAlign: 'left', width: 40 }}>#</th>
+                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', textAlign: 'left' }}>Label</th>
+                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', textAlign: 'left', width: 100 }}>Start</th>
+                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', textAlign: 'left', width: 100 }}>End</th>
+                    <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', textAlign: 'center', width: 60 }}>Break?</th>
                     <th style={{ width: 40 }}></th>
                   </tr>
                 </thead>
                 <tbody>
                   {periods.map((p, i) => (
-                    <tr key={i} style={{ borderBottom: i < periods.length - 1 ? '1px solid #f1f5f9' : 'none', background: p.isBreak ? '#fefce8' : '#fff' }}>
-                      <td style={{ padding: '8px 12px', fontSize: 12, color: '#94a3b8', fontWeight: 600 }}>{i + 1}</td>
+                    <tr key={i} style={{ borderBottom: i < periods.length - 1 ? '1px solid #f7f7f7' : 'none', background: p.isBreak ? '#fefce8' : '#fff' }}>
+                      <td style={{ padding: '8px 12px', fontSize: 12, color: '#9ca3af', fontWeight: 600 }}>{i + 1}</td>
                       <td style={{ padding: '8px 12px' }}>
                         <input value={p.label} onChange={e => updatePeriod(i, 'label', e.target.value)}
-                          style={{ width: '100%', padding: '6px 10px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, fontWeight: 600, outline: 'none' }} />
+                          style={{ width: '100%', padding: '6px 10px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, fontWeight: 600, outline: 'none' }} />
                       </td>
                       <td style={{ padding: '8px 12px' }}>
                         <input type="time" value={p.start} onChange={e => updatePeriod(i, 'start', e.target.value)}
-                          style={{ padding: '6px 8px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, outline: 'none' }} />
+                          style={{ padding: '6px 8px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, outline: 'none' }} />
                       </td>
                       <td style={{ padding: '8px 12px' }}>
                         <input type="time" value={p.end} onChange={e => updatePeriod(i, 'end', e.target.value)}
-                          style={{ padding: '6px 8px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, outline: 'none' }} />
+                          style={{ padding: '6px 8px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, outline: 'none' }} />
                       </td>
                       <td style={{ padding: '8px 12px', textAlign: 'center' }}>
                         <input type="checkbox" checked={!!p.isBreak} onChange={e => updatePeriod(i, 'isBreak', e.target.checked)}
                           style={{ width: 16, height: 16, cursor: 'pointer' }} />
                       </td>
                       <td style={{ padding: '8px 8px', textAlign: 'center' }}>
-                        <button onClick={() => removePeriod(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: 16, padding: 4 }} title="Remove">✕</button>
+                        <button onClick={() => removePeriod(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: 16, padding: 4 }} title="Remove">✕</button>
                       </td>
                     </tr>
                   ))}
@@ -1189,16 +1189,16 @@ function TimetableTab({ school, refreshSchool, toast }) {
           )}
 
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <button onClick={addPeriod} style={{ padding: '8px 16px', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
+            <button onClick={addPeriod} style={{ padding: '8px 16px', background: '#f7f7f7', border: '1px solid #e5e7eb', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
               + Add period
             </button>
             {periods.length > 0 && (
-              <button onClick={loadDefaults} style={{ padding: '8px 16px', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
+              <button onClick={loadDefaults} style={{ padding: '8px 16px', background: '#f7f7f7', border: '1px solid #e5e7eb', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
                 Reset to defaults
               </button>
             )}
             {periods.length > 0 && (
-              <button onClick={savePeriods} disabled={saving} style={{ marginLeft: 'auto', padding: '8px 22px', background: '#0f2044', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? 'not-allowed' : 'pointer' }}>
+              <button onClick={savePeriods} disabled={saving} style={{ marginLeft: 'auto', padding: '8px 22px', background: '#003049', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? 'not-allowed' : 'pointer' }}>
                 {saving ? 'Saving…' : 'Save periods'}
               </button>
             )}
@@ -1215,16 +1215,16 @@ function TimetableTab({ school, refreshSchool, toast }) {
       {/* ─ Step 2: Go to Timetable Builder ─ */}
       {step === 'assign' && (
         <div style={{ maxWidth: 500 }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 32, textAlign: 'center', border: '1.5px solid #e2e8f0' }}>
+          <div style={{ background: '#fff', borderRadius: 12, padding: 32, textAlign: 'center', border: '1.5px solid #e5e7eb' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>📅</div>
-            <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a', marginBottom: 8 }}>
+            <div style={{ fontWeight: 700, fontSize: 16, color: '#1f2937', marginBottom: 8 }}>
               Timetable Builder
             </div>
-            <div style={{ fontSize: 14, color: '#64748b', marginBottom: 20, lineHeight: 1.6 }}>
+            <div style={{ fontSize: 14, color: '#6b7280', marginBottom: 20, lineHeight: 1.6 }}>
               The interactive timetable builder has moved to its own page. Select a class, click any slot, and assign teachers — with automatic conflict detection.
             </div>
             <a href="/timetable" style={{
-              display: 'inline-block', padding: '10px 28px', background: '#0f2044', color: '#fff',
+              display: 'inline-block', padding: '10px 28px', background: '#003049', color: '#fff',
               borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: 'none', transition: 'background .15s'
             }}>
               Open Timetable Builder →
@@ -1282,25 +1282,25 @@ function GradeScaleTab({ school, refreshSchool, toast }) {
     finally { setSaving(false) }
   }
 
-  const gradeColors = ['#16a34a','#2563eb','#d97706','#ea580c','#dc2626','#7c3aed','#0891b2','#be185d']
+  const gradeColors = ['#16a34a','#003049','#d97706','#ea580c','#dc2626','#7c3aed','#0891b2','#be185d']
 
   return (
     <div style={{ maxWidth: 520 }}>
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a', marginBottom: 4 }}>Grade Scale</div>
-        <div style={{ fontSize: 13, color: '#64748b' }}>
+        <div style={{ fontWeight: 700, fontSize: 16, color: '#1f2937', marginBottom: 4 }}>Grade Scale</div>
+        <div style={{ fontSize: 13, color: '#6b7280' }}>
           Define the minimum mark (%) for each grade symbol. Sorted automatically — highest min first.
         </div>
       </div>
 
       {/* Table */}
-      <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden', marginBottom: 16 }}>
+      <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden', marginBottom: 16 }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-              <th style={{ padding: '10px 16px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'left', width: 80 }}>Grade</th>
-              <th style={{ padding: '10px 16px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'left' }}>Min mark (%)</th>
-              <th style={{ padding: '10px 16px', fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'left' }}>Preview</th>
+            <tr style={{ background: '#fafafa', borderBottom: '1px solid #e5e7eb' }}>
+              <th style={{ padding: '10px 16px', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'left', width: 80 }}>Grade</th>
+              <th style={{ padding: '10px 16px', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'left' }}>Min mark (%)</th>
+              <th style={{ padding: '10px 16px', fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'left' }}>Preview</th>
               <th style={{ width: 40 }}></th>
             </tr>
           </thead>
@@ -1310,14 +1310,14 @@ function GradeScaleTab({ school, refreshSchool, toast }) {
               const next = rows[i + 1]
               const maxMark = i === 0 ? 100 : (rows[i - 1]?.min ?? 100) - 1
               return (
-                <tr key={i} style={{ borderBottom: i < rows.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
+                <tr key={i} style={{ borderBottom: i < rows.length - 1 ? '1px solid #f7f7f7' : 'none' }}>
                   <td style={{ padding: '10px 16px' }}>
                     <input
                       value={row.grade}
                       onChange={e => updateRow(i, 'grade', e.target.value)}
                       maxLength={8}
                       placeholder="A"
-                      style={{ width: 56, padding: '6px 10px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 15, fontWeight: 700, textAlign: 'center', outline: 'none', textTransform: 'uppercase' }}
+                      style={{ width: 56, padding: '6px 10px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 15, fontWeight: 700, textAlign: 'center', outline: 'none', textTransform: 'uppercase' }}
                     />
                   </td>
                   <td style={{ padding: '10px 16px' }}>
@@ -1327,9 +1327,9 @@ function GradeScaleTab({ school, refreshSchool, toast }) {
                         min={0} max={100}
                         value={row.min}
                         onChange={e => updateRow(i, 'min', e.target.value)}
-                        style={{ width: 70, padding: '6px 10px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 14, fontWeight: 600, textAlign: 'center', outline: 'none' }}
+                        style={{ width: 70, padding: '6px 10px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 14, fontWeight: 600, textAlign: 'center', outline: 'none' }}
                       />
-                      <span style={{ fontSize: 13, color: '#94a3b8' }}>
+                      <span style={{ fontSize: 13, color: '#9ca3af' }}>
                         – {next ? `${Number(next.min) + 1}%` : ''}
                         {!next ? '100%' : ''}
                         {next ? ` → ${maxMark}%` : ''}
@@ -1342,7 +1342,7 @@ function GradeScaleTab({ school, refreshSchool, toast }) {
                     </span>
                   </td>
                   <td style={{ padding: '10px 12px', textAlign: 'center' }}>
-                    <button onClick={() => removeRow(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: 16, padding: 4 }} title="Remove">✕</button>
+                    <button onClick={() => removeRow(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: 16, padding: 4 }} title="Remove">✕</button>
                   </td>
                 </tr>
               )
@@ -1353,13 +1353,13 @@ function GradeScaleTab({ school, refreshSchool, toast }) {
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        <button onClick={addRow} style={{ padding: '8px 16px', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
+        <button onClick={addRow} style={{ padding: '8px 16px', background: '#f7f7f7', border: '1px solid #e5e7eb', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
           + Add grade
         </button>
-        <button onClick={resetDefaults} style={{ padding: '8px 16px', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
+        <button onClick={resetDefaults} style={{ padding: '8px 16px', background: '#f7f7f7', border: '1px solid #e5e7eb', borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: 'pointer', color: '#374151' }}>
           Reset to defaults
         </button>
-        <button onClick={save} disabled={saving} style={{ marginLeft: 'auto', padding: '8px 22px', background: '#0f2044', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? 'not-allowed' : 'pointer' }}>
+        <button onClick={save} disabled={saving} style={{ marginLeft: 'auto', padding: '8px 22px', background: '#003049', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: saving ? 'not-allowed' : 'pointer' }}>
           {saving ? 'Saving…' : 'Save grade scale'}
         </button>
       </div>

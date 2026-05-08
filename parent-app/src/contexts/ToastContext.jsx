@@ -25,7 +25,7 @@ export function ToastProvider({ children }) {
         {toasts.map(t => (
           <div key={t.id} style={{
             padding: '10px 20px', borderRadius: 10,
-            background: t.type === 'error' ? '#dc2626' : t.type === 'success' ? '#16a34a' : '#1d4ed8',
+            background: t.type === 'error' ? '#dc2626' : t.type === 'success' ? '#16a34a' : '#003049',
             color: '#fff', fontSize: 14, fontWeight: 500,
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             animation: 'fadeIn 0.2s ease'

@@ -50,51 +50,54 @@ export default function SetPassword() {
     }
   }
 
-  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#64748b' }}>Verifying invite...</div>
+  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#6b7280' }}>Verifying invite...</div>
 
   if (error) return (
     <div style={{ padding: 40, textAlign: 'center' }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>:(</div>
-      <h2 style={{ color: '#0f172a', marginBottom: 8 }}>Invalid Invite</h2>
-      <p style={{ color: '#64748b', marginBottom: 24 }}>{error}</p>
-      <a href="/login" style={{ color: '#1d4ed8', textDecoration: 'none', fontWeight: 500 }}>Go to Login</a>
+      <h2 style={{ color: '#1f2937', marginBottom: 8 }}>Invalid Invite</h2>
+      <p style={{ color: '#6b7280', marginBottom: 24 }}>{error}</p>
+      <a href="/login" style={{ color: '#003049', textDecoration: 'none', fontWeight: 500 }}>Go to Login</a>
     </div>
   )
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ background: '#0f2044', padding: '32px 20px 24px', textAlign: 'center', color: '#fff' }}>
+      <div style={{ background: '#003049', padding: '32px 20px 24px', textAlign: 'center', color: '#fff' }}>
         {school?.logo_url && <img src={school.logo_url} alt="" style={{ width: 48, height: 48, borderRadius: 10, marginBottom: 8 }} />}
         <h2 style={{ margin: 0, fontSize: 18 }}>{school?.name || 'Skolo Parent'}</h2>
         <p style={{ opacity: 0.7, fontSize: 13, marginTop: 4 }}>Set up your parent account</p>
       </div>
 
       <div style={{ flex: 1, padding: '24px 20px', maxWidth: 400, margin: '0 auto', width: '100%' }}>
-        <div style={{ background: '#f0f4ff', borderRadius: 10, padding: 14, marginBottom: 20, fontSize: 14 }}>
+        <div style={{ background: '#e6eff5', borderRadius: 10, padding: 14, marginBottom: 20, fontSize: 14 }}>
           Welcome, <strong>{guardian?.first_name} {guardian?.last_name}</strong>! Create a password to access your parent portal.
         </div>
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 6 }}>Password</label>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#374151', marginBottom: 6 }}>Password</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)}
               placeholder="At least 6 characters" required
-              style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '1px solid #e2e8f0', fontSize: 15 }} />
+              style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '1px solid #e5e7eb', fontSize: 15 }} />
           </div>
           <div style={{ marginBottom: 20 }}>
-            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#334155', marginBottom: 6 }}>Confirm Password</label>
+            <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#374151', marginBottom: 6 }}>Confirm Password</label>
             <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)}
               placeholder="Repeat password" required
-              style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '1px solid #e2e8f0', fontSize: 15 }} />
+              style={{ width: '100%', padding: '11px 14px', borderRadius: 9, border: '1px solid #e5e7eb', fontSize: 15 }} />
           </div>
           <button type="submit" disabled={submitting} style={{
             width: '100%', padding: 12, borderRadius: 9, border: 'none',
-            background: '#1d4ed8', color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer',
+            background: '#003049', color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer',
             opacity: submitting ? 0.6 : 1
           }}>
             {submitting ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
+        <div style={{ textAlign:'center', padding:'16px 20px 24px', fontSize:11, color:'#9ca3af', lineHeight:1.6 }}>
+          Developed by <a href="https://innovaearth.com" target="_blank" rel="noopener noreferrer" style={{ color:'#003049', fontWeight:600, textDecoration:'none' }}>InnovaEarth</a> in collaboration with <a href="https://4dcs.co.za" target="_blank" rel="noopener noreferrer" style={{ color:'#003049', fontWeight:600, textDecoration:'none' }}>4D Climate Solutions</a>
+        </div>
       </div>
     </div>
   )
