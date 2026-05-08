@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
 import api from '../lib/api'
+import { SkeletonRows } from '../components/ui'
 
 const STATUS = {
   pending:  { bg:'#fef4d6', color:'#b8870a', label:'Pending' },
@@ -99,7 +100,7 @@ export default function Waivers() {
       {/* Table */}
       <div style={{ background:'#fff', borderRadius:14, boxShadow:'0 1px 3px rgba(0,0,0,.06)', overflow:'hidden' }}>
         {loading ? (
-          <div style={{ padding:48, textAlign:'center', color:'#9ca3af' }}>Loading…</div>
+          <div style={{ padding: 24 }}><SkeletonRows rows={4} /></div>
         ) : filtered.length === 0 ? (
           <div style={{ padding:48, textAlign:'center', color:'#9ca3af' }}>
             <div style={{ fontSize:24, marginBottom:10 }}>✅</div>

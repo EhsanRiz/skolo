@@ -68,6 +68,12 @@ The token system lives at `frontend/src/components/ui.jsx` (the `t` object). Mos
 
 ## Recent Sessions
 
+### 8 May 2026 — Conditional sidebar badges + loading-state polish
+
+- **New backend endpoint `GET /sidebar-counts`** (auth-gated, role-aware) returns `{ messages, waivers, fees, attendance }` in a single call. Pending waivers shown only to admin/principal; overdue fees to admin/bursar/principal; attendance-alerts (learners < 80% in current month) to admin/principal. Messages count for everyone.
+- **Conditional amber badges in the staff sidebar:** Layout polls `/sidebar-counts` every 60s. Desktop nav items show an amber count pill (`#fef4d6` bg, `#b8870a` text, max `99+`) when the relevant count > 0. Mobile bottom nav gets a small amber dot (`#f7c548` with navy ring) on the icon. Replaces the previous one-purpose red Messages badge — semantics now match the palette (amber = pending action), and the same pattern surfaces overdue fees, pending waivers, and attendance alerts.
+- **New shared `Skeleton` / `SkeletonCard` / `SkeletonRows` / `EmptyState` components in `ui.jsx`** — palette-compliant shimmer animation, wired with a single inline keyframes injection. Replaces the bare "Loading…" / "No data" text on Dashboard (3 sub-dashboards), Messages, Waivers, Attendance (3 sites), LearnerProfile (whole-page + tab-level). Empty-state for "No conversations yet" now shows an icon, title, and a hint.
+
 ### 8 May 2026 — App-wide red→amber + palette token normalization
 
 - **Fixed nav-cta button bug:** `Request a Demo` button in landing nav was rendering as solid dark navy with invisible text — `.nav-links a { color: #374151 }` was beating `.btn-primary { color: #fff }` on specificity. Added `color: #fff !important` to `.nav-cta`.

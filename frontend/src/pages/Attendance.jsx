@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
 import api from '../lib/api'
+import { SkeletonRows } from '../components/ui'
 
 const STATUS = [
   { key: 'present', label: 'P', full: 'Present', color: '#16a34a', bg: '#f0fdf4', border: '#86efac' },
@@ -277,7 +278,7 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
       {/* Register grid */}
       <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, overflow: 'hidden' }}>
         {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Loading…</div>
+          <div style={{ padding: 16 }}><SkeletonRows rows={5} /></div>
         ) : learners.length === 0 ? (
           <Empty msg="No active learners in this class" />
         ) : (
@@ -417,7 +418,7 @@ function SummaryTab({ classId }) {
 
       <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, overflow: 'hidden' }}>
         {loading ? (
-          <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Loading…</div>
+          <div style={{ padding: 16 }}><SkeletonRows rows={5} /></div>
         ) : !data || data.learners.length === 0 ? (
           <Empty msg="No attendance data for this period" />
         ) : (
@@ -540,7 +541,7 @@ function HistoryTab({ classId }) {
           {/* History list */}
           <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, overflow: 'hidden' }}>
             {loading ? (
-              <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>Loading…</div>
+              <div style={{ padding: 16 }}><SkeletonRows rows={5} /></div>
             ) : history.length === 0 ? (
               <Empty msg="No attendance records for this period" />
             ) : (

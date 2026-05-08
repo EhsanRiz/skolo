@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import api from '../lib/api'
+import { SkeletonCard, EmptyState } from '../components/ui'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts'
 
 const MONTHS = ['January','February','March','April','May','June',
@@ -403,7 +404,23 @@ function TeacherDashboard() {
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
   const firstName = user?.full_name?.split(' ')[0] || 'there'
 
-  if (loading) return <div style={{ padding: 48, textAlign: 'center', color: '#6b7280' }}>Loading your dashboard…</div>
+  if (loading) return (
+    <div>
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+          <div className="sk-skeleton" style={{ width: '40%', height: 24, borderRadius: 6 }} />
+          <div className="sk-skeleton" style={{ width: '24%', height: 14, borderRadius: 6 }} />
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
+        {[0,1,2,3].map(i => <SkeletonCard key={i} />)}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+        <SkeletonCard height={260} />
+        <SkeletonCard height={260} />
+      </div>
+    </div>
+  )
 
   return (
     <>
@@ -893,7 +910,23 @@ function AdminDashboard() {
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
   const firstName = user?.full_name?.split(' ')[0] || 'there'
 
-  if (loading) return <div style={{ padding: 48, textAlign: 'center', color: '#6b7280' }}>Loading your dashboard…</div>
+  if (loading) return (
+    <div>
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+          <div className="sk-skeleton" style={{ width: '40%', height: 24, borderRadius: 6 }} />
+          <div className="sk-skeleton" style={{ width: '24%', height: 14, borderRadius: 6 }} />
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
+        {[0,1,2,3].map(i => <SkeletonCard key={i} />)}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+        <SkeletonCard height={260} />
+        <SkeletonCard height={260} />
+      </div>
+    </div>
+  )
 
   const fs = data?.feeStats || {}
 
@@ -1117,7 +1150,23 @@ function PrincipalDashboard() {
 
   const rc = r => r >= 80 ? '#16a34a' : '#b8870a'
 
-  if (loading) return <div style={{ padding: 48, textAlign: 'center', color: '#6b7280' }}>Loading your dashboard…</div>
+  if (loading) return (
+    <div>
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+          <div className="sk-skeleton" style={{ width: '40%', height: 24, borderRadius: 6 }} />
+          <div className="sk-skeleton" style={{ width: '24%', height: 14, borderRadius: 6 }} />
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
+        {[0,1,2,3].map(i => <SkeletonCard key={i} />)}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+        <SkeletonCard height={260} />
+        <SkeletonCard height={260} />
+      </div>
+    </div>
+  )
 
   const fs = data?.feeStats || {}
 

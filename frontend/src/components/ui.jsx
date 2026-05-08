@@ -193,3 +193,98 @@ export const t = {
   label: { display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 6 },
   sectionLabel: { fontSize: 11, fontWeight: 700, color: '#9ca3af', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: 12, marginTop: 20 },
 }
+
+
+// ── Shared loading skeleton ─────────────────────────────────────
+// Subtle shimmer using a gradient sweep — Modern Academic palette compliant.
+// Inject keyframes once.
+if (typeof document !== 'undefined' && !document.getElementById('sk-skeleton-style')) {
+  const styleEl = document.createElement('style')
+  styleEl.id = 'sk-skeleton-style'
+  styleEl.textContent = `
+    @keyframes sk-shimmer { 0% { background-position: -800px 0; } 100% { background-position: 800px 0; } }
+    .sk-skeleton {
+      background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 40%, #f3f4f6 80%);
+      background-size: 800px 100%;
+      animation: sk-shimmer 1.4s ease-in-out infinite;
+      border-radius: 6px;
+      display: block;
+    }
+  `
+  document.head.appendChild(styleEl)
+}
+
+// width: number (px) | string (e.g. '60%')
+// height: number (px), default 14
+// rounded: shape — 'sm' | 'md' | 'lg' | 'circle'
+export function Skeleton({ width = '100%', height = 14, rounded = 'md', style = {} }) {
+  const r = rounded === 'circle' ? '50%' : rounded === 'lg' ? '12px' : rounded === 'sm' ? '4px' : '6px'
+  return (
+    <span className="sk-skeleton" style={{
+      width: typeof width === 'number' ? `${width}px` : width,
+      height: typeof height === 'number' ? `${height}px` : height,
+      borderRadius: r,
+      ...style,
+    }} />
+  )
+}
+
+// Pre-built skeleton compositions for the two most common needs.
+export function SkeletonCard({ height = 110 }) {
+  return (
+    <div style={{
+      background: '#fff', borderRadius: 12, padding: 18,
+      border: '1px solid #e5e7eb', minHeight: height,
+      display: 'flex', flexDirection: 'column', gap: 10,
+    }}>
+      <Skeleton width="40%" height={11} />
+      <Skeleton width="60%" height={26} />
+      <Skeleton width="50%" height={11} />
+    </div>
+  )
+}
+
+export function SkeletonRows({ rows = 5 }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid #f7f7f7' }}>
+          <Skeleton width={36} height={36} rounded="circle" />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <Skeleton width="40%" height={13} />
+            <Skeleton width="65%" height={11} />
+          </div>
+          <Skeleton width={60} height={20} rounded="lg" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ── Empty state ─────────────────────────────────────────────────
+// A friendlier alternative to "No data" — icon + title + (optional) hint + (optional) CTA.
+//
+//   <EmptyState
+//     icon="📋"                              // emoji or React element
+//     title="No learners yet"
+//     hint="Add your first learner to get started."
+//     cta={{ label: 'Add learner', onClick: () => ... }}
+//   />
+export function EmptyState({ icon = '✨', title, hint, cta, style = {} }) {
+  return (
+    <div style={{
+      textAlign: 'center', padding: '48px 24px', color: '#6b7280',
+      background: '#fff', borderRadius: 14, border: '1.5px dashed #e5e7eb', ...style,
+    }}>
+      <div style={{ fontSize: 36, marginBottom: 12, lineHeight: 1 }}>{icon}</div>
+      {title && <div style={{ fontSize: 16, fontWeight: 800, color: '#1f2937', marginBottom: 6 }}>{title}</div>}
+      {hint && <div style={{ fontSize: 13, color: '#6b7280', maxWidth: 360, margin: '0 auto', lineHeight: 1.6 }}>{hint}</div>}
+      {cta && (
+        <button onClick={cta.onClick} style={{
+          marginTop: 20, padding: '10px 22px', background: '#003049', color: '#fff',
+          border: 'none', borderRadius: 9, fontWeight: 700, fontSize: 14, cursor: 'pointer'
+        }}>{cta.label}</button>
+      )}
+    </div>
+  )
+}

@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
 import { t } from '../components/ui'
 import api from '../lib/api'
+import { SkeletonRows, EmptyState } from '../components/ui'
 
 export default function Messages() {
   const { user } = useAuth()
@@ -365,7 +366,7 @@ export default function Messages() {
   }
 
   // ── Conversation list ──
-  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#6b7280' }}>Loading...</div>
+  if (loading) return <div style={{ padding: 24 }}><SkeletonRows rows={6} /></div>
 
   return (
     <div>
@@ -405,7 +406,7 @@ export default function Messages() {
           <div style={{ fontSize: 48, marginBottom: 12, opacity: 0.2 }}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           </div>
-          <div style={{ color: '#6b7280', fontSize: 15, fontWeight: 600 }}>No conversations yet</div>
+          <EmptyState icon="💬" title="No conversations yet" hint="Start a conversation with staff or parents from the buttons above." style={{ background:'transparent', border:'none', padding:'8px 0' }} />
           <div style={{ color: '#9ca3af', fontSize: 13, marginTop: 6 }}>
             Click <strong>&ldquo;+ New message&rdquo;</strong> to start a conversation with a parent
           </div>

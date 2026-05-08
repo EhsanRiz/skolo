@@ -227,23 +227,37 @@ export default function Layout() {
   const { user, school, logout } = useAuth()
   const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [unreadMsgs, setUnreadMsgs] = useState(0)
+  const [counts, setCounts] = useState({ messages: 0, waivers: 0, fees: 0, attendance: 0 })
 
-  // Poll unread messages
+  // Poll sidebar counts (messages, pending waivers, overdue fees, attendance alerts)
   useEffect(() => {
-    const loadMsgCount = async () => {
+    const load = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/messaging/unread-count`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/sidebar-counts`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('sk_token')}` }
         })
+        if (!res.ok) return
         const data = await res.json()
-        setUnreadMsgs(data.count || 0)
+        setCounts({
+          messages:   data.messages   || 0,
+          waivers:    data.waivers    || 0,
+          fees:       data.fees       || 0,
+          attendance: data.attendance || 0,
+        })
       } catch {}
     }
-    loadMsgCount()
-    const iv = setInterval(loadMsgCount, 15000)
+    load()
+    const iv = setInterval(load, 60000)  // 60s — sidebar isn't time-critical
     return () => clearInterval(iv)
   }, [])
+
+  // Map nav label -> count key
+  const COUNT_FOR = {
+    'Messages':   counts.messages,
+    'Waivers':    counts.waivers,
+    'Fees':       counts.fees,
+    'Attendance': counts.attendance,
+  }
 
   // Close mobile menu on route change
   useEffect(() => { setMenuOpen(false) }, [location.pathname])
@@ -277,18 +291,22 @@ export default function Layout() {
 
       {/* Nav */}
       <nav style={{ flex:1, padding:'4px 12px', overflowY:'auto' }}>
-        {NAV_ITEMS.filter(item => !item.roles || item.roles.includes(user?.role)).map(({ to, label, icon: Icon }) => (
-          <NavLink key={to} to={to} end={to==='/'} className={({isActive}) => `nav-link${isActive?' active':''}`}>
-            <Icon />
-            <span style={{ flex:1 }}>{label}</span>
-            {label === 'Messages' && unreadMsgs > 0 && (
-              <span style={{
-                background:'#dc2626', color:'#fff', fontSize:10, fontWeight:700,
-                borderRadius:10, padding:'1px 7px', minWidth:18, textAlign:'center'
-              }}>{unreadMsgs > 9 ? '9+' : unreadMsgs}</span>
-            )}
-          </NavLink>
-        ))}
+        {NAV_ITEMS.filter(item => !item.roles || item.roles.includes(user?.role)).map(({ to, label, icon: Icon }) => {
+          const c = COUNT_FOR[label] || 0
+          return (
+            <NavLink key={to} to={to} end={to==='/'} className={({isActive}) => `nav-link${isActive?' active':''}`}>
+              <Icon />
+              <span style={{ flex:1 }}>{label}</span>
+              {c > 0 && (
+                <span style={{
+                  background:'#fef4d6', color:'#b8870a', fontSize:10, fontWeight:800,
+                  borderRadius:10, padding:'1px 7px', minWidth:18, textAlign:'center',
+                  letterSpacing:'.2px'
+                }}>{c > 99 ? '99+' : c}</span>
+              )}
+            </NavLink>
+          )
+        })}
       </nav>
 
       {/* User footer */}
@@ -391,12 +409,24 @@ export default function Layout() {
           boxShadow:'0 -2px 12px rgba(0,0,0,0.2)',
           overflowX:'auto', WebkitOverflowScrolling:'touch'
         }}>
-          {NAV_ITEMS.filter(item => !item.roles || item.roles.includes(user?.role)).map(({ to, label, icon: Icon }) => (
-            <NavLink key={to} to={to} end={to==='/'} className={({isActive}) => `mob-nav-link${isActive?' active':''}`}>
-              <Icon />
-              <span>{label}</span>
-            </NavLink>
-          ))}
+          {NAV_ITEMS.filter(item => !item.roles || item.roles.includes(user?.role)).map(({ to, label, icon: Icon }) => {
+            const c = COUNT_FOR[label] || 0
+            return (
+              <NavLink key={to} to={to} end={to==='/'} className={({isActive}) => `mob-nav-link${isActive?' active':''}`}>
+                <span style={{ position:'relative', display:'inline-flex' }}>
+                  <Icon />
+                  {c > 0 && (
+                    <span style={{
+                      position:'absolute', top:-2, right:-4,
+                      background:'#f7c548', border:'1.5px solid #003049',
+                      width:8, height:8, borderRadius:'50%'
+                    }} />
+                  )}
+                </span>
+                <span>{label}</span>
+              </NavLink>
+            )
+          })}
         </div>
       </div>
     </>

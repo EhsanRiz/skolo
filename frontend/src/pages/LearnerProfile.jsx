@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
 import api from '../lib/api'
+import { SkeletonRows, SkeletonCard } from '../components/ui'
 
 // ── Constants ─────────────────────────────────────────────────
 const TERMS  = [1, 2, 3, 4]
@@ -318,7 +319,7 @@ function FeesTab({ learnerId, sym, isReadOnly }) {
       </div>
 
       <div style={{ background:'#fff', borderRadius:12, boxShadow:'0 1px 3px rgba(0,0,0,.06)', overflow:'hidden' }}>
-        {loading ? <div style={{ padding:40, textAlign:'center', color:'#9ca3af' }}>Loading…</div> : (
+        {loading ? <div style={{ padding: 16 }}><SkeletonRows rows={4} /></div> : (
           <table style={{ width:'100%', borderCollapse:'collapse' }}>
             <thead><tr>
               {['Description','Due date','Due','Paid','Balance','Status',''].map(h=>
@@ -750,7 +751,15 @@ export default function LearnerProfile() {
       .catch(() => { setLoading(false) })
   }, [id])
 
-  if (loading) return <div style={{ padding:48, textAlign:'center', color:'#6b7280' }}>Loading…</div>
+  if (loading) return (
+    <div>
+      <SkeletonCard height={120} />
+      <div style={{ height: 16 }} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
+        {[0,1,2,3].map(i => <SkeletonCard key={i} height={90} />)}
+      </div>
+    </div>
+  )
   if (!learner) return (
     <div style={{ padding:48, textAlign:'center', color:'#6b7280' }}>
       <div>Learner not found.</div>

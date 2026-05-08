@@ -57,6 +57,7 @@ app.use('/timetable',     require('./routes/timetable'))
 app.use('/report-cards',       require('./routes/report-cards'))
 app.use('/attendance-alerts',  require('./routes/attendance-alerts'))
 app.use('/dashboard',          require('./routes/dashboard'))
+app.use('/sidebar-counts',     require('./routes/sidebar-counts'))
 app.use('/super-admin',        require('./routes/super-admin'))
 app.use('/demo-requests',     require('./routes/demo-requests'))
 
