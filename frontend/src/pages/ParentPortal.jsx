@@ -6,7 +6,7 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 const STATUS_STYLE = {
   paid:    { bg: '#dcfce7', color: '#15803d', label: 'Paid' },
   partial: { bg: '#fef4d6', color: '#b8870a', label: 'Partial' },
-  overdue: { bg: '#fee2e2', color: '#dc2626', label: 'Overdue' },
+  overdue: { bg: '#fef4d6', color: '#b8870a', label: 'Overdue' },
   pending: { bg: '#f7f7f7', color: '#6b7280', label: 'Pending' },
 }
 
@@ -43,7 +43,7 @@ function LearnerCard({ learner, sym }) {
           </div>
         </div>
         <div style={{ textAlign:'right' }}>
-          <div style={{ fontSize:22, fontWeight:800, color: hasBalance ? '#dc2626' : '#16a34a' }}>
+          <div style={{ fontSize:22, fontWeight:800, color: hasBalance ? '#b8870a' : '#16a34a' }}>
             {sym}{fs.balance.toLocaleString()}
           </div>
           <div style={{ fontSize:12, color:'#9ca3af', marginTop:1 }}>
@@ -57,7 +57,7 @@ function LearnerCard({ learner, sym }) {
         {[
           { label:'Total due',   value:`${sym}${fs.total_due.toLocaleString()}` },
           { label:'Paid',        value:`${sym}${fs.total_paid.toLocaleString()}`, color:'#16a34a' },
-          { label:'Balance',     value:`${sym}${fs.balance.toLocaleString()}`,    color: fs.balance > 0 ? '#dc2626' : '#16a34a' },
+          { label:'Balance',     value:`${sym}${fs.balance.toLocaleString()}`,    color: fs.balance > 0 ? '#b8870a' : '#16a34a' },
         ].map((c, i) => (
           <div key={c.label} style={{ padding:'12px 16px', borderLeft: i > 0 ? '1px solid #f7f7f7' : 'none' }}>
             <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.6px', marginBottom:3 }}>{c.label}</div>
@@ -68,7 +68,7 @@ function LearnerCard({ learner, sym }) {
 
       {/* Overdue warning */}
       {fs.overdue > 0 && (
-        <div style={{ padding:'10px 20px', background:'#fff5f5', borderTop:'1px solid #fca5a5', fontSize:13, color:'#dc2626', fontWeight:600 }}>
+        <div style={{ padding:'10px 20px', background:'#fef4d6', borderTop:'1px solid #fcd34d', fontSize:13, color:'#b8870a', fontWeight:600 }}>
           ⚠ {fs.overdue} overdue payment{fs.overdue > 1 ? 's' : ''} — please contact the school
         </div>
       )}
@@ -91,7 +91,7 @@ function LearnerCard({ learner, sym }) {
                 </div>
                 <div style={{ textAlign:'right', marginLeft:16 }}>
                   <StatusBadge status={e.status} />
-                  <div style={{ fontSize:13, fontWeight:700, marginTop:4, color: balance > 0 ? '#dc2626' : '#16a34a' }}>
+                  <div style={{ fontSize:13, fontWeight:700, marginTop:4, color: balance > 0 ? '#b8870a' : '#16a34a' }}>
                     {balance > 0 ? `${sym}${balance.toLocaleString()} due` : `${sym}${Number(e.amount_paid).toLocaleString()} paid`}
                   </div>
                 </div>

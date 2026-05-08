@@ -47,7 +47,7 @@ export default function Grades() {
     if (grade === 'B') return '#003049'
     if (grade === 'C') return '#b8870a'
     if (grade === 'D') return '#c2410c'
-    return '#dc2626'
+    return '#b8870a'
   }
 
   async function downloadReport(learnerId, term) {
@@ -167,7 +167,7 @@ export default function Grades() {
                       disabled={downloading === `${child.id}-${term}`}
                       style={{
                         width: '100%', padding: '10px', borderRadius: 8, border: '1.5px solid #003049',
-                        background: '#f0f5fa', color: '#003049', fontWeight: 600, fontSize: 13,
+                        background: '#e6eff5', color: '#003049', fontWeight: 600, fontSize: 13,
                         cursor: 'pointer', marginTop: 14, opacity: downloading === `${child.id}-${term}` ? 0.5 : 1
                       }}>
                       {downloading === `${child.id}-${term}` ? 'Generating...' : 'Download Report Card'}

@@ -7,7 +7,7 @@ const STATUS = [
   { key: 'present', label: 'P', full: 'Present', color: '#16a34a', bg: '#f0fdf4', border: '#86efac' },
   { key: 'absent',  label: 'A', full: 'Absent',  color: '#dc2626', bg: '#fff5f5', border: '#fca5a5' },
   { key: 'late',    label: 'L', full: 'Late',    color: '#d97706', bg: '#fffbeb', border: '#fcd34d' },
-  { key: 'excused', label: 'E', full: 'Excused', color: '#003049', bg: '#f0f5fa', border: '#c6dae7' },
+  { key: 'excused', label: 'E', full: 'Excused', color: '#003049', bg: '#e6eff5', border: '#c6dae7' },
 ]
 const STATUS_MAP = Object.fromEntries(STATUS.map(s => [s.key, s]))
 
@@ -212,7 +212,7 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '12px 18px', borderRadius: 10, marginBottom: 14, flexWrap: 'wrap', gap: 10,
-          background: override ? '#fffbeb' : '#f0f5fa',
+          background: override ? '#fffbeb' : '#e6eff5',
           border: `1px solid ${override ? '#fcd34d' : '#e6eff5'}`
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -228,7 +228,7 @@ function RegisterTab({ classId, canOverride, isTeacher, showToast, userRole }) {
             style={{
               padding: '6px 16px', borderRadius: 7, border: 'none', cursor: 'pointer',
               fontWeight: 700, fontSize: 12, transition: 'all .15s',
-              background: override ? '#dc2626' : '#003049',
+              background: override ? '#b8870a' : '#003049',
               color: '#fff'
             }}
           >
@@ -400,8 +400,7 @@ function SummaryTab({ classId }) {
   function pctColor(pct) {
     if (pct === null) return '#9ca3af'
     if (pct >= 90) return '#16a34a'
-    if (pct >= 75) return '#d97706'
-    return '#dc2626'
+    return '#b8870a'
   }
 
   if (!classId) return <Empty msg="Select a class above" />
@@ -532,7 +531,7 @@ function HistoryTab({ classId }) {
             ))}
             {pct !== null && (
               <div style={{ flex: '1 1 80px', background: '#fafafa', border: '1px solid #e5e7eb', borderRadius: 10, padding: '10px 14px', textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 800, color: pct >= 90 ? '#16a34a' : pct >= 75 ? '#d97706' : '#dc2626' }}>{pct}%</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: pct >= 90 ? '#16a34a' : '#b8870a' }}>{pct}%</div>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Attendance</div>
               </div>
             )}

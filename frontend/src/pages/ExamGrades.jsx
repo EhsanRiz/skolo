@@ -15,7 +15,7 @@ const DEFAULT_BOUNDARIES = [
   { grade: 'F', min: 0  },
 ]
 
-const GRADE_COLORS = ['#16a34a','#003049','#d97706','#ea580c','#dc2626','#7c3aed','#0891b2','#be185d']
+const GRADE_COLORS = ['#16a34a','#003049','#d97706','#b8870a','#dc2626','#7c3aed','#0891b2','#be185d']
 
 function letterGrade(mark, boundaries) {
   if (mark === null || mark === undefined || mark === '') return '—'

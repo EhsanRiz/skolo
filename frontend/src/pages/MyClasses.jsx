@@ -18,7 +18,7 @@ const CSS = `
 .progress-fill-sm { height:100%; border-radius:10px; transition:width .6s ease; }
 `
 
-const GRADE_COLORS = { A:'#16a34a', B:'#003049', C:'#ca8a04', D:'#ea580c', F:'#dc2626' }
+const GRADE_COLORS = { A:'#16a34a', B:'#003049', C:'#b8870a', D:'#b8870a', F:'#dc2626' }
 
 export default function MyClasses() {
   const { user, school } = useAuth()
@@ -170,7 +170,7 @@ export default function MyClasses() {
                       </span>
                     )}
                     {tc.subject && (
-                      <span style={{ fontSize: 11, background: tc.is_home_class ? 'rgba(255,255,255,0.15)' : '#f0f5fa', color: tc.is_home_class ? 'rgba(255,255,255,0.8)' : '#003049', padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>
+                      <span style={{ fontSize: 11, background: tc.is_home_class ? 'rgba(255,255,255,0.15)' : '#e6eff5', color: tc.is_home_class ? 'rgba(255,255,255,0.8)' : '#003049', padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>
                         {tc.subject}
                       </span>
                     )}
@@ -190,7 +190,7 @@ export default function MyClasses() {
               <div style={{ display: 'flex', borderBottom: isOpen ? '1px solid #f7f7f7' : 'none', padding: '12px 20px', gap: 8 }}>
                 {/* Attendance rate */}
                 <div className="stat-pill">
-                  <div style={{ fontSize: 18, fontWeight: 800, color: stats.attendanceRate != null ? (stats.attendanceRate >= 80 ? '#16a34a' : stats.attendanceRate >= 60 ? '#ca8a04' : '#dc2626') : '#d1d5db' }}>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: stats.attendanceRate != null ? (stats.attendanceRate >= 80 ? '#16a34a' : stats.attendanceRate >= 60 ? '#b8870a' : '#dc2626') : '#d1d5db' }}>
                     {stats.attendanceRate != null ? `${stats.attendanceRate}%` : '—'}
                   </div>
                   <div style={{ fontSize: 11, color: '#9ca3af', fontWeight: 500, marginTop: 2 }}>Attendance</div>
@@ -198,7 +198,7 @@ export default function MyClasses() {
                     <div className="progress-bar-sm" style={{ marginTop: 6, maxWidth: 60 }}>
                       <div className="progress-fill-sm" style={{
                         width: `${stats.attendanceRate}%`,
-                        background: stats.attendanceRate >= 80 ? '#16a34a' : stats.attendanceRate >= 60 ? '#ca8a04' : '#dc2626'
+                        background: stats.attendanceRate >= 80 ? '#16a34a' : stats.attendanceRate >= 60 ? '#b8870a' : '#dc2626'
                       }} />
                     </div>
                   )}

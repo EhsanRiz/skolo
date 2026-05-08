@@ -75,7 +75,7 @@ const LandingPage = () => {
       .nav-links a:hover { color: var(--navy); }
       .nav-signin { color: var(--navy) !important; padding: 9px 18px; border-radius: 10px; border: 1.5px solid #e5e7eb; transition: all .15s; }
       .nav-signin:hover { border-color: var(--navy); }
-      .nav-cta { padding: 9px 20px !important; font-size: 13px !important; }
+      .nav-cta { padding: 9px 20px !important; font-size: 13px !important; color: #fff !important; }
       .nav-hamburger {
         display: none; background: none; border: none; color: var(--navy);
         cursor: pointer; padding: 6px; border-radius: 6px; transition: background .15s;

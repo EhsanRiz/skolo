@@ -59,7 +59,7 @@ export default function Fees() {
                 <div style={{ textAlign: 'right' }}>
                   <div style={{
                     fontWeight: 700, fontSize: 16,
-                    color: balance > 0 ? '#dc2626' : '#16a34a'
+                    color: balance > 0 ? '#b8870a' : '#16a34a'
                   }}>
                     {currency}{child.fee_summary?.balance || '0.00'}
                   </div>
@@ -146,7 +146,7 @@ function StatusBadge({ status }) {
   const styles = {
     paid: { bg: '#dcfce7', color: '#15803d', label: 'Paid' },
     partial: { bg: '#fef4d6', color: '#b8870a', label: 'Partial' },
-    overdue: { bg: '#fee2e2', color: '#dc2626', label: 'Overdue' },
+    overdue: { bg: '#fef4d6', color: '#b8870a', label: 'Overdue' },
     pending: { bg: '#f7f7f7', color: '#6b7280', label: 'Pending' },
     waived: { bg: '#ede9fe', color: '#7c3aed', label: 'Waived' }
   }

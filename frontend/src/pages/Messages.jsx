@@ -217,7 +217,7 @@ export default function Messages() {
               onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
                 <div style={{
-                  width: 40, height: 40, borderRadius: '50%', background: '#f0f5fa',
+                  width: 40, height: 40, borderRadius: '50%', background: '#e6eff5',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontWeight: 700, color: '#003049', fontSize: 15, flexShrink: 0
                 }}>
@@ -257,7 +257,7 @@ export default function Messages() {
             background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: '#003049', padding: 4
           }}>&larr;</button>
           <div style={{
-            width: 36, height: 36, borderRadius: '50%', background: '#f0f5fa',
+            width: 36, height: 36, borderRadius: '50%', background: '#e6eff5',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontWeight: 700, color: '#003049', fontSize: 14, flexShrink: 0
           }}>
@@ -427,7 +427,7 @@ export default function Messages() {
             >
               {/* Avatar */}
               <div style={{
-                width: 44, height: 44, borderRadius: '50%', background: conv.unread_count > 0 ? '#003049' : '#f0f5fa',
+                width: 44, height: 44, borderRadius: '50%', background: conv.unread_count > 0 ? '#003049' : '#e6eff5',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontWeight: 700, color: conv.unread_count > 0 ? '#fff' : '#003049', fontSize: 16, flexShrink: 0,
                 transition: 'all .15s'

@@ -153,7 +153,7 @@ export default function Messages() {
               cursor: 'pointer', alignItems: 'center'
             }}>
               <div style={{
-                width: 42, height: 42, borderRadius: '50%', background: '#f0f5fa',
+                width: 42, height: 42, borderRadius: '50%', background: '#e6eff5',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontWeight: 700, color: '#003049', fontSize: 16, flexShrink: 0
               }}>
@@ -300,7 +300,7 @@ export default function Messages() {
           }}>
             {/* Avatar */}
             <div style={{
-              width: 42, height: 42, borderRadius: '50%', background: '#f0f5fa',
+              width: 42, height: 42, borderRadius: '50%', background: '#e6eff5',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontWeight: 700, color: '#003049', fontSize: 16, flexShrink: 0
             }}>

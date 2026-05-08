@@ -188,7 +188,7 @@ export default function Dashboard() {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{
-                  width: 40, height: 40, borderRadius: '50%', background: '#f0f5fa',
+                  width: 40, height: 40, borderRadius: '50%', background: '#e6eff5',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontWeight: 700, color: '#003049', fontSize: 15
                 }}>{child.first_name[0]}</div>
@@ -202,8 +202,8 @@ export default function Dashboard() {
               <div style={{ textAlign: 'right' }}>
                 <div style={{
                   padding: '3px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600,
-                  background: parseFloat(child.fee_summary?.balance) > 0 ? '#fee2e2' : '#dcfce7',
-                  color: parseFloat(child.fee_summary?.balance) > 0 ? '#dc2626' : '#15803d'
+                  background: parseFloat(child.fee_summary?.balance) > 0 ? '#fef4d6' : '#dcfce7',
+                  color: parseFloat(child.fee_summary?.balance) > 0 ? '#b8870a' : '#15803d'
                 }}>
                   {currency}{child.fee_summary?.balance || '0.00'}
                 </div>
@@ -226,7 +226,7 @@ export default function Dashboard() {
           ) : data.events.slice(0, 4).map(ev => (
             <div key={ev.id} style={{ display: 'flex', gap: 10, padding: '8px 0', borderBottom: '1px solid #fafafa' }}>
               <div style={{
-                width: 36, height: 36, borderRadius: 8, background: '#f0f5fa', color: '#003049',
+                width: 36, height: 36, borderRadius: 8, background: '#e6eff5', color: '#003049',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, flexShrink: 0
               }}>{new Date(ev.event_date).getDate()}</div>
               <div>

@@ -64,7 +64,7 @@ export default function Attendance() {
               <div style={{
                 width: 52, height: 52, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 background: pct >= 90 ? '#dcfce7' : pct >= 75 ? '#fef4d6' : '#fee2e2',
-                color: pct >= 90 ? '#16a34a' : pct >= 75 ? '#b8870a' : '#dc2626',
+                color: pct >= 90 ? '#16a34a' : '#b8870a',
                 fontWeight: 700, fontSize: 14
               }}>
                 {pct}%

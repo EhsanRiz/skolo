@@ -8,7 +8,7 @@ const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
 // ── Color palette for teacher cards ──────────────────────────
 const PALETTE = [
-  { bg: '#f0f5fa', border: '#c6dae7', text: '#00253a', dragBg: '#e6eff5' },
+  { bg: '#e6eff5', border: '#c6dae7', text: '#00253a', dragBg: '#e6eff5' },
   { bg: '#f0fdf4', border: '#86efac', text: '#166534', dragBg: '#dcfce7' },
   { bg: '#faf5ff', border: '#d8b4fe', text: '#7c3aed', dragBg: '#f3e8ff' },
   { bg: '#fff7ed', border: '#fdba74', text: '#c2410c', dragBg: '#ffedd5' },
@@ -101,8 +101,8 @@ function TeacherSidebar({ teacherClasses, colorMap, busyMap, dragTcId }) {
                 {isBusy && (
                   <div style={{
                     position: 'absolute', top: 6, right: 8,
-                    fontSize: 9, fontWeight: 700, color: '#dc2626',
-                    background: '#fee2e2', padding: '2px 6px', borderRadius: 4,
+                    fontSize: 9, fontWeight: 700, color: '#b8870a',
+                    background: '#fef4d6', padding: '2px 6px', borderRadius: 4,
                     textTransform: 'uppercase', letterSpacing: '0.3px'
                   }}>
                     Busy
@@ -287,7 +287,7 @@ function TeacherAvailability({ classTcs, allSlots, periods, colorMap, selectedCl
               Free
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ width: 14, height: 14, borderRadius: 4, background: '#f0f5fa', border: '1.5px solid #c6dae7', display: 'inline-block' }} />
+              <span style={{ width: 14, height: 14, borderRadius: 4, background: '#e6eff5', border: '1.5px solid #c6dae7', display: 'inline-block' }} />
               This class
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -335,7 +335,7 @@ function TeacherAvailability({ classTcs, allSlots, periods, colorMap, selectedCl
                       <div style={{ width: 48, height: 5, background: '#f7f7f7', borderRadius: 3, overflow: 'hidden' }}>
                         <div style={{
                           width: `${utilization}%`, height: '100%', borderRadius: 3,
-                          background: utilization > 80 ? '#dc2626' : utilization > 50 ? '#f7c548' : '#16a34a',
+                          background: utilization > 80 ? '#b8870a' : utilization > 50 ? '#f7c548' : '#16a34a',
                           transition: 'width .3s'
                         }} />
                       </div>
@@ -383,8 +383,8 @@ function TeacherAvailability({ classTcs, allSlots, periods, colorMap, selectedCl
                                     <div
                                       title={`${tc?.subject || 'General'} — ${cls}`}
                                       style={{
-                                        background: isThisClass ? color.bg : '#fef2f2',
-                                        border: `1px solid ${isThisClass ? color.border : '#fca5a5'}`,
+                                        background: isThisClass ? color.bg : '#fef4d6',
+                                        border: `1px solid ${isThisClass ? color.border : '#fcd34d'}`,
                                         borderRadius: 5, padding: '3px 2px',
                                         textAlign: 'center', cursor: 'default',
                                         lineHeight: 1.2
@@ -392,7 +392,7 @@ function TeacherAvailability({ classTcs, allSlots, periods, colorMap, selectedCl
                                     >
                                       <div style={{
                                         fontSize: 9, fontWeight: 700,
-                                        color: isThisClass ? color.text : '#dc2626',
+                                        color: isThisClass ? color.text : '#b8870a',
                                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
                                       }}>
                                         {subj}
@@ -722,7 +722,7 @@ export default function Timetable() {
       {view === 'my' && myTeacher && (
         <div style={{ ...t.card, padding: '14px 20px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{
-            width: 40, height: 40, borderRadius: 10, background: '#f0f5fa',
+            width: 40, height: 40, borderRadius: 10, background: '#e6eff5',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontWeight: 800, fontSize: 16, color: '#00253a'
           }}>

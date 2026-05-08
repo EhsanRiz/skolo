@@ -68,6 +68,13 @@ The token system lives at `frontend/src/components/ui.jsx` (the `t` object). Mos
 
 ## Recent Sessions
 
+### 8 May 2026 — App-wide red→amber + palette token normalization
+
+- **Fixed nav-cta button bug:** `Request a Demo` button in landing nav was rendering as solid dark navy with invisible text — `.nav-links a { color: #374151 }` was beating `.btn-primary { color: #fff }` on specificity. Added `color: #fff !important` to `.nav-cta`.
+- **Bulk palette token normalization (23 files):** swept off-palette tokens app-wide — `#fef3c7` → `#fef4d6` (amber tint), `#f0f5fa` → `#e6eff5` (Sky Blue tint), `#ca8a04` → `#b8870a` (amber dark, was off-palette deep yellow), `#ea580c` → `#b8870a` (was off-palette deep orange).
+- **Semantic red→amber sweep:** following palette discipline (red = error/broken, amber = attention/pending), moved "outstanding/overdue/balance > 0" surfaces to amber dark across staff Dashboard (StatCard accents, KPIs, fee-row colors, attendance-alerts header, rate helpers), staff Fees (status pills, fee rows, balance cells, KPI strip, group summaries, payment dialog "Remaining"), staff Attendance (override toggle, pct rate helper), Settings ("Not invited" pill), LearnerProfile (overdue STATUS_C, Outstanding KPI, balance cells), Learners ("Skipped rows" CSV warning), Timetable (Busy slot indicator, utilization > 80%, foreign-class slot in mini grid), ParentPortal (overdue status, Balance KPI, Overdue warning bar), parent-app Fees/Attendance/Dashboard/Grades, and the shared `unpaid` design token in `ui.jsx`. Red kept where it belongs: F grades, Absent attendance markers, delete/reject/danger buttons, login/register validation errors, error toasts, the receipt's UNPAID stamp, "Suspended" status, and notification badge counts.
+- **Rate helpers simplified to 2-tier:** `r >= 80 ? green : amber` instead of `green / amber / red`. A 27% fee collection rate now reads as "needs attention" (amber dark) rather than "broken" (red), matching the palette intent that red is reserved for actual error states.
+
 ### 8 May 2026 — Visual polish sweep (post-palette audit)
 
 - **Landing page palette consistency:** swept three off-palette tints (`#fef3c7` → `#fef4d6` amber tint, `#d97706` → `#b8870a` amber dark, `#f0f5fa` → `#e6eff5` Sky Blue tint); decorative purple → Sky Blue on the Audience "Education organisations" globe icon and the Challenges "Real-time visibility" stat. Skolo AI plan tier and Exam grades feature icon keep their purple (justified per palette spec — tier semantic and subject/grades semantic).

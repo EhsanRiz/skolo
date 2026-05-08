@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext'
 import api from '../lib/api'
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
-const COLORS = ['#f0f5fa', '#f0fdf4', '#fef4d6', '#fce7f3', '#ede9fe', '#fff7ed', '#ecfdf5', '#fef2f2']
+const COLORS = ['#e6eff5', '#f0fdf4', '#fef4d6', '#fce7f3', '#ede9fe', '#fff7ed', '#ecfdf5', '#fef2f2']
 
 function hashColor(str) {
   let hash = 0

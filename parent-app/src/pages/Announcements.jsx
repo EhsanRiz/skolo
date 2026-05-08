@@ -33,7 +33,7 @@ export default function Announcements() {
               {a.target !== 'all' && (
                 <span style={{
                   padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 500,
-                  background: '#f0f5fa', color: '#003049', flexShrink: 0, marginLeft: 8
+                  background: '#e6eff5', color: '#003049', flexShrink: 0, marginLeft: 8
                 }}>
                   {a.target}
                 </span>

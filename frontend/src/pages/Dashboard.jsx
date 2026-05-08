@@ -9,7 +9,7 @@ const MONTHS = ['January','February','March','April','May','June',
 
 const EVENT_COLORS = {
   academic: '#003049', sports: '#16a34a',
-  meeting:  '#ca8a04', holiday: '#db2777', general: '#6b7280'
+  meeting:  '#b8870a', holiday: '#db2777', general: '#6b7280'
 }
 
 const DAY_NAMES = ['','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
@@ -78,7 +78,7 @@ function OutstandingDrawer({ entries, sym, onClose }) {
             const balance   = Number(e.amount_due) - Number(e.amount_paid)
             const isOverdue = e.status === 'overdue'
             return (
-              <div key={e.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 0', borderBottom:'1px solid #fafafa', background: isOverdue ? '#fff9f9' : '' }}>
+              <div key={e.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 0', borderBottom:'1px solid #fafafa', background: isOverdue ? '#fef4d6' : '' }}>
                 <div>
                   <div style={{ fontWeight:600, fontSize:14, color:'#1f2937' }}>
                     {e.learners?.first_name} {e.learners?.last_name}
@@ -89,8 +89,8 @@ function OutstandingDrawer({ entries, sym, onClose }) {
                   </div>
                 </div>
                 <div style={{ textAlign:'right', flexShrink:0, marginLeft:16 }}>
-                  <div style={{ fontWeight:800, fontSize:15, color: isOverdue ? '#dc2626' : '#374151' }}>{sym}{balance.toLocaleString()}</div>
-                  <span style={{ fontSize:11, fontWeight:700, background: isOverdue?'#fee2e2':'#f7f7f7', color: isOverdue?'#dc2626':'#6b7280', padding:'1px 8px', borderRadius:20 }}>
+                  <div style={{ fontWeight:800, fontSize:15, color: isOverdue ? '#b8870a' : '#374151' }}>{sym}{balance.toLocaleString()}</div>
+                  <span style={{ fontSize:11, fontWeight:700, background: isOverdue?'#fef4d6':'#f7f7f7', color: isOverdue?'#b8870a':'#6b7280', padding:'1px 8px', borderRadius:20 }}>
                     {e.status}
                   </span>
                 </div>
@@ -154,7 +154,7 @@ function AttendanceAlertsCard({ delay }) {
       .finally(() => setLoading(false))
   }, [threshold])
 
-  const rateColor = rate => rate < 50 ? '#dc2626' : rate < 70 ? '#ea580c' : '#ca8a04'
+  const rateColor = rate => rate < 50 ? '#dc2626' : '#b8870a'
 
   return (
     <div className="dash-card" style={{ animationDelay: delay || '0ms' }}>
@@ -184,7 +184,7 @@ function AttendanceAlertsCard({ delay }) {
 
       {!loading && alerts.length > 0 && (
         <>
-          <div style={{ fontSize: 12, fontWeight: 700, color: '#dc2626', marginBottom: 10 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#b8870a', marginBottom: 10 }}>
             ⚠ {alerts.length} learner{alerts.length !== 1 ? 's' : ''} below {threshold}%
           </div>
           {alerts.slice(0, 6).map(a => (
@@ -342,8 +342,8 @@ function TeacherDashboard() {
         setGradeDistribution([
           { name: 'A', value: dist.A, color: '#16a34a' },
           { name: 'B', value: dist.B, color: '#003049' },
-          { name: 'C', value: dist.C, color: '#ca8a04' },
-          { name: 'D', value: dist.D, color: '#ea580c' },
+          { name: 'C', value: dist.C, color: '#b8870a' },
+          { name: 'D', value: dist.D, color: '#b8870a' },
           { name: 'F', value: dist.F, color: '#dc2626' },
         ].filter(d => d.value > 0))
       }
@@ -416,7 +416,7 @@ function TeacherDashboard() {
         </h1>
         <p style={{ fontSize: 14, color: '#6b7280', marginTop: 2 }}>
           {now.toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-          <span style={{ marginLeft: 10, fontSize: 12, background: '#f0f5fa', color: '#003049', padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>Teacher</span>
+          <span style={{ marginLeft: 10, fontSize: 12, background: '#e6eff5', color: '#003049', padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>Teacher</span>
         </p>
       </div>
 
@@ -426,7 +426,7 @@ function TeacherDashboard() {
         <StatCard delay="60ms"  label="Total learners" value={totalLearners}   sub={school?.name || ''} onClick={() => navigate('/my-classes')} />
         <StatCard delay="120ms" label="Attendance today" value={`${attendanceTaken}/${totalClasses}`}
           sub={attendancePending > 0 ? `${attendancePending} class${attendancePending !== 1 ? 'es' : ''} pending` : 'All done ✓'}
-          accent={attendancePending === 0 ? '#16a34a' : '#ca8a04'} onClick={() => navigate('/attendance')} />
+          accent={attendancePending === 0 ? '#16a34a' : '#b8870a'} onClick={() => navigate('/attendance')} />
         <StatCard delay="180ms" label="Today's lessons" value={todaySlots.length}
           sub={todayNum === 0 ? 'Weekend — no classes' : currentPeriod ? `Now: Period ${currentPeriod.number}` : nextPeriod ? `Next: ${nextPeriod.start}` : 'Done for today'}
           accent={todayNum === 0 ? '#6b7280' : '#003049'} />
@@ -484,7 +484,7 @@ function TeacherDashboard() {
             }
 
             // Colour scheme: done=green, now=blue, upcoming=neutral
-            const slotBg    = isPast ? '#f0fdf4' : isNow ? '#f0f5fa' : slot ? '#fff' : '#fafafa'
+            const slotBg    = isPast ? '#f0fdf4' : isNow ? '#e6eff5' : slot ? '#fff' : '#fafafa'
             const slotBorder = isPast ? '1.5px solid #bbf7d0' : isNow ? '1.5px solid #c6dae7' : '1.5px solid #f7f7f7'
             const labelColor = isPast ? '#16a34a' : isNow ? '#003049' : '#1f2937'
             const descColor  = isPast ? '#86efac' : isNow ? '#669bbc' : '#6b7280'
@@ -558,7 +558,7 @@ function TeacherDashboard() {
                   </div>
                   <span style={{
                     fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
-                    background: taken ? '#dcfce7' : '#fef3c7',
+                    background: taken ? '#dcfce7' : '#fef4d6',
                     color: taken ? '#16a34a' : '#b8870a'
                   }}>
                     {taken ? '✓ Taken' : 'Pending'}
@@ -625,7 +625,7 @@ function TeacherDashboard() {
                   <Tooltip contentStyle={{ borderRadius: 10, border: '1px solid #e5e7eb', fontSize: 12 }} />
                   <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
                   <Bar dataKey="Present" fill="#16a34a" radius={[4,4,0,0]} />
-                  <Bar dataKey="Late" fill="#ca8a04" radius={[4,4,0,0]} />
+                  <Bar dataKey="Late" fill="#b8870a" radius={[4,4,0,0]} />
                   <Bar dataKey="Absent" fill="#dc2626" radius={[4,4,0,0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -647,7 +647,7 @@ function TeacherDashboard() {
                     formatter={(val) => [`${val}%`, 'Average']} />
                   <Bar dataKey="avg" radius={[0,6,6,0]}>
                     {classPerformance.map((entry, i) => (
-                      <Cell key={i} fill={entry.avg >= 70 ? '#16a34a' : entry.avg >= 50 ? '#ca8a04' : '#dc2626'} />
+                      <Cell key={i} fill={entry.avg >= 70 ? '#16a34a' : entry.avg >= 50 ? '#b8870a' : '#dc2626'} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -735,7 +735,7 @@ function WeeklyTimetable({ periods, slots, todayNum }) {
     slotMap[key].push(s)
   })
 
-  const SLOT_COLORS = ['#003049','#16a34a','#d97706','#db2777','#7c3aed','#0891b2','#ea580c','#be185d']
+  const SLOT_COLORS = ['#003049','#16a34a','#d97706','#db2777','#7c3aed','#0891b2','#b8870a','#be185d']
 
   // Build color map per class for consistency
   const classColorMap = {}
@@ -773,7 +773,7 @@ function WeeklyTimetable({ periods, slots, todayNum }) {
                     padding: '8px 6px', fontSize: 11, fontWeight: 700, textAlign: 'center',
                     borderBottom: '1px solid #e5e7eb',
                     color: d === todayNum ? '#003049' : '#6b7280',
-                    background: d === todayNum ? '#f0f5fa' : 'transparent'
+                    background: d === todayNum ? '#e6eff5' : 'transparent'
                   }}>
                     {DAY_NAMES[d]}
                   </th>
@@ -803,7 +803,7 @@ function WeeklyTimetable({ periods, slots, todayNum }) {
                       const isToday = d === todayNum
 
                       return (
-                        <td key={d} style={{ padding: '4px', verticalAlign: 'top', background: isToday ? '#f0f5fa08' : 'transparent' }}>
+                        <td key={d} style={{ padding: '4px', verticalAlign: 'top', background: isToday ? '#e6eff508' : 'transparent' }}>
                           {cellSlots.map(s => {
                             const tc = s.teacher_classes
                             const color = classColorMap[tc?.classes?.id] || '#6b7280'
@@ -852,7 +852,7 @@ const ChartTooltip = ({ active, payload, label, sym }) => {
   )
 }
 
-const CHART_COLORS = ['#003049', '#16a34a', '#f7c548', '#db2777', '#7c3aed', '#0891b2', '#ea580c', '#8b5cf6']
+const CHART_COLORS = ['#003049', '#16a34a', '#f7c548', '#db2777', '#7c3aed', '#0891b2', '#b8870a', '#8b5cf6']
 
 
 // ════════════════════════════════════════════════════════════════
@@ -887,7 +887,7 @@ function AdminDashboard() {
   const unpaidEntries = ledger.filter(e => e.status !== 'paid')
   const monthBalance  = ledger.reduce((s,e) => s + Number(e.amount_due) - Number(e.amount_paid), 0)
 
-  const rc = r => r >= 80 ? '#16a34a' : r >= 50 ? '#ca8a04' : '#dc2626'
+  const rc = r => r >= 80 ? '#16a34a' : '#b8870a'
 
   const hour = now.getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
@@ -908,7 +908,7 @@ function AdminDashboard() {
         </h1>
         <p style={{ fontSize: 14, color: '#6b7280', marginTop: 2 }}>
           {now.toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-          <span style={{ marginLeft: 10, fontSize: 12, background: '#f0f5fa', color: '#003049', padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>
+          <span style={{ marginLeft: 10, fontSize: 12, background: '#e6eff5', color: '#003049', padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>
             {user?.role === 'bursar' ? 'Bursar' : 'Admin'}
           </span>
         </p>
@@ -926,7 +926,7 @@ function AdminDashboard() {
           accent={rc(data?.attendanceRate || 0)} onClick={() => navigate('/attendance')} />
         <StatCard delay="180ms" label="Outstanding"         value={`${sym}${(fs.outstanding||0).toLocaleString()}`}
           sub={fs.overdueCount > 0 ? `${fs.overdueCount} overdue entries` : 'No overdue fees'}
-          accent={fs.outstanding > 0 ? '#dc2626' : '#16a34a'} onClick={() => setDrawer(true)} />
+          accent={fs.outstanding > 0 ? '#b8870a' : '#16a34a'} onClick={() => setDrawer(true)} />
       </div>
 
       {/* Charts row */}
@@ -1115,7 +1115,7 @@ function PrincipalDashboard() {
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
   const firstName = user?.full_name?.split(' ')[0] || 'there'
 
-  const rc = r => r >= 80 ? '#16a34a' : r >= 50 ? '#ca8a04' : '#dc2626'
+  const rc = r => r >= 80 ? '#16a34a' : '#b8870a'
 
   if (loading) return <div style={{ padding: 48, textAlign: 'center', color: '#6b7280' }}>Loading your dashboard…</div>
 
@@ -1189,7 +1189,7 @@ function PrincipalDashboard() {
         <div className="dash-card stat-card"
           style={{ animationDelay: '240ms', textAlign: 'center', padding: '28px 20px' }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 12 }}>Outstanding</div>
-          <div style={{ fontSize: 36, fontWeight: 900, color: fs.outstanding > 0 ? '#dc2626' : '#16a34a', letterSpacing: '-0.5px', lineHeight: 1 }}>
+          <div style={{ fontSize: 36, fontWeight: 900, color: fs.outstanding > 0 ? '#b8870a' : '#16a34a', letterSpacing: '-0.5px', lineHeight: 1 }}>
             {sym}{(fs.outstanding||0).toLocaleString()}
           </div>
           <div style={{ fontSize: 13, color: '#6b7280', marginTop: 10 }}>

@@ -54,7 +54,7 @@ function printReceipt(entry, schoolName, sym, schoolLogoUrl) {
   .amount-label{font-size:12px;color:#6b7280}
   .amount-value{font-size:14px;font-weight:700;color:#1f2937}
   .amount-value.paid{color:#15803d}
-  .amount-value.balance{color:${balance>0?'#dc2626':'#15803d'}}
+  .amount-value.balance{color:${balance>0?'#b8870a':'#15803d'}}
   .stamp{margin:16px 28px;padding:10px 14px;border-radius:8px;text-align:center;font-size:15px;font-weight:900;letter-spacing:1px;border:2.5px solid ${isPaid?'#16a34a':'#dc2626'};color:${isPaid?'#15803d':'#dc2626'}}
   .method-row{padding:12px 28px;font-size:12px;color:#6b7280;border-top:1px solid #f7f7f7}
   .footer{background:#fafafa;padding:14px 28px;margin-top:8px}
@@ -161,7 +161,7 @@ const STATUS_STYLE = {
   waived:          { bg: '#f3e8ff', color: '#7c3aed' },
   partial_waiver:  { bg: '#ede9fe', color: '#6d28d9' },
   partial:         { bg: '#fef4d6', color: '#b8870a' },
-  overdue:         { bg: '#fee2e2', color: '#dc2626' },
+  overdue:         { bg: '#fef4d6', color: '#b8870a' },
   pending:         { bg: '#f7f7f7', color: '#6b7280' },
 }
 
@@ -470,7 +470,7 @@ export default function Fees() {
     const balance  = Number(row.amount_due) - Number(row.amount_paid) - Number(row.amount_waived||0)
     const hasWaiver = Number(row.amount_waived||0) > 0
     return (
-      <tr className="fee-row" style={{ background: row.status==='overdue' ? '#fff9f9' : '#fff' }}>
+      <tr className="fee-row" style={{ background: row.status==='overdue' ? '#fef4d6' : '#fff' }}>
         <td style={{ padding:'10px 16px 10px 40px', fontSize:11, color:'#9ca3af', fontWeight:700, letterSpacing:'0.5px', width:70 }}>
           {row.learners?.reference_no || '—'}
         </td>
@@ -478,13 +478,13 @@ export default function Fees() {
           {row.learners?.first_name} {row.learners?.last_name}
         </td>
         <td style={{ padding:'10px 8px', fontSize:13, color:'#6b7280' }}>{row.description}</td>
-        <td style={{ padding:'10px 8px', fontSize:12, color: row.status==='overdue' ? '#dc2626' : '#6b7280', whiteSpace:'nowrap' }}>
+        <td style={{ padding:'10px 8px', fontSize:12, color: row.status==='overdue' ? '#b8870a' : '#6b7280', whiteSpace:'nowrap' }}>
           {new Date(row.due_date).toLocaleDateString('en-ZA')}
           {row.status==='overdue' && <div style={{ fontSize:10, fontWeight:800 }}>OVERDUE</div>}
         </td>
         <td style={{ padding:'10px 8px', fontSize:13 }}>{sym}{Number(row.amount_due).toLocaleString()}</td>
         <td style={{ padding:'10px 8px', fontSize:13, color:'#16a34a', fontWeight:600 }}>{sym}{Number(row.amount_paid).toLocaleString()}</td>
-        <td style={{ padding:'10px 8px', fontSize:13, fontWeight:700, color: balance>0?'#dc2626':'#16a34a' }}>
+        <td style={{ padding:'10px 8px', fontSize:13, fontWeight:700, color: balance>0?'#b8870a':'#16a34a' }}>
           {sym}{balance.toLocaleString()}
         </td>
         <td style={{ padding:'10px 8px' }}><StatusPill status={row.status} /></td>
@@ -507,7 +507,7 @@ export default function Fees() {
                 title="Print / view receipt"
                 style={{ display:'inline-flex', alignItems:'center', justifyContent:'center',
                   width:26, height:26, border:'1px solid #e6eff5', borderRadius:6,
-                  background:'#f0f5fa', color:'#003049', cursor:'pointer', flexShrink:0 }}>
+                  background:'#e6eff5', color:'#003049', cursor:'pointer', flexShrink:0 }}>
                 <ReceiptIcon />
               </button>
             )}
@@ -542,7 +542,7 @@ export default function Fees() {
           {!allPaid && (
             <span style={{ fontSize:12, color:'#6b7280' }}>
               {unpaidCount} unpaid ·{' '}
-              <span style={{ fontWeight:700, color: hasOverdue?'#dc2626':'#374151' }}>
+              <span style={{ fontWeight:700, color: hasOverdue?'#b8870a':'#374151' }}>
                 {sym}{gradeBalance.toLocaleString()} outstanding
               </span>
             </span>
@@ -551,8 +551,8 @@ export default function Fees() {
             {sym}{gradeOwed.toLocaleString()} due · {sym}{gradePaid.toLocaleString()} paid
           </div>
           {hasOverdue && (
-            <span style={{ fontSize:11, fontWeight:700, color:'#dc2626',
-              background:'#fee2e2', padding:'2px 8px', borderRadius:20 }}>
+            <span style={{ fontSize:11, fontWeight:700, color:'#b8870a',
+              background:'#fef4d6', padding:'2px 8px', borderRadius:20 }}>
               ⚠ overdue
             </span>
           )}
@@ -648,7 +648,7 @@ export default function Fees() {
                   background:  statusFilter===p.key ? '#003049' : '#fff',
                   color:       statusFilter===p.key ? '#fff' : '#6b7280',
                   fontWeight:600, fontSize:12, cursor:'pointer', transition:'all .15s',
-                  ...(p.key==='overdue' && counts.overdue>0 && statusFilter!==p.key ? { borderColor:'#fca5a5', color:'#dc2626' } : {})
+                  ...(p.key==='overdue' && counts.overdue>0 && statusFilter!==p.key ? { borderColor:'#fcd34d', color:'#b8870a' } : {})
                 }}>
                 {p.label}
               </button>
@@ -671,8 +671,8 @@ export default function Fees() {
               { label: statusFilter==='all' ? 'Total due' : `${statusFilter.charAt(0).toUpperCase()+statusFilter.slice(1)} — due`,
                 value:`${sym}${monthDue.toLocaleString()}`, color:'#1f2937' },
               { label:'Collected',   value:`${sym}${monthPaid.toLocaleString()}`,    color:'#16a34a' },
-              { label:'Outstanding', value:`${sym}${monthBalance.toLocaleString()}`, color: monthBalance>0?'#dc2626':'#16a34a' },
-              { label:'Collection rate (month)', value:`${fullPct}%`,               color: fullPct>=80?'#16a34a':fullPct>=50?'#ca8a04':'#dc2626' },
+              { label:'Outstanding', value:`${sym}${monthBalance.toLocaleString()}`, color: monthBalance>0?'#b8870a':'#16a34a' },
+              { label:'Collection rate (month)', value:`${fullPct}%`,               color: fullPct>=80?'#16a34a':'#b8870a' },
             ].map((c, i) => (
               <div key={c.label} style={{ flex:1, padding:'12px 20px', borderLeft: i>0?'1px solid #f7f7f7':'none' }}>
                 <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.6px', marginBottom:4 }}>{c.label}</div>
@@ -736,18 +736,18 @@ export default function Fees() {
                           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
                             <div style={{ fontWeight:800, fontSize:15, color:'#1f2937' }}>{gname}</div>
                             {allPaid && <span style={{ fontSize:11, fontWeight:700, color:'#16a34a', background:'#f0fdf4', padding:'2px 8px', borderRadius:10 }}>All paid</span>}
-                            {hasOverdue && <span style={{ fontSize:11, fontWeight:700, color:'#dc2626', background:'#fee2e2', padding:'2px 8px', borderRadius:10 }}>{overdueCount} overdue</span>}
+                            {hasOverdue && <span style={{ fontSize:11, fontWeight:700, color:'#b8870a', background:'#fef4d6', padding:'2px 8px', borderRadius:10 }}>{overdueCount} overdue</span>}
                           </div>
 
                           {/* Collection progress bar */}
                           <div style={{ marginBottom:12 }}>
                             <div style={{ display:'flex', justifyContent:'space-between', fontSize:11, fontWeight:600, color:'#6b7280', marginBottom:4 }}>
                               <span>Collection rate</span>
-                              <span style={{ color: collPct>=80?'#16a34a':collPct>=50?'#d97706':'#dc2626', fontWeight:800 }}>{collPct}%</span>
+                              <span style={{ color: collPct>=80?'#16a34a':'#b8870a', fontWeight:800 }}>{collPct}%</span>
                             </div>
                             <div style={{ height:8, background:'#f7f7f7', borderRadius:4, overflow:'hidden' }}>
                               <div style={{ height:'100%', width:`${collPct}%`, borderRadius:4, transition:'width .3s',
-                                background: collPct>=80?'#16a34a':collPct>=50?'#d97706':'#dc2626' }} />
+                                background: collPct>=80?'#16a34a':'#b8870a' }} />
                             </div>
                           </div>
 
@@ -763,7 +763,7 @@ export default function Fees() {
                             </div>
                             <div style={{ background: gradeBalance>0?'#fff5f5':'#f0fdf4', borderRadius:8, padding:'8px 10px' }}>
                               <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.4px' }}>Outstanding</div>
-                              <div style={{ fontSize:15, fontWeight:800, color: gradeBalance>0?'#dc2626':'#16a34a' }}>{sym}{gradeBalance.toLocaleString()}</div>
+                              <div style={{ fontSize:15, fontWeight:800, color: gradeBalance>0?'#b8870a':'#16a34a' }}>{sym}{gradeBalance.toLocaleString()}</div>
                             </div>
                             <div style={{ background:'#fafafa', borderRadius:8, padding:'8px 10px' }}>
                               <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.4px' }}>Learners</div>
@@ -904,7 +904,7 @@ export default function Fees() {
                 </div>
                 <div>
                   <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', marginBottom:3 }}>Remaining</div>
-                  <div style={{ fontWeight:800, fontSize:20, color:'#dc2626' }}>
+                  <div style={{ fontWeight:800, fontSize:20, color:'#b8870a' }}>
                     {sym}{(Number(payEntry.amount_due)-Number(payEntry.amount_paid)).toLocaleString()}
                   </div>
                 </div>

@@ -286,7 +286,7 @@ export default function Learners() {
           <select
             value={gradeFilter}
             onChange={e => { setGradeFilter(e.target.value); setClassFilter('') }}
-            style={{ padding: '7px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, outline: 'none', background: gradeFilter ? '#f0f5fa' : '#fff', color: gradeFilter ? '#003049' : '#374151', fontWeight: gradeFilter ? 600 : 400, minWidth: 140 }}
+            style={{ padding: '7px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, outline: 'none', background: gradeFilter ? '#e6eff5' : '#fff', color: gradeFilter ? '#003049' : '#374151', fontWeight: gradeFilter ? 600 : 400, minWidth: 140 }}
           >
             <option value="">All grades</option>
             {grades.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
@@ -296,7 +296,7 @@ export default function Learners() {
             <select
               value={classFilter}
               onChange={e => setClassFilter(e.target.value)}
-              style={{ padding: '7px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, outline: 'none', background: classFilter ? '#f0f5fa' : '#fff', color: classFilter ? '#003049' : '#374151', fontWeight: classFilter ? 600 : 400, minWidth: 120 }}
+              style={{ padding: '7px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, outline: 'none', background: classFilter ? '#e6eff5' : '#fff', color: classFilter ? '#003049' : '#374151', fontWeight: classFilter ? 600 : 400, minWidth: 120 }}
             >
               <option value="">All classes</option>
               {filteredClasses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -428,7 +428,7 @@ export default function Learners() {
                 </div>
                 {importResult.errors.length > 0 && (
                   <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 10, padding: '14px 16px', maxHeight: 140, overflowY: 'auto' }}>
-                    <div style={{ fontWeight: 700, color: '#dc2626', marginBottom: 6, fontSize: 13 }}>Skipped rows</div>
+                    <div style={{ fontWeight: 700, color: '#b8870a', marginBottom: 6, fontSize: 13 }}>Skipped rows</div>
                     {importResult.errors.map((e, i) => (
                       <div key={i} style={{ fontSize: 12, color: '#7f1d1d', marginBottom: 3 }}>• {e}</div>
                     ))}

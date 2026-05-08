@@ -16,7 +16,7 @@ const GRADE_SYMBOL = mark => {
   return 'F'
 }
 const GRADE_COLOR = sym => ({
-  A: '#15803d', B: '#003049', C: '#ca8a04', D: '#ea580c', F: '#dc2626', '—': '#9ca3af'
+  A: '#15803d', B: '#003049', C: '#b8870a', D: '#b8870a', F: '#dc2626', '—': '#9ca3af'
 }[sym] || '#9ca3af')
 
 const DEFAULT_SUBJECTS = [
@@ -240,7 +240,7 @@ function FeesTab({ learnerId, sym, isReadOnly }) {
     { value:'snapscan', label:'SnapScan' }, { value:'other', label:'Other' },
   ]
 
-  const STATUS_C = { paid:['#dcfce7','#15803d'], partial:['#fef4d6','#b8870a'], overdue:['#fee2e2','#dc2626'], pending:['#f7f7f7','#6b7280'] }
+  const STATUS_C = { paid:['#dcfce7','#15803d'], partial:['#fef4d6','#b8870a'], overdue:['#fef4d6','#b8870a'], pending:['#f7f7f7','#6b7280'] }
 
   const [catchingUp, setCatchingUp] = useState(false)
 
@@ -308,7 +308,7 @@ function FeesTab({ learnerId, sym, isReadOnly }) {
         {[
           { label:'Total due',    value:`${sym}${totalDue.toLocaleString()}`,             color:'#1f2937' },
           { label:'Paid',         value:`${sym}${totalPaid.toLocaleString()}`,            color:'#16a34a' },
-          { label:'Outstanding',  value:`${sym}${(totalDue-totalPaid).toLocaleString()}`, color: totalDue>totalPaid?'#dc2626':'#16a34a' },
+          { label:'Outstanding',  value:`${sym}${(totalDue-totalPaid).toLocaleString()}`, color: totalDue>totalPaid?'#b8870a':'#16a34a' },
         ].map(c=>(
           <div key={c.label} style={{ background:'#fff', borderRadius:10, padding:'14px 18px', boxShadow:'0 1px 3px rgba(0,0,0,.06)' }}>
             <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.6px', marginBottom:4 }}>{c.label}</div>
@@ -335,7 +335,7 @@ function FeesTab({ learnerId, sym, isReadOnly }) {
                     <td style={{ padding:'11px 14px', fontSize:12, color:'#6b7280' }}>{new Date(e.due_date).toLocaleDateString('en-ZA')}</td>
                     <td style={{ padding:'11px 14px', fontSize:13 }}>{sym}{Number(e.amount_due).toLocaleString()}</td>
                     <td style={{ padding:'11px 14px', fontSize:13, color:'#16a34a', fontWeight:600 }}>{sym}{Number(e.amount_paid).toLocaleString()}</td>
-                    <td style={{ padding:'11px 14px', fontSize:13, fontWeight:700, color:bal>0?'#dc2626':'#16a34a' }}>{sym}{bal.toLocaleString()}</td>
+                    <td style={{ padding:'11px 14px', fontSize:13, fontWeight:700, color:bal>0?'#b8870a':'#16a34a' }}>{sym}{bal.toLocaleString()}</td>
                     <td style={{ padding:'11px 14px' }}><span style={{ background:bg, color:col, padding:'2px 9px', borderRadius:20, fontSize:11, fontWeight:700 }}>{e.status}</span></td>
                     <td style={{ padding:'11px 14px' }}>
                       {e.status!=='paid' && !isReadOnly && <button onClick={()=>openPay(e)} style={{ padding:'5px 12px', background:'#003049', color:'#fff', border:'none', borderRadius:7, fontSize:12, fontWeight:700, cursor:'pointer' }}>Pay</button>}

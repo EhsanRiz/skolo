@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import api from '../lib/api'
 
 const EVENT_COLORS = {
-  academic: { bg: '#f0f5fa', color: '#003049', icon: '&#128218;' },
+  academic: { bg: '#e6eff5', color: '#003049', icon: '&#128218;' },
   sports: { bg: '#ecfdf5', color: '#059669', icon: '&#9917;' },
-  meeting: { bg: '#fef3c7', color: '#d97706', icon: '&#128101;' },
+  meeting: { bg: '#fef4d6', color: '#d97706', icon: '&#128101;' },
   holiday: { bg: '#fce7f3', color: '#db2777', icon: '&#127881;' },
   general: { bg: '#f7f7f7', color: '#4b5563', icon: '&#128197;' }
 }

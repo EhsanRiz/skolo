@@ -51,7 +51,7 @@ export function IconUpload({ size = 16 }) {
 export const STATUS_COLORS = {
   paid:     { bg: '#dcfce7', color: '#15803d' },
   partial:  { bg: '#fef4d6', color: '#b8870a' },
-  unpaid:   { bg: '#fee2e2', color: '#dc2626' },
+  unpaid:   { bg: '#fef4d6', color: '#b8870a' },
   'no fees':{ bg: '#f3f4f6', color: '#6b7280' },
   active:   { bg: '#dcfce7', color: '#15803d' },
   trial:    { bg: '#fef4d6', color: '#b8870a' },

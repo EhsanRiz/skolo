@@ -5,7 +5,7 @@ import api from '../lib/api'
 const TYPE_COLORS = {
   academic: { bg: '#e6eff5', color: '#003049', dot: '#003049' },
   sports:   { bg: '#dcfce7', color: '#15803d', dot: '#16a34a' },
-  meeting:  { bg: '#fef4d6', color: '#b8870a', dot: '#ca8a04' },
+  meeting:  { bg: '#fef4d6', color: '#b8870a', dot: '#b8870a' },
   holiday:  { bg: '#fce7f3', color: '#be185d', dot: '#db2777' },
   general:  { bg: '#f7f7f7', color: '#4b5563', dot: '#6b7280' },
 }

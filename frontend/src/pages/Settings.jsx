@@ -690,7 +690,7 @@ export default function Settings() {
                     {label:'Total',     count:guardians.length, bg:'#f7f7f7', color:'#1f2937'},
                     {label:'Active',    count:active,           bg:'#dcfce7', color:'#15803d'},
                     {label:'Invited',   count:invited,          bg:'#fef4d6', color:'#b8870a'},
-                    {label:'Not invited',count:notInvited,      bg:'#fee2e2', color:'#dc2626'},
+                    {label:'Not invited',count:notInvited,      bg:'#fef4d6', color:'#b8870a'},
                   ].map(s=>(
                     <div key={s.label} style={{background:s.bg,borderRadius:10,padding:'12px 20px',minWidth:100,flex:1}}>
                       <div style={{fontSize:22,fontWeight:800,color:s.color}}>{s.count}</div>
@@ -1282,7 +1282,7 @@ function GradeScaleTab({ school, refreshSchool, toast }) {
     finally { setSaving(false) }
   }
 
-  const gradeColors = ['#16a34a','#003049','#d97706','#ea580c','#dc2626','#7c3aed','#0891b2','#be185d']
+  const gradeColors = ['#16a34a','#003049','#d97706','#b8870a','#dc2626','#7c3aed','#0891b2','#be185d']
 
   return (
     <div style={{ maxWidth: 520 }}>

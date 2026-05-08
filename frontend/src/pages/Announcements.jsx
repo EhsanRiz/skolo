@@ -31,9 +31,9 @@ const CSS = `
 
 // Type/color mapping for announcement badges
 const TARGET_STYLE = {
-  all:   { bg: '#f0f5fa', color: '#003049', label: 'All parents', icon: '📢' },
+  all:   { bg: '#e6eff5', color: '#003049', label: 'All parents', icon: '📢' },
   grade: { bg: '#faf5ff', color: '#7c3aed', label: 'Grade', icon: '🎓' },
-  class: { bg: '#fef3c7', color: '#b8870a', label: 'Class', icon: '🏫' },
+  class: { bg: '#fef4d6', color: '#b8870a', label: 'Class', icon: '🏫' },
 }
 
 function ConfirmModal({ open, title, message, confirmLabel, danger, onConfirm, onCancel }) {
