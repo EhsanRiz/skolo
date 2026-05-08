@@ -41,10 +41,13 @@ export function AuthProvider({ children }) {
   }
 
   const logout = () => {
+    // Clear credentials and do a hard reload to '/'. We deliberately skip
+    // setUser(null)/setSchool(null) here — they would trigger an intermediate
+    // React re-render (Layout unmount → LandingPage mount via ProtectedRoute)
+    // before the navigation actually fires, producing a visible flicker.
+    // The hard reload tears down all React state cleanly.
     localStorage.removeItem('sk_token')
     localStorage.removeItem('sk_user')
-    setUser(null)
-    setSchool(null)
     window.location.href = '/'
   }
 
