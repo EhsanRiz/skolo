@@ -70,7 +70,7 @@ export default function Register() {
         <style>{CSS}</style>
         <div style={{
           minHeight: '100vh',
-          background: 'linear-gradient(160deg, #1a3a6b 0%, #003049 50%, #00253a 100%)',
+          background: 'linear-gradient(160deg, #f7f7f7 0%, #e6eff5 100%)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px'
         }}>
           <div style={{
@@ -100,7 +100,7 @@ export default function Register() {
         <style>{CSS}</style>
         <div style={{
           minHeight: '100vh',
-          background: 'linear-gradient(160deg, #1a3a6b 0%, #003049 50%, #00253a 100%)',
+          background: 'linear-gradient(160deg, #f7f7f7 0%, #e6eff5 100%)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px'
         }}>
           <div style={{
@@ -126,7 +126,7 @@ export default function Register() {
   // Still validating
   if (validating) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #1a3a6b 0%, #003049 50%, #00253a 100%)' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(160deg, #f7f7f7 0%, #e6eff5 100%)' }}>
         <div style={{ textAlign: 'center', color: '#fff' }}>
           <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.5px' }}>Skolo</div>
           <div style={{ fontSize: 14, marginTop: 8, opacity: 0.7 }}>Verifying your invite...</div>
@@ -144,7 +144,7 @@ export default function Register() {
       <style>{CSS}</style>
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(160deg, #1a3a6b 0%, #003049 50%, #00253a 100%)',
+        background: 'linear-gradient(160deg, #f7f7f7 0%, #e6eff5 100%)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px'
       }}>
         <div style={{

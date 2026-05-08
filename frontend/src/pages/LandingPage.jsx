@@ -401,8 +401,9 @@ const LandingPage = () => {
       {/* ═══════ NAV ═══════ */}
       <nav className={`nav ${scrolled ? 'scrolled' : ''}`}>
         <div className="container">
-          <a href="/" className="nav-logo">
-            <img src="/skolo-logo-navy.svg" alt="Skolo \u2014 One platform. Whole school." style={{ height:88, objectFit:'contain', borderRadius:10 }} />
+          <a href="/" className="nav-logo" style={{ display:'flex', alignItems:'center', gap:10 }}>
+            <img src="/skolo-icon-navy.svg" alt="" style={{ height:38, width:38, objectFit:'contain', borderRadius:8 }} />
+            <img src="/skolo-wordmark-navy.svg" alt="Skolo" style={{ height:24, objectFit:'contain' }} />
           </a>
           <div className="nav-links">
             <a href="#features">Features</a>
@@ -567,32 +568,32 @@ const LandingPage = () => {
       </section>
 
       {/* ═══════ AI ═══════ */}
-      <section style={{ padding:'100px 0', background:'linear-gradient(135deg,#003049 0%,#162d5a 100%)', color:'#fff', position:'relative', overflow:'hidden' }}>
-        <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 70% 30%,rgba(124,58,237,.15) 0%,transparent 60%),radial-gradient(ellipse at 30% 70%,rgba(0,48,73,.1) 0%,transparent 50%)' }}></div>
+      <section style={{ padding:'100px 0', background:'linear-gradient(180deg, #ffffff 0%, #e6eff5 100%)', position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at 75% 25%, rgba(102,155,188,.12) 0%, transparent 55%), radial-gradient(ellipse at 25% 75%, rgba(247,197,72,.08) 0%, transparent 50%)' }}></div>
         <div className="container" style={{ position:'relative', zIndex:1 }}>
           <div style={{ textAlign:'center' }}>
-            <span className="section-label" style={{ background:'rgba(124,58,237,.2)', color:'#c4b5fd' }}>AI-powered</span>
-            <h2 className="section-title" style={{ color:'#fff' }}>Smart tools that learn<br />with your school.</h2>
-            <p className="section-sub" style={{ margin:'0 auto', color:'rgba(255,255,255,.55)' }}>Skolo doesn&rsquo;t just store data &mdash; it works with it. Our AI layer turns your school&rsquo;s information into insights, predictions, and automation.</p>
+            <span className="section-label" style={{ background:'#fef4d6', color:'#b8870a' }}>AI-powered</span>
+            <h2 className="section-title" style={{ color:'#003049' }}>Smart tools that learn<br />with your school.</h2>
+            <p className="section-sub" style={{ margin:'0 auto' }}>Skolo doesn&rsquo;t just store data &mdash; it works with it. Our AI layer turns your school&rsquo;s information into insights, predictions, and automation.</p>
           </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:'20px', marginTop:'48px' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(240px, 1fr))', gap:'20px', marginTop:'48px' }}>
             {[
-              { title: 'Early warning alerts', desc: 'AI spots learners at risk of dropping out based on attendance patterns, fee arrears, and grade trends \u2014 before it\u2019s too late.', color: '#c4b5fd', bg: 'rgba(124,58,237,.2)', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/></svg> },
-              { title: 'Smart reports', desc: 'Ask questions in plain English: \u201CWhich grade has the lowest attendance this term?\u201D \u2014 no spreadsheets, no formulas.', color: '#c6dae7', bg: 'rgba(0,48,73,.2)', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c6dae7" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> },
-              { title: 'Automated parent comms', desc: 'AI drafts personalised fee reminders, absence follow-ups, and term-end summaries \u2014 saving hours each week.', color: '#86efac', bg: 'rgba(22,163,74,.2)', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#86efac" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> },
+              { title: 'Early warning alerts', desc: 'AI spots learners at risk of dropping out based on attendance patterns, fee arrears, and grade trends \u2014 before it\u2019s too late.', iconColor: '#003049', iconBg: '#e6eff5', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#003049" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/></svg> },
+              { title: 'Smart reports', desc: 'Ask questions in plain English: \u201CWhich grade has the lowest attendance this term?\u201D \u2014 no spreadsheets, no formulas.', iconColor: '#669bbc', iconBg: '#e6eff5', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#669bbc" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> },
+              { title: 'Automated parent comms', desc: 'AI drafts personalised fee reminders, absence follow-ups, and term-end summaries \u2014 saving hours each week.', iconColor: '#16a34a', iconBg: '#dcfce7', svg: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> },
             ].map((item, i) => (
-              <div key={i} className={`animate delay-${i+1}`} style={{ background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.08)', borderRadius:'14px', padding:'28px' }}>
+              <div key={i} className={`animate delay-${i+1}`} style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:'14px', padding:'28px', boxShadow:'0 1px 3px rgba(0,48,73,.04)' }}>
                 <div style={{ display:'flex', alignItems:'center', gap:'12px', marginBottom:'14px' }}>
-                  <div style={{ width:'40px', height:'40px', borderRadius:'10px', background:item.bg, display:'flex', alignItems:'center', justifyContent:'center' }}>{item.svg}</div>
-                  <div style={{ fontSize:'16px', fontWeight:'800' }}>{item.title}</div>
+                  <div style={{ width:'40px', height:'40px', borderRadius:'10px', background:item.iconBg, display:'flex', alignItems:'center', justifyContent:'center' }}>{item.svg}</div>
+                  <div style={{ fontSize:'16px', fontWeight:'800', color:'#003049' }}>{item.title}</div>
                 </div>
-                <div style={{ fontSize:'14px', color:'rgba(255,255,255,.5)', lineHeight:'1.7' }}>{item.desc}</div>
+                <div style={{ fontSize:'14px', color:'#6b7280', lineHeight:'1.7' }}>{item.desc}</div>
               </div>
             ))}
           </div>
           <div style={{ textAlign:'center', marginTop:'40px' }}>
-            <div style={{ display:'inline-flex', alignItems:'center', gap:'8px', background:'rgba(255,255,255,.06)', border:'1px solid rgba(255,255,255,.1)', borderRadius:'20px', padding:'8px 18px', fontSize:'13px', color:'rgba(255,255,255,.45)', fontWeight:'600' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            <div style={{ display:'inline-flex', alignItems:'center', gap:'8px', background:'#fff', border:'1px solid #e5e7eb', borderRadius:'20px', padding:'8px 18px', fontSize:'13px', color:'#003049', fontWeight:'600', boxShadow:'0 1px 3px rgba(0,48,73,.04)' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#669bbc" strokeWidth="2" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
               Available on the Skolo AI plan
             </div>
           </div>
@@ -776,7 +777,7 @@ const LandingPage = () => {
           <h2 className="animate">Ready to simplify your school?</h2>
           <p className="animate delay-1">Join schools across Lesotho and South Africa already using Skolo to save time, collect fees faster, and give parents peace of mind.</p>
           <div className="cta-buttons animate delay-2">
-            <Link to="/request-demo" className="btn btn-green">
+            <Link to="/request-demo" className="btn btn-amber">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               Request a Demo
             </Link>

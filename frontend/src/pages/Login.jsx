@@ -24,13 +24,13 @@ const FORMULAS = [
 const CSS = `
 @keyframes chalkFade {
   0%,100% { opacity:0; }
-  15%,80%  { opacity:1; }
+  15%,80%  { opacity:0.55; }
 }
 @keyframes cardIn {
   from { opacity:0; transform:translateY(18px) scale(0.97); }
   to   { opacity:1; transform:translateY(0) scale(1); }
 }
-.chalk { position:absolute; color:rgba(255,255,255,0.82); font-family:'Courier New',monospace; pointer-events:none; user-select:none; letter-spacing:1px; text-shadow:0 0 8px rgba(255,255,255,0.15); animation:chalkFade 9s ease-in-out infinite; }
+.chalk { position:absolute; color:rgba(0,48,73,0.12); font-family:'Courier New',monospace; pointer-events:none; user-select:none; letter-spacing:1px; animation:chalkFade 9s ease-in-out infinite; font-weight:600; }
 .li { width:100%; padding:11px 14px; border:1.5px solid #e5e7eb; border-radius:10px; font-size:14px; outline:none; margin-bottom:16px; box-sizing:border-box; font-family:inherit; transition:border-color .15s,box-shadow .15s; }
 .li:focus { border-color:#003049; box-shadow:0 0 0 3px rgba(15,32,68,.12); }
 `
@@ -56,16 +56,18 @@ export default function Login() {
       <style>{CSS}</style>
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(160deg, #003049 0%, #1a3a6b 45%, #003049 100%)',
+        background: 'linear-gradient(160deg, #f7f7f7 0%, #e6eff5 100%)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         position: 'relative', overflow: 'hidden', padding: '20px'
       }}>
-        {/* Ruled lines */}
+        {/* Soft ruled lines */}
         <div style={{ position:'absolute', inset:0, pointerEvents:'none',
-          backgroundImage:'repeating-linear-gradient(0deg,rgba(255,255,255,0.04) 0,transparent 1px,transparent 52px)',
+          backgroundImage:'repeating-linear-gradient(0deg,rgba(0,48,73,0.025) 0,transparent 1px,transparent 52px)',
         }}/>
-        {/* Border */}
-        <div style={{ position:'absolute', inset:14, border:'1.5px solid rgba(255,255,255,0.07)', borderRadius:4, pointerEvents:'none' }}/>
+        {/* Subtle radial accent */}
+        <div style={{ position:'absolute', inset:0, pointerEvents:'none',
+          background:'radial-gradient(ellipse at 80% 20%, rgba(102,155,188,.18) 0%, transparent 55%), radial-gradient(ellipse at 20% 80%, rgba(247,197,72,.08) 0%, transparent 50%)'
+        }}/>
 
         {/* Formulas */}
         {FORMULAS.map((f, i) => (
@@ -80,11 +82,11 @@ export default function Login() {
         <div style={{
           background:'#fff', borderRadius:20, padding:'44px 40px',
           width:'100%', maxWidth:420, position:'relative', zIndex:1,
-          boxShadow:'0 32px 80px rgba(0,0,0,0.35)',
+          boxShadow:'0 24px 60px rgba(0,48,73,0.15), 0 0 0 1px rgba(0,48,73,0.04)',
           animation:'cardIn 0.55s cubic-bezier(0.16,1,0.3,1) both'
         }}>
           <div style={{ marginBottom:28 }}>
-            <img src="/skolo-logo-white.svg" alt="Skolo" style={{ height:100, objectFit:'contain', display:'block', maxWidth:'100%' }} />
+            <img src="/skolo-logo.svg" alt="Skolo" style={{ height:62, objectFit:'contain', display:'block', maxWidth:'100%' }} />
           </div>
 
           <div style={{ fontSize:19, fontWeight:700, color:'#1f2937', marginBottom:22 }}>Sign in to your school</div>
