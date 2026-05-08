@@ -429,7 +429,7 @@ export default function Fees() {
     e.preventDefault(); setPaying(true)
 
     try {
-      await api.post(`/fee-ledger/${entryId}/pay`, payForm)
+      await api.post(`/fee-ledger/${payEntry.id}/pay`, payForm)
       setPayEntry(null); loadLedger(); loadSummary()
       // Small delay so ledger reloads with updated data before printing
       toast.success('Payment recorded — click the receipt icon to print')
