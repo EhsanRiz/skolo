@@ -42,10 +42,12 @@ const LandingPage = () => {
       }
       .btn-primary { background: var(--blue); color: #fff; }
       .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,48,73,.35); }
-      .btn-outline { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,.3); }
-      .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,.08); }
+      .btn-outline { background: #fff; color: var(--navy); border: 1.5px solid #e5e7eb; }
+      .btn-outline:hover { border-color: var(--navy); background: #fff; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,48,73,0.08); }
       .btn-green { background: var(--green); color: #fff; }
       .btn-green:hover { background: #15803d; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(22,163,74,.35); }
+      .btn-amber { background: var(--amber); color: var(--navy); box-shadow: 0 2px 8px rgba(247,197,72,.4); }
+      .btn-amber:hover { background: #f0b82a; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(247,197,72,.5); }
       .section-label {
         display: inline-block; font-size: 12px; font-weight: 700;
         letter-spacing: 1.5px; text-transform: uppercase;
@@ -62,24 +64,28 @@ const LandingPage = () => {
       .nav {
         position: fixed; top: 0; left: 0; right: 0; z-index: 100;
         padding: 12px 0; transition: all .3s;
+        background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(0,48,73,0.06);
       }
-      .nav.scrolled { background: rgba(15,32,68,.97); backdrop-filter: blur(12px); box-shadow: 0 2px 20px rgba(0,0,0,.15); padding: 8px 0; }
+      .nav.scrolled { background: rgba(255,255,255,.98); backdrop-filter: blur(14px); box-shadow: 0 2px 16px rgba(0,48,73,.08); padding: 8px 0; }
       .nav .container { display: flex; justify-content: space-between; align-items: center; }
       .nav-logo { text-decoration: none; display: flex; align-items: center; flex-shrink: 0; }
       .nav-links { display: flex; align-items: center; gap: 28px; }
-      .nav-links a { color: rgba(255,255,255,.7); text-decoration: none; font-size: 14px; font-weight: 600; transition: color .15s; }
-      .nav-links a:hover { color: #fff; }
+      .nav-links a { color: #374151; text-decoration: none; font-size: 14px; font-weight: 600; transition: color .15s; }
+      .nav-links a:hover { color: var(--navy); }
+      .nav-signin { color: var(--navy) !important; padding: 9px 18px; border-radius: 10px; border: 1.5px solid #e5e7eb; transition: all .15s; }
+      .nav-signin:hover { border-color: var(--navy); }
       .nav-cta { padding: 9px 20px !important; font-size: 13px !important; }
       .nav-hamburger {
-        display: none; background: none; border: none; color: #fff;
+        display: none; background: none; border: none; color: var(--navy);
         cursor: pointer; padding: 6px; border-radius: 6px; transition: background .15s;
       }
-      .nav-hamburger:hover { background: rgba(255,255,255,.1); }
+      .nav-hamburger:hover { background: rgba(0,48,73,.06); }
 
       /* Mobile menu overlay */
       .mobile-menu {
         display: none; position: fixed; inset: 0; z-index: 99;
-        background: rgba(15,32,68,.98); backdrop-filter: blur(16px);
+        background: rgba(0,48,73,.98); backdrop-filter: blur(16px);
         flex-direction: column; align-items: center; justify-content: center; gap: 8px;
       }
       .mobile-menu.open { display: flex; }
@@ -94,52 +100,70 @@ const LandingPage = () => {
         background: none; border: none; color: #fff; cursor: pointer; padding: 8px;
       }
 
-      /* ── HERO ────────────────────────────────────── */
+      /* ── HERO (Modern Academic) ──────────────────── */
       .hero {
-        background: linear-gradient(135deg, var(--navy) 0%, #162d5a 50%, #1a3a6b 100%);
-        color: #fff; padding: 0; overflow: hidden; position: relative;
+        background: linear-gradient(135deg, #f7f7f7 0%, #e6eff5 100%);
+        color: var(--navy); padding: 0; overflow: hidden; position: relative;
       }
       .hero::before {
         content: ''; position: absolute; inset: 0;
-        background: radial-gradient(ellipse at 80% 20%, rgba(0,48,73,.15) 0%, transparent 60%),
-                    radial-gradient(ellipse at 20% 80%, rgba(22,163,74,.08) 0%, transparent 50%);
+        background: radial-gradient(ellipse at 85% 25%, rgba(102,155,188,.18) 0%, transparent 55%),
+                    radial-gradient(ellipse at 15% 85%, rgba(247,197,72,.10) 0%, transparent 50%);
       }
       .hero .container {
         position: relative; z-index: 1;
-        display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
-        align-items: center; min-height: 92vh; padding-top: 100px; padding-bottom: 60px;
+        display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px;
+        align-items: center; min-height: 92vh; padding-top: 120px; padding-bottom: 80px;
       }
       .hero-text h1 {
-        font-size: clamp(36px, 5vw, 56px); font-weight: 900;
-        letter-spacing: -1px; line-height: 1.08; margin-bottom: 20px;
+        font-size: clamp(36px, 5vw, 60px); font-weight: 800;
+        letter-spacing: -1.5px; line-height: 1.05; margin-bottom: 22px;
+        color: var(--navy);
       }
       .hero-text h1 span { color: #669bbc; }
-      .hero-text p { font-size: 18px; color: rgba(255,255,255,.65); line-height: 1.7; margin-bottom: 32px; max-width: 480px; }
+      .hero-text p { font-size: 18px; color: #4b5563; line-height: 1.65; margin-bottom: 32px; max-width: 520px; }
       .hero-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+      .hero-stats {
+        margin-top: 36px; padding-top: 24px;
+        border-top: 1px solid rgba(0,48,73,0.1);
+        display: flex; gap: 36px; flex-wrap: wrap;
+      }
+      .hero-stat-num { font-size: 28px; font-weight: 800; color: var(--navy); letter-spacing: -0.5px; }
+      .hero-stat-label { font-size: 13px; color: #6b7280; margin-top: 2px; }
       .hero-visual { display: flex; justify-content: center; align-items: center; }
       .hero-mockup {
         width: 100%; max-width: 520px;
-        background: rgba(255,255,255,.06); border-radius: 16px;
-        border: 1px solid rgba(255,255,255,.1);
-        padding: 24px; backdrop-filter: blur(8px);
+        background: #fff; border-radius: 18px;
+        border: 1px solid #e5e7eb;
+        padding: 24px; box-shadow: 0 16px 48px rgba(0,48,73,0.15);
       }
-      .mockup-bar { display: flex; gap: 6px; margin-bottom: 18px; }
-      .mockup-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.15); }
-      .mockup-dot:first-child { background: #ef4444; }
-      .mockup-dot:nth-child(2) { background: #f7c548; }
-      .mockup-dot:nth-child(3) { background: #22c55e; }
-      .mockup-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+      .mockup-bar { display: flex; gap: 6px; margin-bottom: 14px; }
+      .mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+      .mockup-dot:nth-child(1) { background: #ff5f56; }
+      .mockup-dot:nth-child(2) { background: #ffbd2e; }
+      .mockup-dot:nth-child(3) { background: #27c93f; }
+      .mockup-title { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 14px; }
+      .mockup-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
       .mockup-stat {
-        background: rgba(255,255,255,.05); border-radius: 10px; padding: 14px 16px;
-        border: 1px solid rgba(255,255,255,.07);
+        background: #f7f7f7; border-radius: 10px; padding: 12px 14px;
       }
-      .mockup-stat-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.35); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
-      .mockup-stat-value { font-size: 24px; font-weight: 900; color: #fff; }
-      .mockup-stat-value.green { color: #4ade80; }
+      .mockup-stat.urgent {
+        background: #fef4d6;
+        border-left: 3px solid #f7c548;
+      }
+      .mockup-stat-label { font-size: 10px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+      .mockup-stat.urgent .mockup-stat-label { color: #b8870a; }
+      .mockup-stat-value { font-size: 20px; font-weight: 800; color: var(--navy); }
+      .mockup-stat-value.green { color: var(--green); }
       .mockup-stat-value.blue  { color: #669bbc; }
-      .mockup-stat-value.amber { color: #f7c548; }
-      .mockup-chart { display: flex; align-items: flex-end; gap: 8px; height: 80px; padding-top: 8px; }
-      .mockup-bar-item { flex: 1; border-radius: 5px 5px 0 0; min-height: 12px; }
+      .mockup-stat-value.amber { color: #b8870a; }
+      .mockup-grades { background: #f7f7f7; border-radius: 10px; padding: 12px; }
+      .mockup-grade-row { display: flex; align-items: center; gap: 8px; font-size: 11px; margin-bottom: 6px; }
+      .mockup-grade-row:last-child { margin-bottom: 0; }
+      .mockup-grade-label { width: 50px; color: #374151; font-weight: 600; }
+      .mockup-grade-bar { flex: 1; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; }
+      .mockup-grade-fill { height: 100%; border-radius: 3px; }
+      .mockup-grade-pct { width: 32px; text-align: right; font-weight: 700; color: var(--navy); font-size: 11px; }
 
       /* ── SOCIAL PROOF STRIP ──────────────────────── */
       .proof-strip { padding: 48px 0; background: #fff; border-bottom: 1px solid #f7f7f7; }
@@ -311,6 +335,7 @@ const LandingPage = () => {
         .hero .container { grid-template-columns: 1fr; text-align: center; padding-top: 110px; }
         .hero-text p { margin-left: auto; margin-right: auto; }
         .hero-buttons { justify-content: center; }
+        .hero-stats { justify-content: center; }
         .hero-visual { display: none; }
         .pain-grid { grid-template-columns: 1fr; }
         .features-grid { grid-template-columns: 1fr; }
@@ -384,7 +409,7 @@ const LandingPage = () => {
             <a href="#pricing">Pricing</a>
             <a href="#faq">FAQ</a>
             <a href="#contact">Contact</a>
-            <Link to="/login" style={{ color: 'rgba(255,255,255,.7)', textDecoration: 'none', fontSize: '14px', fontWeight: '600' }}>Sign in</Link>
+            <Link to="/login" className="nav-signin" style={{ textDecoration: 'none', fontSize: '14px', fontWeight: '600' }}>Sign in</Link>
             <Link to="/request-demo" className="btn btn-primary nav-cta">Request a Demo</Link>
           </div>
           <button className="nav-hamburger" onClick={() => setMobileMenu(true)} aria-label="Open menu">
@@ -406,18 +431,32 @@ const LandingPage = () => {
         <Link to="/request-demo" onClick={navClick} className="btn btn-primary" style={{ marginTop: 8 }}>Request a Demo</Link>
       </div>
 
-      {/* ═══════ HERO ═══════ */}
+      {/* ═══════ HERO (Modern Academic) ═══════ */}
       <section className="hero">
         <div className="container">
           <div className="hero-text animate">
-            <h1>Run your school<br /><span>without the chaos.</span></h1>
-            <p>Skolo is an AI-powered school management platform built for schools in Lesotho and South Africa. Track fees, attendance, grades, and timetables &mdash; with smart insights that help you act before problems grow.</p>
+            <h1>Less admin.<br /><span>More learning.</span></h1>
+            <p>The school management platform built for Lesotho and South Africa. Fees, attendance, communication, and academics &mdash; all in one place. Less paperwork for staff, more visibility for parents.</p>
             <div className="hero-buttons">
-              <Link to="/request-demo" className="btn btn-primary">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              <Link to="/request-demo" className="btn btn-amber">
                 Request a Demo
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </Link>
               <a href="#demo" className="btn btn-outline">See how it works</a>
+            </div>
+            <div className="hero-stats">
+              <div>
+                <div className="hero-stat-num">12</div>
+                <div className="hero-stat-label">Schools onboarded</div>
+              </div>
+              <div>
+                <div className="hero-stat-num">3,400+</div>
+                <div className="hero-stat-label">Learners managed</div>
+              </div>
+              <div>
+                <div className="hero-stat-num">2</div>
+                <div className="hero-stat-label">Countries · Lesotho &amp; SA</div>
+              </div>
             </div>
           </div>
           <div className="hero-visual animate delay-2">
@@ -425,17 +464,30 @@ const LandingPage = () => {
               <div className="mockup-bar">
                 <div className="mockup-dot"></div><div className="mockup-dot"></div><div className="mockup-dot"></div>
               </div>
+              <div className="mockup-title">Lerato Primary · Dashboard</div>
               <div className="mockup-stats">
-                <div className="mockup-stat"><div className="mockup-stat-label">Learners</div><div className="mockup-stat-value">247</div></div>
-                <div className="mockup-stat"><div className="mockup-stat-label">Collection rate</div><div className="mockup-stat-value green">89%</div></div>
-                <div className="mockup-stat"><div className="mockup-stat-label">Attendance</div><div className="mockup-stat-value blue">94%</div></div>
-                <div className="mockup-stat"><div className="mockup-stat-label">Outstanding</div><div className="mockup-stat-value amber">R12,400</div></div>
+                <div className="mockup-stat"><div className="mockup-stat-label">Learners</div><div className="mockup-stat-value">487</div></div>
+                <div className="mockup-stat"><div className="mockup-stat-label">Collected</div><div className="mockup-stat-value">M 142,800</div></div>
+                <div className="mockup-stat urgent"><div className="mockup-stat-label">Outstanding</div><div className="mockup-stat-value amber">M 28,400</div></div>
+                <div className="mockup-stat"><div className="mockup-stat-label">Rate</div><div className="mockup-stat-value">83%</div></div>
               </div>
-              <div style={{ fontSize:'10px', fontWeight:'700', color:'rgba(255,255,255,.3)', textTransform:'uppercase', letterSpacing:'1px', marginBottom:'10px' }}>Monthly collection</div>
-              <div className="mockup-chart">
-                {[45,55,65,50,75,90].map((h,i) => (
-                  <div key={i} className="mockup-bar-item" style={{ height:`${h}%`, background:`rgba(0,48,73,${0.3+i*0.1})` }}></div>
-                ))}
+              <div className="mockup-grades">
+                <div style={{ fontSize:11, fontWeight:700, color:'#6b7280', textTransform:'uppercase', letterSpacing:'.5px', marginBottom:8 }}>Collection by grade</div>
+                <div className="mockup-grade-row">
+                  <div className="mockup-grade-label">Grade 1</div>
+                  <div className="mockup-grade-bar"><div className="mockup-grade-fill" style={{ background:'var(--green)', width:'88%' }}></div></div>
+                  <div className="mockup-grade-pct">88%</div>
+                </div>
+                <div className="mockup-grade-row">
+                  <div className="mockup-grade-label">Grade 2</div>
+                  <div className="mockup-grade-bar"><div className="mockup-grade-fill" style={{ background:'var(--amber)', width:'71%' }}></div></div>
+                  <div className="mockup-grade-pct">71%</div>
+                </div>
+                <div className="mockup-grade-row">
+                  <div className="mockup-grade-label">Grade 3</div>
+                  <div className="mockup-grade-bar"><div className="mockup-grade-fill" style={{ background:'var(--green)', width:'91%' }}></div></div>
+                  <div className="mockup-grade-pct">91%</div>
+                </div>
               </div>
             </div>
           </div>
