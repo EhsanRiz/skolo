@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
 import { t } from '../components/ui'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
@@ -513,9 +513,7 @@ export default function Timetable() {
         if (allClasses.length > 0 && !isTeacher) {
           setSelectedClass(allClasses[0].id)
         }
-      } catch {
-        toast.error('Failed to load timetable data')
-      } finally { setLoading(false) }
+      } catch (err) { toast.error(errMessage(err, 'Failed to load timetable data')) } finally { setLoading(false) }
     }
     load()
   }, [])
@@ -585,7 +583,7 @@ export default function Timetable() {
       setAllSlots(prev => [...prev, data])
       toast.success('Assigned!')
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to assign — teacher may be busy')
+      toast.error(errMessage(err, 'Failed to assign — teacher may be busy'))
     }
   }
 
@@ -595,7 +593,7 @@ export default function Timetable() {
       await api.delete(`/timetable/${slotId}`)
       setSlots(prev => prev.filter(s => s.id !== slotId))
       setAllSlots(prev => prev.filter(s => s.id !== slotId))
-    } catch { toast.error('Failed to remove') }
+    } catch (err) { toast.error(errMessage(err, 'Failed to remove')) }
   }
 
   // ── Stats ────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { IconTrash, t } from '../components/ui'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 
 const TYPE_COLORS = {
   academic: { bg: '#e6eff5', color: '#003049', dot: '#003049' },
@@ -26,7 +26,7 @@ export default function Events() {
   const save = async e => {
     e.preventDefault(); setSaving(true)
     try { await api.post('/events', form); setShow(false); setForm(empty); load() }
-    catch (err) { alert(err.response?.data?.error || 'Failed') }
+    catch (err) { alert(errMessage(err, 'Failed')) }
     finally { setSaving(false) }
   }
 

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
 import { t } from '../components/ui'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 import { SkeletonRows, EmptyState } from '../components/ui'
 
 export default function Messages() {
@@ -69,7 +69,7 @@ export default function Messages() {
       setNewMsg('')
       await loadMessages(activeConv.id)
       loadConversations()
-    } catch { toast.error('Failed to send') }
+    } catch (err) { toast.error(errMessage(err, 'Failed to send')) }
     setSending(false)
   }
 
@@ -95,7 +95,7 @@ export default function Messages() {
       conv.participants = [{ user_id: parent.id, name: parent.full_name, role: 'parent' }]
       setActiveConv(conv)
       loadConversations()
-    } catch { toast.error('Failed to start conversation') }
+    } catch (err) { toast.error(errMessage(err, 'Failed to start conversation')) }
   }
 
   function getConvName(conv) {

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { errMessage } from '../lib/api'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -47,7 +48,7 @@ export default function Login() {
   const submit = async e => {
     e.preventDefault(); setError(''); setLoading(true)
     try { await login(form.email, form.password); navigate('/dashboard') }
-    catch (err) { setError(err.response?.data?.error || 'Invalid email or password') }
+    catch (err) { setError(errMessage(err, 'Invalid email or password')) }
     finally { setLoading(false) }
   }
 

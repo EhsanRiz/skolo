@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 
 export default function SuperAdminLogin() {
   const navigate = useNavigate()
@@ -18,7 +18,7 @@ export default function SuperAdminLogin() {
       localStorage.setItem('sa_token', data.token)
       navigate('/super-admin')
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed')
+      setError(errMessage(err, 'Login failed'))
     } finally {
       setLoading(false)
     }

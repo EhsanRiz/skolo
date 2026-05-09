@@ -68,6 +68,12 @@ The token system lives at `frontend/src/components/ui.jsx` (the `t` object). Mos
 
 ## Recent Sessions
 
+### 8 May 2026 — Error message sweep (no more silent 'Failed' toasts)
+
+- **Root issue surfaced by the Record Payment bug:** the `err.response?.data?.error || 'Failed'` pattern only shows the backend's JSON `.error` field. If a 500 has no JSON body, or it's a network error, axios throws but the toast says "Failed" with no detail — the actual cause (the Record Payment URL was hitting `/fee-ledger/undefined/pay`) was hidden behind that generic toast.
+- **New helper `errMessage(err, fallback)`** added to both `frontend/src/lib/api.js` and `parent-app/src/lib/api.js`. Falls through: `response.data.error → response.data.message → err.message → fallback`. The middle two cover: backends that use `.message` instead of `.error`, network errors (`err.message = "Network Error"`), and 5xx with no body (`err.message = "Request failed with status code 500"`).
+- **Swept 21 files** across staff + parent: replaced every `err.response?.data?.error || 'X'` with `errMessage(err, 'X')`, converted bare `catch { toast.error('X') }` to `catch (err) { toast.error(errMessage(err, 'X')) }`, and upgraded the remaining `alert()` calls in Learners and parent-app Grades to surface the real error too. Pre-emptive validation messages (e.g. "Passwords do not match") were left alone — those aren't catching errors.
+
 ### 8 May 2026 — Conditional sidebar badges + loading-state polish
 
 - **New backend endpoint `GET /sidebar-counts`** (auth-gated, role-aware) returns `{ messages, waivers, fees, attendance }` in a single call. Pending waivers shown only to admin/principal; overdue fees to admin/bursar/principal; attendance-alerts (learners < 80% in current month) to admin/principal. Messages count for everyone.

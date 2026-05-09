@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
 import * as XLSX from 'xlsx'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 
 // Open receipt in a new printable window
 function printReceipt(entry, schoolName, sym, schoolLogoUrl) {
@@ -413,7 +413,7 @@ export default function Fees() {
       })
       toast.success('Waiver request submitted — pending approval from principal/admin')
       setWaiveEntry(null); loadLedger()
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
+    } catch (err) { toast.error(errMessage(err, 'Failed')) }
     finally { setWaiving(false) }
   }
 
@@ -422,7 +422,7 @@ export default function Fees() {
     try {
       await api.post(`/fee-ledger/${id}/remove-waiver`)
       toast.success('Waiver removed'); loadLedger(); loadSummary()
-    } catch { toast.error('Failed') }
+    } catch (err) { toast.error(errMessage(err, 'Failed')) }
   }
 
   const recordPay = async e => {
@@ -433,14 +433,14 @@ export default function Fees() {
       setPayEntry(null); loadLedger(); loadSummary()
       // Small delay so ledger reloads with updated data before printing
       toast.success('Payment recorded — click the receipt icon to print')
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
+    } catch (err) { toast.error(errMessage(err, 'Failed')) }
     finally { setPaying(false) }
   }
 
   const deleteLedger = async id => {
     if (!confirm('Delete this fee entry?')) return
     try { await api.delete(`/fee-ledger/${id}`); toast.success('Entry deleted'); loadLedger(); loadSummary() }
-    catch (err) { toast.error(err.response?.data?.error || 'Failed') }
+    catch (err) { toast.error(errMessage(err, 'Failed')) }
   }
 
   const fetchPreview = async e => {
@@ -462,7 +462,7 @@ export default function Fees() {
       setShowGen(false); setPreview(null)
       toast.success(`Generated ${data.created} entries · ${data.skipped} already existed`)
       loadLedger(); loadSummary()
-    } catch (err) { toast.error(err.response?.data?.error || 'Generation failed') }
+    } catch (err) { toast.error(errMessage(err, 'Generation failed')) }
     finally { setGenerating(false) }
   }
 

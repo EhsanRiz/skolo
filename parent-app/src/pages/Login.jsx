@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { errMessage } from '../lib/api'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
@@ -17,7 +18,7 @@ export default function Login() {
     try {
       await login(email, password)
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Login failed')
+      toast.error(errMessage(err, 'Login failed'))
     } finally {
       setLoading(false)
     }

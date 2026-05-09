@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 
 const CSS = `
 @keyframes fadeIn {
@@ -36,7 +36,7 @@ export default function Register() {
         setAdmin(a => ({ ...a, email: r.data.email }))
       })
       .catch(err => {
-        setError(err.response?.data?.error || 'Invalid or expired invite link')
+        setError(errMessage(err, 'Invalid or expired invite link'))
       })
       .finally(() => setValidating(false))
   }, [inviteToken])
@@ -59,7 +59,7 @@ export default function Register() {
       localStorage.setItem('sk_token', data.token)
       localStorage.setItem('sk_user', JSON.stringify(data.user))
       navigate('/dashboard')
-    } catch (err) { setError(err.response?.data?.error || 'Registration failed') }
+    } catch (err) { setError(errMessage(err, 'Registration failed')) }
     finally { setLoading(false) }
   }
 

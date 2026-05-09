@@ -27,3 +27,13 @@ api.interceptors.response.use(
 )
 
 export default api
+
+// Best-effort error message extraction for axios errors.
+// Falls back through: backend JSON .error → backend JSON .message → axios err.message → fallback.
+// Use in catch blocks: toast.error(errMessage(err, 'Could not save'))
+export function errMessage(err, fallback = 'Something went wrong') {
+  return err?.response?.data?.error
+      || err?.response?.data?.message
+      || err?.message
+      || fallback
+}

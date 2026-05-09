@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 
 // ════════════════════════════════════════════════════════════
@@ -175,7 +175,7 @@ export default function SuperAdmin() {
       setInviteEmail('')
       loadInvites()
     } catch (err) {
-      setInviteMsg({ type: 'error', text: err.response?.data?.error || 'Failed to send invite' })
+      setInviteMsg({ type: 'error', text: errMessage(err, 'Failed to send invite') })
     } finally {
       setInviteLoading(false)
     }

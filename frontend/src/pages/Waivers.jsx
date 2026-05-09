@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 import { SkeletonRows } from '../components/ui'
 
 const STATUS = {
@@ -38,7 +38,7 @@ export default function Waivers() {
       await api.post(`/waivers/${selected.id}/approve`, { review_note: reviewNote })
       toast.success('Waiver approved — ledger updated')
       setSelected(null); setReviewNote(''); load()
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
+    } catch (err) { toast.error(errMessage(err, 'Failed')) }
     finally { setActing(false) }
   }
 
@@ -49,7 +49,7 @@ export default function Waivers() {
       await api.post(`/waivers/${selected.id}/reject`, { review_note: reviewNote })
       toast.success('Waiver rejected')
       setSelected(null); setReviewNote(''); load()
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
+    } catch (err) { toast.error(errMessage(err, 'Failed')) }
     finally { setActing(false) }
   }
 

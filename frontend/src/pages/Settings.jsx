@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
 import { IconUpload, IconEdit, ActionBtn, t } from '../components/ui'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 
 const PRESETS = ['Grade R','Grade 1','Grade 2','Grade 3','Grade 4','Grade 5',
   'Grade 6','Grade 7','Grade 8','Grade 9','Grade 10','Grade 11','Grade 12']
@@ -132,7 +132,7 @@ export default function Settings() {
   const addGrade = async name => {
     const n = (name||newGrade).trim(); if(!n) return
     try { await api.post('/grades',{name:n,display_order:grades.length}); setNewGrade(''); loadGrades(); toast.success(`"${n}" added`) }
-    catch(err){ toast.error(err.response?.data?.error||'Failed') }
+    catch(err){ toast.error(errMessage(err, 'Failed')) }
   }
   const addAllPresets = async () => {
     const existing = grades.map(g=>g.name)
@@ -140,7 +140,7 @@ export default function Settings() {
     if(!toAdd.length){ toast.info('All standard grades already added'); return }
     setSaving(true)
     try { for(let i=0;i<toAdd.length;i++) await api.post('/grades',{name:toAdd[i],display_order:grades.length+i}); loadGrades(); toast.success(`${toAdd.length} grades added`) }
-    catch{ toast.error('Failed') } finally{ setSaving(false) }
+    catch (err) { toast.error(errMessage(err, 'Failed')) } finally{ setSaving(false) }
   }
   const deleteGrade = (id,name) => {
     showConfirm({
@@ -149,18 +149,18 @@ export default function Settings() {
       onConfirm: async () => {
         closeConfirm()
         try{ await api.delete(`/grades/${id}`); loadGrades(); toast.success('Grade deleted') }
-        catch(err){ toast.error(err.response?.data?.error||'Failed') }
+        catch(err){ toast.error(errMessage(err, 'Failed')) }
       }
     })
   }
   const addClass = async gradeId => {
     const name=(newClasses[gradeId]||'').trim(); if(!name) return
     try{ await api.post('/grades/classes',{grade_id:gradeId,name}); setNewClasses(p=>({...p,[gradeId]:''})); loadGrades() }
-    catch(err){ toast.error(err.response?.data?.error||'Failed') }
+    catch(err){ toast.error(errMessage(err, 'Failed')) }
   }
   const deleteClass = async id => {
     try{ await api.delete(`/grades/classes/${id}`); loadGrades() }
-    catch(err){ toast.error(err.response?.data?.error||'Failed') }
+    catch(err){ toast.error(errMessage(err, 'Failed')) }
   }
 
   // ── FEE PLANS ─────────────────────────────────────────────────
@@ -171,12 +171,12 @@ export default function Settings() {
       setShowFeePlan(false)
       setFpForm({ name:'', grade_id:'', amount:'', frequency:'monthly', due_day:1, term:1, year:new Date().getFullYear() })
       loadFeePlans(); toast.success('Fee plan created')
-    } catch(err){ toast.error(err.response?.data?.error||'Failed') }
+    } catch(err){ toast.error(errMessage(err, 'Failed')) }
     finally{ setSaving(false) }
   }
   const togglePlan = async(id, is_active) => {
     try{ await api.patch(`/fee-plans/${id}`,{is_active:!is_active}); loadFeePlans() }
-    catch{ toast.error('Failed') }
+    catch (err) { toast.error(errMessage(err, 'Failed')) }
   }
   const deletePlan = (id) => {
     showConfirm({
@@ -185,7 +185,7 @@ export default function Settings() {
       onConfirm: async () => {
         closeConfirm()
         try{ await api.delete(`/fee-plans/${id}`); loadFeePlans(); toast.success('Fee plan deleted') }
-        catch(err){ toast.error(err.response?.data?.error||'Failed') }
+        catch(err){ toast.error(errMessage(err, 'Failed')) }
       }
     })
   }
@@ -204,7 +204,7 @@ export default function Settings() {
       setShowTeacher(false); setEditTeacher(null)
       setTcForm({ full_name:'', email:'', phone:'', subject:'' })
       loadTeachers()
-    } catch(err){ toast.error(err.response?.data?.error||'Failed') }
+    } catch(err){ toast.error(errMessage(err, 'Failed')) }
     finally{ setSaving(false) }
   }
   const openEditTeacher = tc => {
@@ -218,7 +218,7 @@ export default function Settings() {
       onConfirm: async () => {
         closeConfirm()
         try{ await api.delete(`/teachers/${id}`); loadTeachers(); toast.success('Teacher deactivated') }
-        catch{ toast.error('Failed') }
+        catch (err) { toast.error(errMessage(err, 'Failed')) }
       }
     })
   }
@@ -232,12 +232,12 @@ export default function Settings() {
     try {
       await api.post('/teacher-classes', { teacher_id: assignTeacher.id, ...assignForm })
       setAssignTeacher(null); loadTeacherClasses(); toast.success('Class assigned')
-    } catch(err) { toast.error(err.response?.data?.error||'Failed') }
+    } catch(err) { toast.error(errMessage(err, 'Failed')) }
     finally { setSaving(false) }
   }
   const removeTeacherClass = async id => {
     try { await api.delete(`/teacher-classes/${id}`); loadTeacherClasses(); toast.success('Class removed') }
-    catch { toast.error('Failed') }
+    catch (err) { toast.error(errMessage(err, 'Failed')) }
   }
 
   // Link user account to teacher
@@ -248,14 +248,14 @@ export default function Settings() {
     try {
       await api.patch(`/teacher-classes/link-user/${linkTeacher.id}`, { user_id: linkUserId||null })
       setLinkTeacher(null); loadTeachers(); toast.success('Account linked')
-    } catch(err) { toast.error(err.response?.data?.error||'Failed') }
+    } catch(err) { toast.error(errMessage(err, 'Failed')) }
   }
 
   // ── PROFILE ───────────────────────────────────────────────────
   const saveProfile = async e => {
     e.preventDefault(); setSaving(true)
     try{ await api.patch('/schools/me',profile); toast.success('Profile updated') }
-    catch(err){ toast.error(err.response?.data?.error||'Failed') }
+    catch(err){ toast.error(errMessage(err, 'Failed')) }
     finally{ setSaving(false) }
   }
   const handleLogoFile = async e => {
@@ -267,7 +267,7 @@ export default function Settings() {
       try {
         const { data } = await api.post('/upload/logo',{ base64:ev.target.result.split(',')[1], mime_type:file.type, file_name:file.name })
         setLogoPreview(data.logo_url); await refreshSchool(); toast.success('Logo uploaded successfully')
-      } catch(err){ toast.error(err.response?.data?.error||'Upload failed') }
+      } catch(err){ toast.error(errMessage(err, 'Upload failed')) }
       finally{ setUploading(false) }
     }
     reader.readAsDataURL(file)
@@ -284,7 +284,7 @@ export default function Settings() {
       if (data.invite_sent) toast.success(`Invite email sent to ${userForm.email}`)
       else toast.success(`Account created — share this link: ${data.invite_url}`)
     }
-    catch(err){ toast.error(err.response?.data?.error||'Failed') }
+    catch(err){ toast.error(errMessage(err, 'Failed')) }
     finally{ setSaving(false) }
   }
 
@@ -297,7 +297,7 @@ export default function Settings() {
         navigator.clipboard.writeText(data.invite_url).catch(()=>{})
         toast.success(`Link copied to clipboard — share via WhatsApp`)
       }
-    } catch { toast.error('Failed to resend invite') }
+    } catch (err) { toast.error(errMessage(err, 'Failed to resend invite')) }
   }
 
   const copyInviteLink = async (userId) => {
@@ -307,7 +307,7 @@ export default function Settings() {
         await navigator.clipboard.writeText(data.invite_url)
         toast.success('Invite link copied — paste into WhatsApp or email')
       }
-    } catch { toast.error('Failed to generate link') }
+    } catch (err) { toast.error(errMessage(err, 'Failed to generate link')) }
   }
 
   const deleteUser = (userId, name) => {
@@ -322,7 +322,7 @@ export default function Settings() {
           await api.delete(`/users/${userId}`)
           loadUsers()
           toast.success('Account deleted')
-        } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
+        } catch (err) { toast.error(errMessage(err, 'Failed')) }
       }
     })
   }
@@ -331,13 +331,13 @@ export default function Settings() {
     const payload={full_name:editForm.full_name,email:editForm.email,role:editForm.role}
     if(editForm.password) payload.password=editForm.password
     try{ await api.patch(`/users/${editUser.id}`,payload); setEditUser(null); loadUsers(); toast.success('Account updated') }
-    catch(err){ toast.error(err.response?.data?.error||'Failed') }
+    catch(err){ toast.error(errMessage(err, 'Failed')) }
     finally{ setSaving(false) }
   }
   const toggleUser = async u => {
     if(u.id===currentUser?.id){ toast.warning("Can't disable your own account"); return }
     try{ await api.patch(`/users/${u.id}`,{is_active:!u.is_active}); loadUsers(); toast.success(u.is_active?'Account disabled':'Account enabled') }
-    catch{ toast.error('Failed') }
+    catch (err) { toast.error(errMessage(err, 'Failed')) }
   }
   const openEditUser = u => { setEditForm({full_name:u.full_name,email:u.email,role:u.role,password:''}); setEditUser(u) }
 
@@ -677,7 +677,7 @@ export default function Settings() {
                         const r = await api.post('/users/bulk-invite-parents')
                         toast.success(`Invited ${r.data.invited} guardian(s), ${r.data.emails_sent} email(s) sent`)
                         loadGuardians()
-                      } catch(e){ toast.error(e.response?.data?.error||'Bulk invite failed') }
+                      } catch(e){ toast.error(errMessage(e, 'Bulk invite failed')) }
                       finally{ setSaving(false) }
                     }}>
                     {saving?'Sending…':`Invite all (${notInvited})`}
@@ -734,7 +734,7 @@ export default function Settings() {
                                       const r = await api.post('/users/invite-parent',{guardian_id:g.id})
                                       toast.success(`Invite sent to ${g.first_name}${r.data.email_sent?' — email delivered':''}`)
                                       loadGuardians()
-                                    } catch(e){ toast.error(e.response?.data?.error||'Invite failed') }
+                                    } catch(e){ toast.error(errMessage(e, 'Invite failed')) }
                                     finally{ setInviting(null) }
                                   }}>
                                   {inviting===g.id?'Sending…':g.status==='invited'?'Resend':'Send invite'}
@@ -1006,7 +1006,7 @@ function TimetableTab({ school, refreshSchool, toast }) {
         setSlots(timetableRes.data || [])
         setTcs(tcRes.data || [])
       }).catch(err => {
-        const msg = err.response?.data?.error || 'Failed to load timetable data'
+        const msg = errMessage(err, 'Failed to load timetable data')
         setTimetableError(msg)
         toast.error(msg)
       }).finally(() => setLoadingTimetable(false))
@@ -1058,7 +1058,7 @@ function TimetableTab({ school, refreshSchool, toast }) {
       await refreshSchool()
       setPeriods(cleaned)
       toast.success('Periods saved')
-    } catch { toast.error('Failed to save periods') }
+    } catch (err) { toast.error(errMessage(err, 'Failed to save periods')) }
     finally { setSaving(false) }
   }
 
@@ -1087,14 +1087,14 @@ function TimetableTab({ school, refreshSchool, toast }) {
       })
       setSlots(prev => [...prev, data])
       toast.success('Slot assigned')
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed to assign') }
+    } catch (err) { toast.error(errMessage(err, 'Failed to assign')) }
   }
 
   async function removeSlot(slotId) {
     try {
       await api.delete(`/timetable/${slotId}`)
       setSlots(prev => prev.filter(s => s.id !== slotId))
-    } catch { toast.error('Failed to remove') }
+    } catch (err) { toast.error(errMessage(err, 'Failed to remove')) }
   }
 
   const teachablePeriods = periods.filter(p => !p.isBreak)
@@ -1278,7 +1278,7 @@ function GradeScaleTab({ school, refreshSchool, toast }) {
       await refreshSchool()
       setRows(cleaned)
       toast.success('Grade scale saved')
-    } catch { toast.error('Failed to save grade scale') }
+    } catch (err) { toast.error(errMessage(err, 'Failed to save grade scale')) }
     finally { setSaving(false) }
   }
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 import { useToast } from '../contexts/ToastContext'
 
 export default function SetPassword() {
@@ -44,7 +44,7 @@ export default function SetPassword() {
       toast.success('Account created! Welcome to Skolo Parent.')
       window.location.href = '/dashboard'
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong')
+      toast.error(errMessage(err, 'Something went wrong'))
     } finally {
       setSubmitting(false)
     }

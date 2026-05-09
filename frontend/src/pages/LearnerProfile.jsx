@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 import { SkeletonRows, SkeletonCard } from '../components/ui'
 
 // ── Constants ─────────────────────────────────────────────────
@@ -138,7 +138,7 @@ function OverviewTab({ learner, school }) {
       const { data } = await api.post('/portal/generate', { guardian_id: guardian.id })
       setPortalUrl(`${window.location.origin}/parent/${data.token}`)
       toast.success('Portal link generated')
-    } catch { toast.error('Failed to generate portal link') }
+    } catch (err) { toast.error(errMessage(err, 'Failed to generate portal link')) }
     finally { setGeneratingLink(false) }
   }
 
@@ -269,7 +269,7 @@ function FeesTab({ learnerId, sym, isReadOnly }) {
       const { data } = await api.post('/fee-ledger/auto-generate')
       if (data.created > 0) { toast.success(`${data.created} fee entr${data.created>1?'ies':'y'} generated`); load() }
       else toast.info('No new entries — check fee plans exist in Settings → Fee Plans for this grade')
-    } catch { toast.error('Failed to generate fees') }
+    } catch (err) { toast.error(errMessage(err, 'Failed to generate fees')) }
     finally { setCatchingUp(false) }
   }
 
@@ -281,7 +281,7 @@ function FeesTab({ learnerId, sym, isReadOnly }) {
       await api.post(`/fee-ledger/${payEntry.id}/pay`, payForm)
       toast.success('Payment recorded')
       setPayEntry(null); load()
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
+    } catch (err) { toast.error(errMessage(err, 'Failed')) }
     finally { setPaying(false) }
   }
 
@@ -566,7 +566,7 @@ function AwardsTab({ learnerId }) {
   const save = async e => {
     e.preventDefault(); setSaving(true)
     try { await api.post(`/learner-profile/${learnerId}/awards`, form); setShow(false); setForm({ title:'',description:'',award_date:'' }); load(); toast.success('Award added') }
-    catch (err) { toast.error(err.response?.data?.error||'Failed') }
+    catch (err) { toast.error(errMessage(err, 'Failed')) }
     finally { setSaving(false) }
   }
 
@@ -647,7 +647,7 @@ function NotesTab({ learnerId }) {
     if (!text.trim()) return
     setSaving(true)
     try { await api.post(`/learner-profile/${learnerId}/notes`, { note:text }); setText(''); load(); toast.success('Note saved') }
-    catch { toast.error('Failed to save note') }
+    catch (err) { toast.error(errMessage(err, 'Failed to save note')) }
     finally { setSaving(false) }
   }
 

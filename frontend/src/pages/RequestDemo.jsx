@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 
 const CSS = `
 .demo-wrapper {
@@ -327,7 +327,7 @@ export default function RequestDemo() {
       })
       setSubmitted(true)
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to submit demo request. Please try again.')
+      setError(errMessage(err, 'Failed to submit demo request. Please try again.'))
     } finally {
       setLoading(false)
     }

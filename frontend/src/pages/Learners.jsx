@@ -5,7 +5,7 @@ import { useToast } from '../contexts/ToastContext'
 import { IconEye, IconEdit, IconTrash, ActionBtn, t } from '../components/ui'
 import * as XLSX from 'xlsx'
 import Papa from 'papaparse'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 
 const phonePlaceholder = c => c === 'ZA' ? '082 000 0000' : 'XXXX XXXX'
 const phoneMaxLen      = c => c === 'ZA' ? 10 : 8
@@ -59,7 +59,7 @@ function PortalLinkBox({ learnerId, guardians }) {
       const { data } = await api_.post('/portal/generate', { guardian_id: primary.id })
       const baseUrl = window.location.origin
       setPortalUrl(`${baseUrl}/parent/${data.token}`)
-    } catch (err) { alert('Failed to generate portal link') }
+    } catch (err) { alert(errMessage(err, 'Failed to generate portal link')) }
     finally { setGenerating(false) }
   }
 
@@ -161,7 +161,7 @@ export default function Learners() {
       await api.post('/learners', { learner: form, guardian })
       toast.success('Learner added successfully')
       close(); load()
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed to save') }
+    } catch (err) { toast.error(errMessage(err, 'Failed to save')) }
     finally { setSaving(false) }
   }
 
@@ -171,7 +171,7 @@ export default function Learners() {
       await api.patch(`/learners/${selected.id}`, form)
       toast.success('Learner updated')
       close(); load()
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed to update') }
+    } catch (err) { toast.error(errMessage(err, 'Failed to update')) }
     finally { setSaving(false) }
   }
 
@@ -192,7 +192,7 @@ export default function Learners() {
       const rows = await parseFile(file)
       setImportRows(rows)
       setImportResult(null)
-    } catch { toast.error('Could not read file. Use CSV or Excel (.xlsx)') }
+    } catch (err) { toast.error(errMessage(err, 'Could not read file. Use CSV or Excel (.xlsx)')) }
     e.target.value = ''
   }
 
@@ -207,7 +207,7 @@ export default function Learners() {
         load()
       }
       if (data.skipped > 0) toast.warning(`${data.skipped} row${data.skipped > 1 ? 's' : ''} skipped — see details below`)
-    } catch (err) { toast.error(err.response?.data?.error || 'Import failed') }
+    } catch (err) { toast.error(errMessage(err, 'Import failed')) }
     finally { setImportLoading(false) }
   }
 

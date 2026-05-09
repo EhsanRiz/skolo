@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { IconTrash, t } from '../components/ui'
 import { useToast } from '../contexts/ToastContext'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 
 const empty = { title: '', body: '', target: 'all', send_sms: false }
 
@@ -91,7 +91,7 @@ export default function Announcements() {
       const { data } = await api.post('/announcements', form)
       setLast(data); setShow(false); setForm(empty); load()
       toast.success('Announcement sent!')
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed') }
+    } catch (err) { toast.error(errMessage(err, 'Failed')) }
     finally { setSaving(false) }
   }
 
@@ -105,7 +105,7 @@ export default function Announcements() {
       onConfirm: async () => {
         setConfirmModal({ open: false })
         try { await api.delete(`/announcements/${id}`); load(); toast.success('Deleted') }
-        catch { toast.error('Failed to delete') }
+        catch (err) { toast.error(errMessage(err, 'Failed to delete')) }
       }
     })
   }

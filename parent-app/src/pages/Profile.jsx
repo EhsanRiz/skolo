@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 
 export default function Profile() {
   const { user, refreshDashboard } = useAuth()
@@ -46,7 +46,7 @@ export default function Profile() {
       setMsg({ type: 'success', text: 'Profile updated successfully' })
       refreshDashboard()
     } catch (err) {
-      setMsg({ type: 'error', text: err.response?.data?.error || 'Failed to update' })
+      setMsg({ type: 'error', text: errMessage(err, 'Failed to update') })
     }
     setSaving(false)
   }
@@ -64,7 +64,7 @@ export default function Profile() {
       setPwMsg({ type: 'success', text: 'Password changed successfully' })
       setCurrentPw(''); setNewPw(''); setConfirmPw('')
     } catch (err) {
-      setPwMsg({ type: 'error', text: err.response?.data?.error || 'Failed to change password' })
+      setPwMsg({ type: 'error', text: errMessage(err, 'Failed to change password') })
     }
     setPwSaving(false)
   }

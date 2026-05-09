@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 
 const TERMS = [1, 2, 3, 4]
 
@@ -56,7 +56,7 @@ export default function Grades() {
       const response = await api.get(`/parent-data/report-card/${learnerId}?term=${term}&year=${year}`, { responseType: 'blob' })
       const url = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
       window.open(url, '_blank')
-    } catch { alert('Report card not available') }
+    } catch (err) { alert(errMessage(err, 'Report card not available')) }
     setDownloading(null)
   }
 

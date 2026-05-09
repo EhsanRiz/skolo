@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import api from '../lib/api'
+import api, { errMessage } from '../lib/api'
 import { useToast } from '../contexts/ToastContext'
 
 export default function ResetPassword() {
@@ -21,7 +21,7 @@ export default function ResetPassword() {
       await api.post('/parent-auth/reset-password', { token, password })
       setDone(true)
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to reset password')
+      toast.error(errMessage(err, 'Failed to reset password'))
     }
     setLoading(false)
   }
